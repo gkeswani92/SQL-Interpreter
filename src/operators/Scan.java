@@ -73,12 +73,12 @@ public class Scan extends Operator{
 		}
 	}
 	
-/*	public static void main(String[] args) {
+	public static void main(String[] args) {
 		Scan op = new Scan("Boats");
 		System.out.println(op.getNextTuple().toStringValues());
 		System.out.println(op.getNextTuple().toStringValues());
 		op.reset();
 		System.out.println(op.getNextTuple().toStringValues());
-		System.out.println(op.getNextTuple().toStringValues());	
-	}*/
+		System.out.println(op.getNextTuple().toStringValues());
+	}
 }
