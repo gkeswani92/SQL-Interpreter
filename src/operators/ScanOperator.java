@@ -7,14 +7,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Scan extends Operator{
+public class ScanOperator extends Operator{
 	
 	private String tableName; 
 	private FileReader fileReaderObj;
 	private BufferedReader file;
 	private static final String filePath = "samples/input/db/data/Boats.csv"; //TODO: Remove the hard coding
 	
-	Scan(String tableName) {
+	public ScanOperator(String tableName) {
 		this.tableName = tableName;
 		try {
 			fileReaderObj = new FileReader(filePath);
@@ -74,7 +74,7 @@ public class Scan extends Operator{
 	}
 	
 	public static void main(String[] args) {
-		Scan op = new Scan("Boats");
+		ScanOperator op = new ScanOperator("Boats");
 		System.out.println(op.getNextTuple().toStringValues());
 		System.out.println(op.getNextTuple().toStringValues());
 		op.reset();

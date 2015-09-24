@@ -1,4 +1,4 @@
-package cs4321.Project2;
+package parser;
 import java.io.FileReader;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.statement.Statement;
