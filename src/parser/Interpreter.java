@@ -3,6 +3,7 @@ package parser;
 import java.io.FileReader;
 import java.util.List;
 
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
@@ -33,9 +34,16 @@ public class Interpreter {
                     ScanOperator op = new ScanOperator(body.getFromItem().toString());
                     op.dump();
                 }
+               
 
                 System.out.println("Where clause is:  " + body.getWhere());
 
+                ExpressionEvaluator ob = new ExpressionEvaluator();
+                Expression exp = body.getWhere();
+                exp.accept(ob);
+                
+                
+                
 //                Expression exp = body.getWhere();
 
 //                System.out.println("Select Items are:  " + body.getSelectItems());
