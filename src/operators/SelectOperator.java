@@ -6,6 +6,7 @@ import parser.ExpressionEvaluator;
 import utils.Tuple;
 
 /**
+ * 
  * Created by tanvimehta on 15-09-24.
  */
 public class SelectOperator extends Operator {
@@ -13,15 +14,17 @@ public class SelectOperator extends Operator {
 	ScanOperator scan;
 	Expression whereClause;
 	String tableName;
-	PlainSelect body;
 	
-	public SelectOperator(PlainSelect b) {
-		body = b;
-		tableName = body.getFromItem().toString();
+	public SelectOperator(PlainSelect body) {
+		String tableName = body.getFromItem().toString();
 		scan = new ScanOperator(tableName);
 		whereClause = body.getWhere();
 	}
 	
+	/**
+	 * Gets the next tuple that satisfies the where conditions.
+	 * Returns null if either at the end of the table OR no tuple satisfies condition.
+	 */
     @Override
     public Tuple getNextTuple() {
         Tuple currentTuple = scan.getNextTuple();
@@ -37,6 +40,9 @@ public class SelectOperator extends Operator {
     	return null;
     }
 
+    /**
+     * Resets the operator to the start of the table
+     */
     @Override
     public void reset() {
     	scan = new ScanOperator(tableName);

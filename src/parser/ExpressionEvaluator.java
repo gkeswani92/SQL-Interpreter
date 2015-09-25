@@ -2,7 +2,6 @@ package parser;
 
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
-import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
 import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.DoubleValue;
@@ -43,6 +42,12 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import utils.Tuple;
 
+/**
+ * Implements the ExpressionVisitor. Takes in a tuple and evaluates the expression with
+ * the values of the tuple. Updates the boolean variable in the tuple accordingly.
+ * @author tanvimehta
+ *
+ */
 public class ExpressionEvaluator implements ExpressionVisitor {
 
 	Tuple currTuple;
@@ -125,11 +130,15 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 	
 	@Override
 	public void visit(AndExpression arg0) {
+		// Save the tuple boolean after left evaluation
 		arg0.getLeftExpression().accept(this);
 		Boolean left = currTuple.getIsSatisfies();
+		
+		// Save the tuple boolean after right evaluation
 		arg0.getRightExpression().accept(this);
 		Boolean right = currTuple.getIsSatisfies();
 		
+		// Compare left and right evaluations
 		if (left && right) {
 			currTuple.setIsSatisfies(true);
 		} else {

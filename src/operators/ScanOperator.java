@@ -25,6 +25,9 @@ public class ScanOperator extends Operator{
 		}
 	}
 	
+	/**
+	 * Gets the next tuple in the table
+	 */
 	@Override
 	public Tuple getNextTuple() {
 		
@@ -42,13 +45,15 @@ public class ScanOperator extends Operator{
 		return currentTuple;
 	}
 
+	/**
+	 * Resets the scan operator to the first tuple in the table
+	 */
 	@Override
 	public void reset() {
 		//Closing the current file
 		try {
 			file.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -60,14 +65,5 @@ public class ScanOperator extends Operator{
 		catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public static void main(String[] args) {
-		ScanOperator op = new ScanOperator("Boats");
-		System.out.println(op.getNextTuple().toStringValues());
-		System.out.println(op.getNextTuple().toStringValues());
-		op.reset();
-		System.out.println(op.getNextTuple().toStringValues());
-		System.out.println(op.getNextTuple().toStringValues());
 	}
 }
