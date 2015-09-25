@@ -77,4 +77,8 @@ public class Tuple {
 		}
 		return attr;
 	}
+	
+	public Integer getValueForAttr (String colName) {
+		return attributeValues.get(colName);
+	}
 }

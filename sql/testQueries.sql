@@ -1,2 +1,1 @@
-SELECT * FROM Sailors;
-SELECT * FROM Boats WHERE Boats.id = 4;
+SELECT * FROM Boats WHERE Boats.D = 107 AND Boats.E > 1;

@@ -8,6 +8,7 @@ import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import operators.ScanOperator;
+import operators.SelectOperator;
 
 /**
  * Class for getting started with JSQLParser. Reads SQL statements from
@@ -38,9 +39,11 @@ public class Interpreter {
 
                 System.out.println("Where clause is:  " + body.getWhere());
 
-                ExpressionEvaluator ob = new ExpressionEvaluator();
-                Expression exp = body.getWhere();
-                exp.accept(ob);
+                SelectOperator selOp = new SelectOperator(body);
+                selOp.dump();
+//                ExpressionEvaluator ob = new ExpressionEvaluator();
+//                Expression exp = body.getWhere();
+//                exp.accept(ob);
                 
                 
                 

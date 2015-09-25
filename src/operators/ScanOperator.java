@@ -43,17 +43,6 @@ public class ScanOperator extends Operator{
 	}
 
 	@Override
-	public void dump() {
-		Tuple currentTuple = getNextTuple();
-		String tableDump = new String(currentTuple.toStringAttributes()+"\n");
-		while(currentTuple != null) {
-			tableDump = tableDump + currentTuple.toStringValues() +  "\n";
-			currentTuple = getNextTuple();
-		}
-		System.out.println(tableDump);
-	}
-
-	@Override
 	public void reset() {
 		//Closing the current file
 		try {

@@ -2,6 +2,7 @@ package parser;
 
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
+import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
 import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.DoubleValue;
@@ -40,42 +41,71 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SubSelect;
+import utils.Tuple;
 
 public class ExpressionEvaluator implements ExpressionVisitor {
 
+	Tuple currTuple;
+	ExpressionEvaluator(Tuple tuple) {
+		currTuple = tuple;
+	}
+	
 	@Override
 	public void visit(EqualsTo arg0) {
-		if (arg0.getLeftExpression() == arg0.getRightExpression())
+		LongValue left = (LongValue)arg0.getLeftExpression();
+		LongValue right = (LongValue)arg0.getRightExpression();
+
+		if (left.getValue() == right.getValue())
 			arg0.setNot();
 	}
 
 	@Override
 	public void visit(GreaterThan arg0) {
-		// TODO Auto-generated method stub
+		LongValue left = (LongValue)arg0.getLeftExpression();
+		LongValue right = (LongValue)arg0.getRightExpression();
+
+		if (left.getValue() > right.getValue())
+			arg0.setNot();
 		
 	}
 
 	@Override
 	public void visit(GreaterThanEquals arg0) {
-		// TODO Auto-generated method stub
+		LongValue left = (LongValue)arg0.getLeftExpression();
+		LongValue right = (LongValue)arg0.getRightExpression();
+
+		if (left.getValue() >= right.getValue())
+			arg0.setNot();
 		
 	}
 	
 	@Override
 	public void visit(MinorThan arg0) {
-		// TODO Auto-generated method stub
+		LongValue left = (LongValue)arg0.getLeftExpression();
+		LongValue right = (LongValue)arg0.getRightExpression();
+
+		if (left.getValue() < right.getValue())
+			arg0.setNot();
 		
 	}
 
 	@Override
 	public void visit(MinorThanEquals arg0) {
-		// TODO Auto-generated method stub
+		LongValue left = (LongValue)arg0.getLeftExpression();
+		LongValue right = (LongValue)arg0.getRightExpression();
+
+		if (left.getValue() <= right.getValue())
+			arg0.setNot();
 		
 	}
 
 	@Override
 	public void visit(NotEqualsTo arg0) {
-		// TODO Auto-generated method stub
+		LongValue left = (LongValue)arg0.getLeftExpression();
+		LongValue right = (LongValue)arg0.getRightExpression();
+
+		if (left.getValue() != right.getValue())
+			arg0.setNot();
 		
 	}
 	
@@ -96,7 +126,13 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 	@Override
 	public void visit(AndExpression arg0) {
 		// TODO Auto-generated method stub
-		
+		arg0.getLeftExpression().accept(this);
+		arg0.getRightExpression().accept(this);
+		BinaryExpression left = (BinaryExpression) arg0.getLeftExpression();
+		BinaryExpression right = (BinaryExpression) arg0.getRightExpression();
+		if (left.isNot() && right.isNot()) {
+			arg0.setNot();
+		}
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
