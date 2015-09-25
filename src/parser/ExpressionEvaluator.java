@@ -48,6 +48,10 @@ import utils.Tuple;
  * @author tanvimehta
  *
  */
+
+// TODO: RIGHT SIDE OF EXPRESSION COULD BE ANOTHER COLUMN REFERENCE!!!!!!! 
+// CHECK FIRST!!!!!!!!!!!!!!!!!!
+
 public class ExpressionEvaluator implements ExpressionVisitor {
 
 	Tuple currTuple;
@@ -60,58 +64,99 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 	public void visit(EqualsTo arg0) {
 		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
 		
-		LongValue right = (LongValue)arg0.getRightExpression();
-
-		if (left == right.getValue())
-			currTuple.setIsSatisfies(true);
+		if (arg0.getRightExpression() instanceof LongValue) {
+			LongValue rightLong = (LongValue)arg0.getRightExpression();
+			if (left == rightLong.getValue())
+				currTuple.setIsSatisfies(true);
+		} else if (arg0.getRightExpression() instanceof Column) {
+			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
+			if (left == rightColumn) {
+				currTuple.setIsSatisfies(true);
+			}
+		}
 	}
 
 	@Override
 	public void visit(GreaterThan arg0) {
 		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
-		LongValue right = (LongValue)arg0.getRightExpression();
-
-		if (left > right.getValue())
-			currTuple.setIsSatisfies(true);
+		
+		if (arg0.getRightExpression() instanceof LongValue) {
+			LongValue rightLong = (LongValue)arg0.getRightExpression();
+			if (left > rightLong.getValue())
+				currTuple.setIsSatisfies(true);
+		} else if (arg0.getRightExpression() instanceof Column) {
+			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
+			if (left > rightColumn) {
+				currTuple.setIsSatisfies(true);
+			}
+		}
 		
 	}
 
 	@Override
 	public void visit(GreaterThanEquals arg0) {
 		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
-		LongValue right = (LongValue)arg0.getRightExpression();
-
-		if (left >= right.getValue())
-			currTuple.setIsSatisfies(true);
+		
+		if (arg0.getRightExpression() instanceof LongValue) {
+			LongValue rightLong = (LongValue)arg0.getRightExpression();
+			if (left >= rightLong.getValue())
+				currTuple.setIsSatisfies(true);
+		} else if (arg0.getRightExpression() instanceof Column) {
+			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
+			if (left >= rightColumn) {
+				currTuple.setIsSatisfies(true);
+			}
+		}
 		
 	}
 	
 	@Override
 	public void visit(MinorThan arg0) {
 		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
-		LongValue right = (LongValue)arg0.getRightExpression();
-
-		if (left < right.getValue())
-			currTuple.setIsSatisfies(true);
+		
+		if (arg0.getRightExpression() instanceof LongValue) {
+			LongValue rightLong = (LongValue)arg0.getRightExpression();
+			if (left < rightLong.getValue())
+				currTuple.setIsSatisfies(true);
+		} else if (arg0.getRightExpression() instanceof Column) {
+			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
+			if (left < rightColumn) {
+				currTuple.setIsSatisfies(true);
+			}
+		}
 		
 	}
 
 	@Override
 	public void visit(MinorThanEquals arg0) {
 		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
-		LongValue right = (LongValue)arg0.getRightExpression();
-
-		if (left <= right.getValue())
-			currTuple.setIsSatisfies(true);		
+		
+		if (arg0.getRightExpression() instanceof LongValue) {
+			LongValue rightLong = (LongValue)arg0.getRightExpression();
+			if (left <= rightLong.getValue())
+				currTuple.setIsSatisfies(true);
+		} else if (arg0.getRightExpression() instanceof Column) {
+			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
+			if (left <= rightColumn) {
+				currTuple.setIsSatisfies(true);
+			}
+		}		
 	}
 
 	@Override
 	public void visit(NotEqualsTo arg0) {
 		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
-		LongValue right = (LongValue)arg0.getRightExpression();
-
-		if (left != right.getValue())
-			currTuple.setIsSatisfies(true);		
+		
+		if (arg0.getRightExpression() instanceof LongValue) {
+			LongValue rightLong = (LongValue)arg0.getRightExpression();
+			if (left != rightLong.getValue())
+				currTuple.setIsSatisfies(true);
+		} else if (arg0.getRightExpression() instanceof Column) {
+			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
+			if (left != rightColumn) {
+				currTuple.setIsSatisfies(true);
+			}
+		}		
 	}
 	
 	@Override
