@@ -9,6 +9,16 @@ import java.util.HashMap;
 public class Tuple {
 	
 	private String tableName;
+	private Boolean isSatisfies;
+	
+	public Boolean getIsSatisfies() {
+		return isSatisfies;
+	}
+
+	public void setIsSatisfies(Boolean isSatisfies) {
+		this.isSatisfies = isSatisfies;
+	}
+
 	private HashMap<String, Integer> attributeValues = new HashMap<String, Integer>();
 	private static final String TUPLE_DELIM = ",";
 	private static final String ATTR_DELIM = " ";
@@ -17,6 +27,7 @@ public class Tuple {
 	public Tuple(String line, String tableName){
 		this.tableName = tableName;
 		this.createTuple(line);
+		this.isSatisfies = false;
 	}
 	
 	@SuppressWarnings("resource")

@@ -46,67 +46,67 @@ import utils.Tuple;
 public class ExpressionEvaluator implements ExpressionVisitor {
 
 	Tuple currTuple;
-	ExpressionEvaluator(Tuple tuple) {
+	
+	public ExpressionEvaluator(Tuple tuple) {
 		currTuple = tuple;
 	}
 	
 	@Override
 	public void visit(EqualsTo arg0) {
-		LongValue left = (LongValue)arg0.getLeftExpression();
+		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
+		
 		LongValue right = (LongValue)arg0.getRightExpression();
 
-		if (left.getValue() == right.getValue())
-			arg0.setNot();
+		if (left == right.getValue())
+			currTuple.setIsSatisfies(true);
 	}
 
 	@Override
 	public void visit(GreaterThan arg0) {
-		LongValue left = (LongValue)arg0.getLeftExpression();
+		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
 		LongValue right = (LongValue)arg0.getRightExpression();
 
-		if (left.getValue() > right.getValue())
-			arg0.setNot();
+		if (left > right.getValue())
+			currTuple.setIsSatisfies(true);
 		
 	}
 
 	@Override
 	public void visit(GreaterThanEquals arg0) {
-		LongValue left = (LongValue)arg0.getLeftExpression();
+		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
 		LongValue right = (LongValue)arg0.getRightExpression();
 
-		if (left.getValue() >= right.getValue())
-			arg0.setNot();
+		if (left >= right.getValue())
+			currTuple.setIsSatisfies(true);
 		
 	}
 	
 	@Override
 	public void visit(MinorThan arg0) {
-		LongValue left = (LongValue)arg0.getLeftExpression();
+		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
 		LongValue right = (LongValue)arg0.getRightExpression();
 
-		if (left.getValue() < right.getValue())
-			arg0.setNot();
+		if (left < right.getValue())
+			currTuple.setIsSatisfies(true);
 		
 	}
 
 	@Override
 	public void visit(MinorThanEquals arg0) {
-		LongValue left = (LongValue)arg0.getLeftExpression();
+		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
 		LongValue right = (LongValue)arg0.getRightExpression();
 
-		if (left.getValue() <= right.getValue())
-			arg0.setNot();
-		
+		if (left <= right.getValue())
+			currTuple.setIsSatisfies(true);		
 	}
 
 	@Override
 	public void visit(NotEqualsTo arg0) {
-		LongValue left = (LongValue)arg0.getLeftExpression();
+		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
 		LongValue right = (LongValue)arg0.getRightExpression();
 
-		if (left.getValue() != right.getValue())
-			arg0.setNot();
-		
+		if (left != right.getValue())
+			currTuple.setIsSatisfies(true);		
 	}
 	
 	@Override
@@ -125,13 +125,15 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 	
 	@Override
 	public void visit(AndExpression arg0) {
-		// TODO Auto-generated method stub
 		arg0.getLeftExpression().accept(this);
+		Boolean left = currTuple.getIsSatisfies();
 		arg0.getRightExpression().accept(this);
-		BinaryExpression left = (BinaryExpression) arg0.getLeftExpression();
-		BinaryExpression right = (BinaryExpression) arg0.getRightExpression();
-		if (left.isNot() && right.isNot()) {
-			arg0.setNot();
+		Boolean right = currTuple.getIsSatisfies();
+		
+		if (left && right) {
+			currTuple.setIsSatisfies(true);
+		} else {
+			currTuple.setIsSatisfies(false);
 		}
 	}
 	
