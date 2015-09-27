@@ -68,7 +68,8 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 			LongValue rightLong = (LongValue)arg0.getRightExpression();
 			if (left == rightLong.getValue())
 				currTuple.setIsSatisfies(true);
-		} else if (arg0.getRightExpression() instanceof Column) {
+		} 
+		else if (arg0.getRightExpression() instanceof Column) {
 			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
 			if (left == rightColumn) {
 				currTuple.setIsSatisfies(true);
@@ -84,7 +85,8 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 			LongValue rightLong = (LongValue)arg0.getRightExpression();
 			if (left > rightLong.getValue())
 				currTuple.setIsSatisfies(true);
-		} else if (arg0.getRightExpression() instanceof Column) {
+		} 
+		else if (arg0.getRightExpression() instanceof Column) {
 			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
 			if (left > rightColumn) {
 				currTuple.setIsSatisfies(true);
@@ -101,7 +103,8 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 			LongValue rightLong = (LongValue)arg0.getRightExpression();
 			if (left >= rightLong.getValue())
 				currTuple.setIsSatisfies(true);
-		} else if (arg0.getRightExpression() instanceof Column) {
+		} 
+		else if (arg0.getRightExpression() instanceof Column) {
 			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
 			if (left >= rightColumn) {
 				currTuple.setIsSatisfies(true);
@@ -118,7 +121,8 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 			LongValue rightLong = (LongValue)arg0.getRightExpression();
 			if (left < rightLong.getValue())
 				currTuple.setIsSatisfies(true);
-		} else if (arg0.getRightExpression() instanceof Column) {
+		} 
+		else if (arg0.getRightExpression() instanceof Column) {
 			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
 			if (left < rightColumn) {
 				currTuple.setIsSatisfies(true);
@@ -135,7 +139,8 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 			LongValue rightLong = (LongValue)arg0.getRightExpression();
 			if (left <= rightLong.getValue())
 				currTuple.setIsSatisfies(true);
-		} else if (arg0.getRightExpression() instanceof Column) {
+		} 
+		else if (arg0.getRightExpression() instanceof Column) {
 			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
 			if (left <= rightColumn) {
 				currTuple.setIsSatisfies(true);

@@ -5,20 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Set;
 
 public class Tuple {
 	
 	private String tableName;
 	private Boolean isSatisfies;
-	
-	public Boolean getIsSatisfies() {
-		return isSatisfies;
-	}
-
-	public void setIsSatisfies(Boolean isSatisfies) {
-		this.isSatisfies = isSatisfies;
-	}
-
 	private HashMap<String, Integer> attributeValues = new HashMap<String, Integer>();
 	private static final String TUPLE_DELIM = ",";
 	private static final String ATTR_DELIM = " ";
@@ -92,4 +84,25 @@ public class Tuple {
 	public Integer getValueForAttr (String colName) {
 		return attributeValues.get(colName);
 	}
+	
+	public void dropAttribute(String key) {
+		attributeValues.remove(key);
+	}
+	
+	public Tuple retainAttributes(Set<String> colNames) {
+		attributeValues.keySet().retainAll(colNames);
+		return this;
+	}
+	
+	public Set<String> getArributeList() {
+		return attributeValues.keySet();
+	}
+	public Boolean getIsSatisfies() {
+		return isSatisfies;
+	}
+
+	public void setIsSatisfies(Boolean isSatisfies) {
+		this.isSatisfies = isSatisfies;
+	}
+
 }
