@@ -75,10 +75,8 @@ public class databaseCatalog {
 	
 	public static void main(String[] args) {
 		String inputSrcDir;
-		String outputSrcDir;		
 		if(args.length == 2){
 			inputSrcDir = args[0];
-			outputSrcDir = args[1];
 			databaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
 			String tableName = "Sailors";
 			System.out.print("Table " + tableName + "'s attribute list is :");			;

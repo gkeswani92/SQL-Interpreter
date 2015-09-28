@@ -28,7 +28,8 @@ public class Interpreter {
 
 				Select select = (Select) statement;
                 PlainSelect body = (PlainSelect) select.getSelectBody();
-                List<SelectItem> selectAttr = body.getSelectItems();
+                @SuppressWarnings("unchecked")
+				List<SelectItem> selectAttr = body.getSelectItems();
                 
                 //Decision statements to decide from which operator to enter
                 if (selectAttr.size() == 1 && selectAttr.get(0).toString() == "*") { 

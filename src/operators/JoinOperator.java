@@ -1,7 +1,6 @@
 package operators;
 
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import parser.OperatorVisitor;
 import utils.Tuple;
 
 public class JoinOperator extends Operator {
