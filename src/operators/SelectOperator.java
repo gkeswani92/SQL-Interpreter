@@ -3,6 +3,7 @@ package operators;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import parser.ExpressionEvaluator;
+import parser.OperatorVisitor;
 import utils.Tuple;
 
 /**
@@ -11,14 +12,15 @@ import utils.Tuple;
  */
 public class SelectOperator extends Operator {
 	
-	ScanOperator scan;
+	Operator child;
 	Expression whereClause;
 	String tableName;
 	
-	public SelectOperator(PlainSelect body) {
+	public SelectOperator(PlainSelect body, Operator child) {
 		String tableName = body.getFromItem().toString();
-		scan = new ScanOperator(tableName);
+		child = new ScanOperator(tableName);
 		whereClause = body.getWhere();
+		this.child = child;
 	}
 	
 	/**
@@ -27,24 +29,31 @@ public class SelectOperator extends Operator {
 	 */
     @Override
     public Tuple getNextTuple() {
-        Tuple currentTuple = scan.getNextTuple();
+        Tuple currentTuple = child.getNextTuple();
     	while (currentTuple != null) {
 	        ExpressionEvaluator ob = new ExpressionEvaluator(currentTuple);
 	        whereClause.accept(ob);
 	        if (currentTuple.getIsSatisfies()) {
 	        	return currentTuple;
 	        }
-	        currentTuple = scan.getNextTuple();
+	        currentTuple = child.getNextTuple();
     	}
     	
     	return null;
     }
-
-    /**
-     * Resets the operator to the start of the table
-     */
+    
     @Override
-    public void reset() {
-    	scan = new ScanOperator(tableName);
+	public void accept(OperatorVisitor visitor) {
+		visitor.visit(this);
+	}
+    
+    public Operator getChild() {
+    	return child;
     }
+
+	@Override
+	public void reset() {
+		child = new ScanOperator(tableName);
+		
+	}
 }

@@ -1,11 +1,12 @@
 package operators;
 
-import utils.Tuple;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+
+import parser.OperatorVisitor;
+import utils.Tuple;
 
 public class ScanOperator extends Operator{
 	
@@ -65,5 +66,10 @@ public class ScanOperator extends Operator{
 		catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public void accept(OperatorVisitor visitor) {
+		visitor.visit(this);
 	}
 }

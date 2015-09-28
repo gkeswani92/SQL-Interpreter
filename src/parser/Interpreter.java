@@ -37,14 +37,17 @@ public class Interpreter {
                 	//Enter from the scan clause if query has no where clause
                 	if (body.getWhere() == null) {
                 		ScanOperator op = new ScanOperator(body.getFromItem().toString());
-                		op.dump();
+                		EvaluateOperatorVisitor eval = new EvaluateOperatorVisitor();
+                		op.accept(eval);
                 	}
                 	
                 	// Enter from selectOperator if query has where clause
-                	else {
+                	else {  		
                 		System.out.println("Where clause is:  " + body.getWhere());
-                        SelectOperator selOp = new SelectOperator(body);
-                        selOp.dump();
+                		ScanOperator op = new ScanOperator(body.getFromItem().toString());
+                        SelectOperator selOp = new SelectOperator(body, op);
+                        EvaluateOperatorVisitor eval = new EvaluateOperatorVisitor();
+                        selOp.accept(eval);
                 	}
                 } 
                 

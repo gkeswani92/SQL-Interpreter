@@ -1,4 +1,5 @@
 package operators;
+import parser.OperatorVisitor;
 import utils.Tuple;
 
 /**
@@ -34,4 +35,7 @@ public abstract class Operator {
 		}
 		System.out.println(tableDump);
     }
+    
+    public abstract void accept(OperatorVisitor visitor);
+    
 }
