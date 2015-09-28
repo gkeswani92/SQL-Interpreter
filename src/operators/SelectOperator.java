@@ -18,6 +18,7 @@ public class SelectOperator extends Operator {
 	public SelectOperator(PlainSelect body, Operator child) {
 		this.child = child;
 		whereClause = body.getWhere();
+		this.child = child;
 	}
 	
 	/**
@@ -38,10 +39,7 @@ public class SelectOperator extends Operator {
     	
     	return null;
     }
-
-    /**
-     * Resets the operator to the start of the table
-     */
+    
     @Override
     public void reset() {
     	child = new ScanOperator(tableName);

@@ -40,7 +40,7 @@ public class Interpreter {
                 	}
                 	
                 	// Enter from selectOperator if query has where clause
-                	else {
+                	else {  		
                 		System.out.println("Where clause is:  " + body.getWhere());
                         ScanOperator scanOp = new ScanOperator(body.getFromItem().toString());
                         SelectOperator selOp = new SelectOperator(body, scanOp);

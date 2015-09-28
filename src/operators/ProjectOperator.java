@@ -17,7 +17,6 @@ public class ProjectOperator extends Operator {
 	public ProjectOperator(PlainSelect body, Operator child) {
 		this.tableName = body.getFromItem().toString();
 		this.body = body;
-		
 		this.child = child;
 		
 		//Adding the columns from the query into the required Column hash set
@@ -53,4 +52,8 @@ public class ProjectOperator extends Operator {
 		else
 			child = new ScanOperator(tableName);
 	}
+	
+    public Operator getChild() {
+    	return child;
+    }
 }
