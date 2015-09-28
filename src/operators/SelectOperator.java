@@ -11,13 +11,12 @@ import utils.Tuple;
  */
 public class SelectOperator extends Operator {
 	
-	ScanOperator scan;
+	Operator child;
 	Expression whereClause;
 	String tableName;
 	
-	public SelectOperator(PlainSelect body) {
-		String tableName = body.getFromItem().toString();
-		scan = new ScanOperator(tableName);
+	public SelectOperator(PlainSelect body, Operator child) {
+		this.child = child;
 		whereClause = body.getWhere();
 	}
 	
@@ -27,14 +26,14 @@ public class SelectOperator extends Operator {
 	 */
     @Override
     public Tuple getNextTuple() {
-        Tuple currentTuple = scan.getNextTuple();
+        Tuple currentTuple = child.getNextTuple();
     	while (currentTuple != null) {
 	        ExpressionEvaluator ob = new ExpressionEvaluator(currentTuple);
 	        whereClause.accept(ob);
 	        if (currentTuple.getIsSatisfies()) {
 	        	return currentTuple;
 	        }
-	        currentTuple = scan.getNextTuple();
+	        currentTuple = child.getNextTuple();
     	}
     	
     	return null;
@@ -45,6 +44,6 @@ public class SelectOperator extends Operator {
      */
     @Override
     public void reset() {
-    	scan = new ScanOperator(tableName);
+    	child = new ScanOperator(tableName);
     }
 }

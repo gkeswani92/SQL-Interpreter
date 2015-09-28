@@ -1,7 +1,6 @@
 package parser;
 
 import java.io.FileReader;
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.jsqlparser.parser.CCJSqlParser;
@@ -43,13 +42,25 @@ public class Interpreter {
                 	// Enter from selectOperator if query has where clause
                 	else {
                 		System.out.println("Where clause is:  " + body.getWhere());
-                        SelectOperator selOp = new SelectOperator(body);
+                        ScanOperator scanOp = new ScanOperator(body.getFromItem().toString());
+                        SelectOperator selOp = new SelectOperator(body, scanOp);
                         selOp.dump();
                 	}
                 } 
                 
                 else {
-                	ProjectOperator projOp = new ProjectOperator(body);
+                	
+            		//Depending on whether the where clause is present or not, we decide the child i.e scan or select
+                	
+                    ScanOperator scanOp = new ScanOperator(body.getFromItem().toString());
+                    ProjectOperator projOp = null;
+            		if(body.getWhere()!=null) {
+                        SelectOperator child = new SelectOperator(body, scanOp);
+                        projOp = new ProjectOperator(body, child);
+            		}
+            		else {
+            			projOp = new ProjectOperator(body, scanOp);
+            		}
                 	projOp.dump();
                 }
     

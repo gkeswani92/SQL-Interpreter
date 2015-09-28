@@ -10,20 +10,15 @@ import utils.Tuple;
 public class ProjectOperator extends Operator {
 		
 	String tableName;
-	Operator getNextTupleOperator;
+	Operator child;
 	Set<String> requiredColumns;
 	PlainSelect body;
 
-	public ProjectOperator(PlainSelect body) {
+	public ProjectOperator(PlainSelect body, Operator child) {
 		this.tableName = body.getFromItem().toString();
 		this.body = body;
-				
-		//Depending on whether the where clause is present or not, we decide to
-		//the next tuple using scan or select
-		if(body.getWhere()!=null)
-			getNextTupleOperator = new SelectOperator(body);
-		else
-			getNextTupleOperator = new ScanOperator(tableName);		
+		
+		this.child = child;
 		
 		//Adding the columns from the query into the required Column hash set
 		requiredColumns = new HashSet<String>();
@@ -39,7 +34,7 @@ public class ProjectOperator extends Operator {
 	 */
 	@Override
 	public Tuple getNextTuple() {
-		Tuple currentTuple = getNextTupleOperator.getNextTuple();
+		Tuple currentTuple = child.getNextTuple();
 		
 		//Only try to restrict on columns if the tuple exists. Exit with null
 		//if it does not, since dump() will stop executing if null is returned
@@ -54,8 +49,8 @@ public class ProjectOperator extends Operator {
 	@Override
 	public void reset() {
 		if(body.getWhere()!=null)
-			getNextTupleOperator = new SelectOperator(body);
+			child = new SelectOperator(body, new ScanOperator(tableName));
 		else
-			getNextTupleOperator = new ScanOperator(tableName);
+			child = new ScanOperator(tableName);
 	}
 }
