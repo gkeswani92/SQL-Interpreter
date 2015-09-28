@@ -8,7 +8,9 @@ public class JoinOperator extends Operator {
 	Operator leftChild;
 	Operator rightChild;
 	
-	public JoinOperator(PlainSelect body) {
+	public JoinOperator(PlainSelect body, Operator leftChild, Operator rightChild) {
+		this.leftChild = leftChild;
+		this.rightChild = rightChild;
 	}
 	
 	@Override

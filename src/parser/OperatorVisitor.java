@@ -13,6 +13,5 @@ public interface OperatorVisitor {
 	
 	void visit(ProjectOperator node);
 	
-	void visit(JoinOperator node);
-	
+	void visit(JoinOperator node);	
 }

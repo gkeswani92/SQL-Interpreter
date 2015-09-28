@@ -15,10 +15,9 @@ public class SelectOperator extends Operator {
 	Expression whereClause;
 	String tableName;
 	
-	public SelectOperator(PlainSelect body, Operator child) {
+	public SelectOperator(Expression exp, Operator child) {
 		this.child = child;
-		whereClause = body.getWhere();
-		this.child = child;
+		whereClause = exp;
 	}
 	
 	/**
@@ -43,5 +42,9 @@ public class SelectOperator extends Operator {
     @Override
     public void reset() {
     	child = new ScanOperator(tableName);
+    }
+    
+    public Expression getExpression(){
+    	return whereClause;
     }
 }

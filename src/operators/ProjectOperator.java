@@ -48,7 +48,7 @@ public class ProjectOperator extends Operator {
 	@Override
 	public void reset() {
 		if(body.getWhere()!=null)
-			child = new SelectOperator(body, new ScanOperator(tableName));
+			child = new SelectOperator(body.getWhere(), new ScanOperator(tableName));
 		else
 			child = new ScanOperator(tableName);
 	}

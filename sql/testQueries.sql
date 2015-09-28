@@ -1,4 +1,1 @@
-SELECT Boats.D FROM Boats;
-SELECT Boats.D, Boats.E FROM Boats WHERE Boats.D = 101;
-SELECT * FROM Boats;
-SELECT * FROM Boats where Boats.D = 102;
+SELECT * FROM Boats, Sailors, Reserves WHERE Boats.D = Sailors.A AND Reserves.G = Sailors.A AND Boats.D = 101 AND Boats.D = 102;
