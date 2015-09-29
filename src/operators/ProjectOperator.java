@@ -23,7 +23,7 @@ public class ProjectOperator extends Operator {
 		requiredColumns = new HashSet<String>();
 		for(Object c: body.getSelectItems()) {
 			SelectExpressionItem currentExpression = (SelectExpressionItem)c;
-			requiredColumns.add(((Column) currentExpression.getExpression()).getColumnName());
+			requiredColumns.add(body.getFromItem().toString() + "." + ((Column) currentExpression.getExpression()).getColumnName());
 		}
 	}
 	

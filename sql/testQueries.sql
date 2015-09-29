@@ -1,1 +1,1 @@
-SELECT * FROM Boats,Reserves WHERE Boats.D = Reserves.H;
+SELECT Boats.id FROM Boats;
