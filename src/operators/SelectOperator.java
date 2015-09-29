@@ -1,14 +1,9 @@
 package operators;
 
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import parser.ExpressionEvaluator;
 import utils.Tuple;
 
-/**
- * 
- * Created by tanvimehta on 15-09-24.
- */
 public class SelectOperator extends Operator {
 	
 	Operator child;
