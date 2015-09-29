@@ -52,6 +52,12 @@ import operators.Operator;
 import operators.ScanOperator;
 import operators.SelectOperator;
 
+/**
+ * Visitor class to traverse through where clause and keep track of select operations on each table
+ * and join conditions on tables.
+ * @author tmm259
+ *
+ */
 public class WhereBuilder implements ExpressionVisitor{
 
 	private Map<String, List<Operator>> tableOperators;
@@ -62,6 +68,11 @@ public class WhereBuilder implements ExpressionVisitor{
 		this.joins = joins;
 	}
 	
+	/**
+	 * Checks if expression on table is basic(select) or a join condition
+	 * @param exp expression on the table
+	 * @return <true or false, table name> true - if exp is select fale - if exp is join 
+	 */
 	private Entry<Boolean, String> isBasicExpression(BinaryExpression exp) {
 		if (exp.getLeftExpression() instanceof LongValue && exp.getRightExpression() instanceof Column) {
 			return new AbstractMap.SimpleEntry<Boolean, String>(true, ((Column)exp.getRightExpression()).getTable().toString());
@@ -77,12 +88,18 @@ public class WhereBuilder implements ExpressionVisitor{
 		return new AbstractMap.SimpleEntry<Boolean, String>(false, null);
 	}
 	
+	/**
+	 * Checks if the expression is a select, if so then creates a single select(with AND conjuct) for the tables
+	 * Keeps track of all select clauses on the each table and maintain a list of all join conditions in where clause
+	 * @param arg0 expression to be evaluated
+	 */
 	public void buildHelper(Expression arg0) {
 		Entry<Boolean, String> entry = isBasicExpression((BinaryExpression) arg0);
+		
 		if (entry.getKey()) {
 			List<Operator> operators = tableOperators.get(entry.getValue());
 			
-			//If this is the first operator we are adding for the table
+			// If this is the first operator we are adding for the table
 			if (operators == null || operators.isEmpty()) {
 				ScanOperator scanOp = new ScanOperator(entry.getValue());
 				SelectOperator selectOp = new SelectOperator(arg0, scanOp);
@@ -91,7 +108,7 @@ public class WhereBuilder implements ExpressionVisitor{
 				tableOperators.put(entry.getValue(), opList);
 			}
 			
-			//If we need to conjunct multiple select operations
+			// If we need to conjunct multiple select operations
 			else {
 				SelectOperator currentSelectOp = (SelectOperator) operators.get(0);
 				AndExpression expression = new AndExpression();
@@ -104,6 +121,7 @@ public class WhereBuilder implements ExpressionVisitor{
 				tableOperators.put(entry.getValue(), opList);
 			}
 		} else {
+			// If the expression is a join condition, add to joins list
 			List<String> joinTables = new ArrayList<String>();
 			joinTables.add(((Column)((BinaryExpression)arg0).getLeftExpression()).getTable().toString());
 			joinTables.add(((Column)((BinaryExpression)arg0).getRightExpression()).getTable().toString());

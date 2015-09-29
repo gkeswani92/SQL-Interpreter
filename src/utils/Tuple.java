@@ -8,6 +8,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Util class for tuples in a table.
+ * Keep track of attribute names and values and whether a tuple satisfies a certain condition
+ * @author tmm259
+ */
 public class Tuple {
 	
 	private String tableName;

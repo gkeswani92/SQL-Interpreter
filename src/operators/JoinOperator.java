@@ -23,30 +23,33 @@ public class JoinOperator extends Operator {
 		
 		if (currLeftTuple == null) {
 			currLeftTuple = leftChild.getNextTuple();
-		}
+		}		
 		
-			while (currLeftTuple != null) {
-				currRightTuple = rightChild.getNextTuple();
-				while (currRightTuple != null) {
-					Tuple joinTuple = new Tuple(currLeftTuple, currRightTuple);
-					if (joinCondition == null) {
-						return joinTuple;
-					} else {
-						
-						ExpressionEvaluator ob = new ExpressionEvaluator(joinTuple);
-				        joinCondition.accept(ob);
-				        if (joinTuple.getIsSatisfies()) {
-				        	return joinTuple;
-				        }
-				        
-				        currRightTuple = rightChild.getNextTuple();
-					}
+		while (currLeftTuple != null) {
+			currRightTuple = rightChild.getNextTuple();
+			while (currRightTuple != null) {
+				Tuple joinTuple = new Tuple(currLeftTuple, currRightTuple);
+				
+				// Cartesian product
+				if (joinCondition == null) {
+					return joinTuple;
+				} else {
+					// Evaluate join condition	
+					ExpressionEvaluator ob = new ExpressionEvaluator(joinTuple);
+				    joinCondition.accept(ob);
+				    if (joinTuple.getIsSatisfies()) {
+				        return joinTuple;
+				    }       
+				    
+				    currRightTuple = rightChild.getNextTuple();
 				}
-				rightChild.reset();
-				currLeftTuple = leftChild.getNextTuple();
 			}
-			return null;
 			
+			// When right child is completely traversed, reset the child and move to next left tuple
+			rightChild.reset();
+			currLeftTuple = leftChild.getNextTuple();
+		}
+		return null;		
 	}
 
 	@Override
