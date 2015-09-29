@@ -62,7 +62,7 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 	
 	@Override
 	public void visit(EqualsTo arg0) {
-		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
+		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getTable().toString() + "." + ((Column)arg0.getLeftExpression()).getColumnName()).toString());
 		
 		if (arg0.getRightExpression() instanceof LongValue) {
 			LongValue rightLong = (LongValue)arg0.getRightExpression();
@@ -70,16 +70,18 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 				currTuple.setIsSatisfies(true);
 		} 
 		else if (arg0.getRightExpression() instanceof Column) {
-			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
+			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getTable().toString() + "." + ((Column)arg0.getRightExpression()).getColumnName()).toString());
 			if (left == rightColumn) {
 				currTuple.setIsSatisfies(true);
+			} else {
+				currTuple.setIsSatisfies(false);
 			}
 		}
 	}
 
 	@Override
 	public void visit(GreaterThan arg0) {
-		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
+		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getTable().toString() + "." + ((Column)arg0.getLeftExpression()).getColumnName()).toString());
 		
 		if (arg0.getRightExpression() instanceof LongValue) {
 			LongValue rightLong = (LongValue)arg0.getRightExpression();
@@ -87,9 +89,11 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 				currTuple.setIsSatisfies(true);
 		} 
 		else if (arg0.getRightExpression() instanceof Column) {
-			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
+			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getTable().toString() + "." + ((Column)arg0.getRightExpression()).getColumnName()).toString());
 			if (left > rightColumn) {
 				currTuple.setIsSatisfies(true);
+			} else {
+				currTuple.setIsSatisfies(false);
 			}
 		}
 		
@@ -97,7 +101,7 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 
 	@Override
 	public void visit(GreaterThanEquals arg0) {
-		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
+		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getTable().toString() + "." + ((Column)arg0.getLeftExpression()).getColumnName()).toString());
 		
 		if (arg0.getRightExpression() instanceof LongValue) {
 			LongValue rightLong = (LongValue)arg0.getRightExpression();
@@ -105,9 +109,11 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 				currTuple.setIsSatisfies(true);
 		} 
 		else if (arg0.getRightExpression() instanceof Column) {
-			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
+			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getTable().toString() + "." + ((Column)arg0.getRightExpression()).getColumnName()).toString());
 			if (left >= rightColumn) {
 				currTuple.setIsSatisfies(true);
+			} else {
+				currTuple.setIsSatisfies(false);
 			}
 		}
 		
@@ -115,7 +121,7 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 	
 	@Override
 	public void visit(MinorThan arg0) {
-		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
+		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getTable().toString() + "." + ((Column)arg0.getLeftExpression()).getColumnName()).toString());
 		
 		if (arg0.getRightExpression() instanceof LongValue) {
 			LongValue rightLong = (LongValue)arg0.getRightExpression();
@@ -123,9 +129,11 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 				currTuple.setIsSatisfies(true);
 		} 
 		else if (arg0.getRightExpression() instanceof Column) {
-			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
+			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getTable().toString() + "." + ((Column)arg0.getRightExpression()).getColumnName()).toString());
 			if (left < rightColumn) {
 				currTuple.setIsSatisfies(true);
+			} else {
+				currTuple.setIsSatisfies(false);
 			}
 		}
 		
@@ -133,7 +141,7 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 
 	@Override
 	public void visit(MinorThanEquals arg0) {
-		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
+		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getTable().toString() + "." + ((Column)arg0.getLeftExpression()).getColumnName()).toString());
 		
 		if (arg0.getRightExpression() instanceof LongValue) {
 			LongValue rightLong = (LongValue)arg0.getRightExpression();
@@ -141,25 +149,29 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 				currTuple.setIsSatisfies(true);
 		} 
 		else if (arg0.getRightExpression() instanceof Column) {
-			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
+			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getTable().toString() + "." + ((Column)arg0.getRightExpression()).getColumnName()).toString());
 			if (left <= rightColumn) {
 				currTuple.setIsSatisfies(true);
+			} else {
+				currTuple.setIsSatisfies(false);
 			}
 		}		
 	}
 
 	@Override
 	public void visit(NotEqualsTo arg0) {
-		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getColumnName()).toString());
+		Long left = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getLeftExpression()).getTable().toString() + "." + ((Column)arg0.getLeftExpression()).getColumnName()).toString());
 		
 		if (arg0.getRightExpression() instanceof LongValue) {
 			LongValue rightLong = (LongValue)arg0.getRightExpression();
 			if (left != rightLong.getValue())
 				currTuple.setIsSatisfies(true);
 		} else if (arg0.getRightExpression() instanceof Column) {
-			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getColumnName()).toString());
+			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getTable().toString() + "." + ((Column)arg0.getRightExpression()).getColumnName()).toString());
 			if (left != rightColumn) {
 				currTuple.setIsSatisfies(true);
+			} else {
+				currTuple.setIsSatisfies(false);
 			}
 		}		
 	}

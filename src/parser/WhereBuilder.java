@@ -55,9 +55,9 @@ import operators.SelectOperator;
 public class WhereBuilder implements ExpressionVisitor{
 
 	private Map<String, List<Operator>> tableOperators;
-	private List<Expression> joins;
+	private List<Entry<List<String>,Expression>> joins;
 	
-	public WhereBuilder(Map<String, List<Operator>> tableOperators, List<Expression> joins) {
+	public WhereBuilder(Map<String, List<Operator>> tableOperators, List<Entry<List<String>,Expression>> joins) {
 		this.tableOperators = tableOperators;
 		this.joins = joins;
 	}
@@ -104,7 +104,11 @@ public class WhereBuilder implements ExpressionVisitor{
 				tableOperators.put(entry.getValue(), opList);
 			}
 		} else {
-			joins.add(arg0);
+			List<String> joinTables = new ArrayList<String>();
+			joinTables.add(((Column)((BinaryExpression)arg0).getLeftExpression()).getTable().toString());
+			joinTables.add(((Column)((BinaryExpression)arg0).getRightExpression()).getTable().toString());
+			Entry<List<String>,Expression> joinEntry= new AbstractMap.SimpleEntry<List<String>, Expression>(joinTables, arg0);
+			joins.add(joinEntry);
 		}
 	}
 	

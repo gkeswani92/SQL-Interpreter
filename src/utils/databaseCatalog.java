@@ -47,7 +47,7 @@ public class databaseCatalog {
 				String[] attributeList = currentLine.split(ATTR_DELIM);
 				String tableName = attributeList[0];
 				String[] dbFileLoc = new String[1];
-				dbFileLoc[0]= inputsrcDir + "/db/data" + tableName + ".csv";
+				dbFileLoc[0]= inputsrcDir + "/db/data/" + tableName + ".csv";
 				attributeList = Arrays.copyOfRange(attributeList, 1, attributeList.length);
 				tableSchemaCatalag.put(tableName, attributeList);						
 				tableFileCatalag.put(tableName,dbFileLoc);	
@@ -73,21 +73,16 @@ public class databaseCatalog {
 		return tableFileCatalag.get(tableName)[0];		
 	}
 	
-	public static void main(String[] args) {
-		String inputSrcDir;
-		if(args.length == 2){
-			inputSrcDir = args[0];
-			databaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
-			String tableName = "Sailors";
-			System.out.print("Table " + tableName + "'s attribute list is :");			;
-			String [] output = databaseCatalog.getInstance().getTableAttributes(tableName);
-			for(int i=0; i<output.length; i++){
-				System.out.print(output[i]+ ATTR_DELIM);
-			}
-			
-			System.out.println("\nTable" + tableName + "'s data File path:" +databaseCatalog.getInstance().getDataFilePath(tableName));
-			
-		}		
-	}		
+//	public static void main(String[] args) {
+//		String inputSrcDir;
+//		if(args.length == 2){
+//			inputSrcDir = args[0];
+//			databaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
+//			String tableName = "Sailors";
+//			System.out.print("Table " + tableName + "'s attribute list is :");			;
+//			String [] output = databaseCatalog.getInstance().getTableAttributes(tableName);
+//			
+//		}		
+//	}		
 
 }

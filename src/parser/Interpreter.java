@@ -5,15 +5,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
+import operators.JoinOperator;
 import operators.Operator;
 import operators.ProjectOperator;
 import operators.ScanOperator;
 import operators.SelectOperator;
+import utils.databaseCatalog;
 
 /**
  * Class for getting started with JSQLParser. Reads SQL statements from
@@ -23,8 +27,13 @@ import operators.SelectOperator;
 public class Interpreter {
 
 	private static final String queriesFile = "sql/testQueries.sql";
-
+	
 	public static void main(String[] args) {
+		String inputSrcDir;
+		if(args.length == 2){
+			inputSrcDir = args[0];
+			databaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
+		}	
 		try {
 			CCJSqlParser parser = new CCJSqlParser(new FileReader(queriesFile));
 			Statement statement;
@@ -81,10 +90,74 @@ public class Interpreter {
 	
 	public static void handleJoin(PlainSelect body) {
 		Map<String, List<Operator>> tableOperators = new HashMap<String, List<Operator>>();
-		List<Expression> joins = new ArrayList<>();
+		List<Entry<List<String>,Expression>> joins = new ArrayList<>();
 		
-		WhereBuilder where = new WhereBuilder(tableOperators, joins);
-		body.getWhere().accept(where);
+		if (body.getWhere() != null) {
+			WhereBuilder where = new WhereBuilder(tableOperators, joins);
+			body.getWhere().accept(where);
+		}
 		
+		List<String> currentLeftJoinTables = new ArrayList<>();
+		currentLeftJoinTables.add(body.getFromItem().toString());
+		String currentRightJoinTable;
+		
+		Operator temp, root = null;
+		
+		for (Object exp: body.getJoins()) {
+			
+			currentRightJoinTable = ((Join)exp).getRightItem().toString();
+			Expression finalJoinCondition = null;
+			
+			if (root == null && currentLeftJoinTables.size() == 1) {
+				finalJoinCondition = getJoinCondition(joins, currentLeftJoinTables.get(0), currentRightJoinTable);
+				temp = new JoinOperator(finalJoinCondition, 
+						getBasicOperator(tableOperators, currentLeftJoinTables.get(0)), 
+						getBasicOperator(tableOperators, currentRightJoinTable));
+				root = temp;
+			} else {
+				for (String leftTable : currentLeftJoinTables) {
+					Expression currentTableJoin = getJoinCondition(joins, leftTable, currentRightJoinTable);
+					if (finalJoinCondition == null) {
+						finalJoinCondition = currentTableJoin;
+					} else {
+						finalJoinCondition = new AndExpression(finalJoinCondition, currentTableJoin);
+					}
+				}
+				temp = new JoinOperator(finalJoinCondition, root, getBasicOperator(tableOperators, currentRightJoinTable));
+				root = temp;
+			}
+			
+			currentLeftJoinTables.add(currentRightJoinTable);
+		}
+		
+		root.dump();
+	}
+	
+	public static Operator getBasicOperator(Map<String, List<Operator>> tableOperators, String tableName) {
+		
+		Operator op;
+		if (tableOperators.get(tableName) == null || tableOperators.get(tableName).isEmpty()) {
+			op = new ScanOperator(tableName);
+		} else {
+			op = tableOperators.get(tableName).get(0);
+		}	
+		return op;
+	}
+	
+	public static Expression getJoinCondition(List<Entry<List<String>,Expression>> joins, String leftTable, String rightTable) {
+		
+		Expression finalJoinExpression = null;
+		for (Entry<List<String>,Expression> join: joins) {
+			List<String> tables = join.getKey();
+			if (tables.contains(leftTable) && tables.contains(rightTable)) {
+				if (finalJoinExpression == null) {
+					finalJoinExpression = join.getValue();
+				} else {
+					finalJoinExpression = new AndExpression(finalJoinExpression, join.getValue());
+				}
+			}
+		}
+		
+		return finalJoinExpression;
 	}
 }

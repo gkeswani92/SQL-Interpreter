@@ -4,14 +4,15 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class Tuple {
 	
 	private String tableName;
 	private Boolean isSatisfies;
-	private HashMap<String, Integer> attributeValues = new HashMap<String, Integer>();
+	private Map<String, Integer> attributeValues = new LinkedHashMap<String, Integer>();
 	private static final String TUPLE_DELIM = ",";
 	private static final String ATTR_DELIM = " ";
 	private static final String schemaPath = "samples/input/db/schema.txt"; //TODO: Remove the hard coding
@@ -20,6 +21,11 @@ public class Tuple {
 		this.tableName = tableName;
 		this.createTuple(line);
 		this.isSatisfies = false;
+	}
+	
+	public Tuple (Tuple leftTuple, Tuple rightTuple){
+		this.attributeValues.putAll(leftTuple.getAttributeValues());
+		this.attributeValues.putAll(rightTuple.getAttributeValues());	
 	}
 	
 	@SuppressWarnings("resource")
@@ -59,7 +65,7 @@ public class Tuple {
 		//Creating a hash map of attribute name: value
 		//Attribute list is one index in front to ignore table name
 		for(int i=0; i<valueList.length; i++){
-			attributeValues.put(attributeList[i+1], Integer.parseInt(valueList[i]));
+			attributeValues.put(tableName + "." + attributeList[i+1], Integer.parseInt(valueList[i]));
 		}
 		return this;
 	}
@@ -104,5 +110,8 @@ public class Tuple {
 	public void setIsSatisfies(Boolean isSatisfies) {
 		this.isSatisfies = isSatisfies;
 	}
-
+	
+	public Map<String, Integer> getAttributeValues() {
+		return attributeValues;
+	}
 }

@@ -6,16 +6,18 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import utils.Tuple;
+import utils.databaseCatalog;
 
 public class ScanOperator extends Operator{
 	
 	private String tableName; 
 	private FileReader fileReaderObj;
 	private BufferedReader file;
-	private static final String filePath = "samples/input/db/data/Boats.csv"; //TODO: Remove the hard coding
+	private String filePath;
 	
 	public ScanOperator(String tableName) {
 		this.tableName = tableName;
+		filePath = databaseCatalog.getInstance().getDataFilePath(tableName);
 		try {
 			fileReaderObj = new FileReader(filePath);
 			file = new BufferedReader(fileReaderObj);
