@@ -22,7 +22,7 @@ import utils.databaseCatalog;
 /**
  * Class for getting started with JSQLParser. Reads SQL statements from
  * a file and extracts the elements of the SQL query to be further evaluated.
- * @author Tanvi Mehta
+ * @author tmm259
  */
 public class Interpreter {
 
@@ -63,7 +63,6 @@ public class Interpreter {
 	                        selOp.dump();
 	                	}
 	                } 
-	                
 	                else {    	
 	            		//Depending on whether the where clause is present or not, we decide the child i.e scan or select              	
 	                    ScanOperator scanOp = new ScanOperator(body.getFromItem().toString());
@@ -78,7 +77,6 @@ public class Interpreter {
 	                	projOp.dump();
 	                }    
 				} else {
-					// ADD JOIN LOGIC HERE
 					handleJoin(body);
 				}
 			}
@@ -88,16 +86,23 @@ public class Interpreter {
 		}
 	}
 	
+	/**
+	 * Takes in the select body, visits the where clause(to construct the query plan) and calls the joinOperator
+	 * @param body select body
+	 */
 	public static void handleJoin(PlainSelect body) {
 		Map<String, List<Operator>> tableOperators = new HashMap<String, List<Operator>>();
 		List<Entry<List<String>,Expression>> joins = new ArrayList<>();
 		
+		// If where clause exists, call visitor class to get map of basic operators and list of join conditions
 		if (body.getWhere() != null) {
 			WhereBuilder where = new WhereBuilder(tableOperators, joins);
 			body.getWhere().accept(where);
 		}
 		
 		List<String> currentLeftJoinTables = new ArrayList<>();
+		
+		// First left table comes from the FromItem
 		currentLeftJoinTables.add(body.getFromItem().toString());
 		String currentRightJoinTable;
 		
@@ -108,13 +113,20 @@ public class Interpreter {
 			currentRightJoinTable = ((Join)exp).getRightItem().toString();
 			Expression finalJoinCondition = null;
 			
+			// If the root is null and there is just 1 table in the left list of tables, create
+			// join operator tree with left and right table basic operators as left and right children
 			if (root == null && currentLeftJoinTables.size() == 1) {
 				finalJoinCondition = getJoinCondition(joins, currentLeftJoinTables.get(0), currentRightJoinTable);
 				temp = new JoinOperator(finalJoinCondition, 
 						getBasicOperator(tableOperators, currentLeftJoinTables.get(0)), 
 						getBasicOperator(tableOperators, currentRightJoinTable));
 				root = temp;
-			} else {
+			} 
+			// Add 1 table from join(joins from select body) into the left current join list
+			// Check if any of the tables in the left list have a join condition with the right table
+			// If they do, conjunct all the join conditions and create a join operator with the conjunct join condition
+			// Use old root as the left child and right table as right child
+			else {
 				for (String leftTable : currentLeftJoinTables) {
 					Expression currentTableJoin = getJoinCondition(joins, leftTable, currentRightJoinTable);
 					if (finalJoinCondition == null) {
@@ -127,37 +139,53 @@ public class Interpreter {
 				root = temp;
 			}
 			
+			// Add the current right table into the list of left tables for next iteration
 			currentLeftJoinTables.add(currentRightJoinTable);
 		}
-		
 		root.dump();
 	}
 	
+	/**
+	 * Get the basic(select or scan) operator tree (could be multiple select operators with AND conjunct) for the input table
+	 * @param tableOperators map of table name to basic operators from where clause
+	 * @param tableName
+	 * @return operator tree for table name
+	 */
 	public static Operator getBasicOperator(Map<String, List<Operator>> tableOperators, String tableName) {
 		
 		Operator op;
+		// If entry for table name does not exist in the map, use scan operator
 		if (tableOperators.get(tableName) == null || tableOperators.get(tableName).isEmpty()) {
 			op = new ScanOperator(tableName);
 		} else {
 			op = tableOperators.get(tableName).get(0);
-		}	
+		}
 		return op;
 	}
 	
+	/**
+	 * Get join condition on the input tables, if multiple join conditions exists, conjunct them using AND
+	 * @param joins list of all joins from the where clause
+	 * @param leftTable left join table
+	 * @param rightTable right join table
+	 * @return final join condition
+	 */
 	public static Expression getJoinCondition(List<Entry<List<String>,Expression>> joins, String leftTable, String rightTable) {
 		
 		Expression finalJoinExpression = null;
 		for (Entry<List<String>,Expression> join: joins) {
 			List<String> tables = join.getKey();
+			// If join condition contains both tables
 			if (tables.contains(leftTable) && tables.contains(rightTable)) {
 				if (finalJoinExpression == null) {
 					finalJoinExpression = join.getValue();
-				} else {
+				}
+				// If tables have multiple join conditions, conjunct using AND
+				else {
 					finalJoinExpression = new AndExpression(finalJoinExpression, join.getValue());
 				}
 			}
 		}
-		
 		return finalJoinExpression;
 	}
 }

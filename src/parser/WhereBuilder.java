@@ -57,7 +57,7 @@ import operators.SelectOperator;
  * and join conditions on tables.
  * @author tmm259
  */
-public class WhereBuilder implements ExpressionVisitor{
+public class WhereBuilder implements ExpressionVisitor {
 
 	private Map<String, List<Operator>> tableOperators;
 	private List<Entry<List<String>,Expression>> joins;
