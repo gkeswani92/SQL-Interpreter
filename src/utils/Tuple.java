@@ -1,6 +1,7 @@
 package utils;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,7 +70,7 @@ public class Tuple {
 		attributeValues.remove(key);
 	}
 	
-	public Tuple retainAttributes(Set<String> colNames) {
+	public Tuple retainAttributes(List<String> colNames) {
 		attributeValues.keySet().retainAll(colNames);
 		return this;
 	}
