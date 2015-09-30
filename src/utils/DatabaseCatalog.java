@@ -14,21 +14,21 @@ import java.util.HashMap;
  * @author sv387
  *
  */
-public class databaseCatalog {
+public class DatabaseCatalog {
 	private static HashMap<String,String[]> tableFileCatalag = new HashMap<String,String[]>();
 	private static HashMap<String,String[]> tableSchemaCatalag = new HashMap<String,String[]>();
 	private static final String ATTR_DELIM = " ";	
-	private static databaseCatalog instance;
+	private static DatabaseCatalog instance;
 	
-	private databaseCatalog() {	}
+	private DatabaseCatalog() {	}
 	
 	/*private static class databaseCatalogHolder{		
 		private static final databaseCatalog INSTANCE = new databaseCatalog();
 	}*/
 	
-	public static synchronized databaseCatalog getInstance() {
+	public static synchronized DatabaseCatalog getInstance() {
 		if(instance == null){
-			instance = new databaseCatalog();
+			instance = new DatabaseCatalog();
 		}
         return instance;
 	}	

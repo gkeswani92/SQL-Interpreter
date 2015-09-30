@@ -19,7 +19,7 @@ import operators.ProjectOperator;
 import operators.ScanOperator;
 import operators.SelectOperator;
 import operators.SortOperator;
-import utils.databaseCatalog;
+import utils.DatabaseCatalog;
 
 /**
  * Class for getting started with JSQLParser. Reads SQL statements from
@@ -37,7 +37,7 @@ public class Interpreter {
 		//Building the single instance of the database catalog
 		if(args.length == 2){
 			inputSrcDir = args[0];
-			databaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
+			DatabaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
 		}
 		
 		try {
@@ -162,7 +162,7 @@ public class Interpreter {
 		if(body.getFromItem().getAlias()!=null){
 			currentLeftJoinTables.add(body.getFromItem().getAlias());
 			String basetableName = body.getFromItem().toString().substring(0,body.getFromItem().toString().indexOf(" "));
-			databaseCatalog.getInstance().setEntryForAlias(basetableName, body.getFromItem().getAlias());
+			DatabaseCatalog.getInstance().setEntryForAlias(basetableName, body.getFromItem().getAlias());
 		}else {
 			currentLeftJoinTables.add(body.getFromItem().toString());
 		}
@@ -175,7 +175,7 @@ public class Interpreter {
 			if(((Join)exp).getRightItem().getAlias()!=null){
 				currentRightJoinTable = ((Join)exp).getRightItem().getAlias();
 				String basetableName = ((Join)exp).getRightItem().toString().substring(0,((Join)exp).getRightItem().toString().indexOf(" "));
-				databaseCatalog.getInstance().setEntryForAlias(basetableName, ((Join)exp).getRightItem().getAlias());
+				DatabaseCatalog.getInstance().setEntryForAlias(basetableName, ((Join)exp).getRightItem().getAlias());
 			}else{
 				currentRightJoinTable = ((Join)exp).getRightItem().toString();
 			}

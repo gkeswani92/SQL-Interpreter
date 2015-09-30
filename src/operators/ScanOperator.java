@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import utils.Tuple;
-import utils.databaseCatalog;
+import utils.DatabaseCatalog;
 
 public class ScanOperator extends Operator{
 	
@@ -23,7 +23,7 @@ public class ScanOperator extends Operator{
 			this.tableName = updateCatalogForAlias(this.tableName,body.getFromItem().getAlias());
 			alias = body.getFromItem().getAlias();
 		}
-		filePath = databaseCatalog.getInstance().getDataFilePath(this.tableName);
+		filePath = DatabaseCatalog.getInstance().getDataFilePath(this.tableName);
 		try {
 			fileReaderObj = new FileReader(filePath);
 			file = new BufferedReader(fileReaderObj);
@@ -36,7 +36,7 @@ public class ScanOperator extends Operator{
 	public ScanOperator(String tableName) {
 		this.tableName = tableName;
 		
-		filePath = databaseCatalog.getInstance().getDataFilePath(this.tableName);
+		filePath = DatabaseCatalog.getInstance().getDataFilePath(this.tableName);
 		try {
 			fileReaderObj = new FileReader(filePath);
 			file = new BufferedReader(fileReaderObj);
@@ -50,7 +50,7 @@ public class ScanOperator extends Operator{
 		// TODO Auto-generated method stub
 		if(tableName.contains("AS")){
 			String baseTable = tableName.substring(0,tableName.indexOf(" "));
-			databaseCatalog.getInstance().setEntryForAlias(baseTable, alias);
+			DatabaseCatalog.getInstance().setEntryForAlias(baseTable, alias);
 			return tableName.substring(0,tableName.indexOf(" "));
 		}else{
 			return tableName;

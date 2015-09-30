@@ -29,7 +29,7 @@ public class Tuple {
 	}
 	
 	public String[] getTableAttributes(String tableName) {
-		return databaseCatalog.getInstance().getTableAttributes(tableName);
+		return DatabaseCatalog.getInstance().getTableAttributes(tableName);
 	}
 	
 	public Tuple createTuple(String line) {
