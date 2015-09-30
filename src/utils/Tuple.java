@@ -16,7 +16,6 @@ public class Tuple {
 	private Boolean isSatisfies;
 	private Map<String, Integer> attributeValues = new LinkedHashMap<String, Integer>();
 	private static final String TUPLE_DELIM = ",";
-	private static final String ATTR_DELIM = " ";
 	
 	public Tuple(String line, String tableName){
 		this.tableName = tableName;
