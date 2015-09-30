@@ -29,7 +29,7 @@ import utils.DumpRelations;
  */
 public class Interpreter {
 
-	private static final String queriesFile = "sql/queries.sql";
+	private static String queriesFile = null;
 	
 	public static void main(String[] args) {
 		
@@ -41,6 +41,7 @@ public class Interpreter {
 		if(args.length == 2){
 			inputSrcDir = args[0];
             outputScrDir = args[1];
+            queriesFile = inputSrcDir+"/queries.sql";
 			DatabaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
 			writeToFile = new DumpRelations(outputScrDir);
 		}
