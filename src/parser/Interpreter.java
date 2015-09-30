@@ -142,17 +142,29 @@ public class Interpreter {
 			body.getWhere().accept(where);
 		}
 		
-		List<String> currentLeftJoinTables = new ArrayList<>();
+		List<String> currentLeftJoinTables = new ArrayList<>();		
 		
 		// First left table comes from the FromItem
-		currentLeftJoinTables.add(body.getFromItem().toString());
+		if(body.getFromItem().getAlias()!=null){
+			currentLeftJoinTables.add(body.getFromItem().getAlias());
+			String basetableName = body.getFromItem().toString().substring(0,body.getFromItem().toString().indexOf(" "));
+			databaseCatalog.getInstance().setEntryForAlias(basetableName, body.getFromItem().getAlias());
+		}else {
+			currentLeftJoinTables.add(body.getFromItem().toString());
+		}
 		String currentRightJoinTable;
 		
 		Operator temp, root = null;
 		
 		for (Object exp: body.getJoins()) {
 			
-			currentRightJoinTable = ((Join)exp).getRightItem().toString();
+			if(((Join)exp).getRightItem().getAlias()!=null){
+				currentRightJoinTable = ((Join)exp).getRightItem().getAlias();
+				String basetableName = ((Join)exp).getRightItem().toString().substring(0,((Join)exp).getRightItem().toString().indexOf(" "));
+				databaseCatalog.getInstance().setEntryForAlias(basetableName, ((Join)exp).getRightItem().getAlias());
+			}else{
+				currentRightJoinTable = ((Join)exp).getRightItem().toString();
+			}
 			Expression finalJoinCondition = null;
 			
 			// If the root is null and there is just 1 table in the left list of tables, create

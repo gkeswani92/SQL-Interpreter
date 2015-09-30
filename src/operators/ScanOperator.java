@@ -5,19 +5,25 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import net.sf.jsqlparser.statement.select.PlainSelect;
 import utils.Tuple;
 import utils.databaseCatalog;
 
 public class ScanOperator extends Operator{
 	
 	private String tableName; 
+	private String alias;
 	private FileReader fileReaderObj;
 	private BufferedReader file;
 	private String filePath;
 	
-	public ScanOperator(String tableName) {
-		this.tableName = tableName;
-		filePath = databaseCatalog.getInstance().getDataFilePath(tableName);
+	public ScanOperator(PlainSelect body) {
+		this.tableName = body.getFromItem().toString();
+		if(body.getFromItem().getAlias()!=null){
+			this.tableName = updateCatalogForAlias(this.tableName,body.getFromItem().getAlias());
+			alias = body.getFromItem().getAlias();
+		}
+		filePath = databaseCatalog.getInstance().getDataFilePath(this.tableName);
 		try {
 			fileReaderObj = new FileReader(filePath);
 			file = new BufferedReader(fileReaderObj);
@@ -27,6 +33,31 @@ public class ScanOperator extends Operator{
 		}
 	}
 	
+	public ScanOperator(String tableName) {
+		this.tableName = tableName;
+		
+		filePath = databaseCatalog.getInstance().getDataFilePath(this.tableName);
+		try {
+			fileReaderObj = new FileReader(filePath);
+			file = new BufferedReader(fileReaderObj);
+		} 
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private String updateCatalogForAlias(String tableName,String alias) {
+		// TODO Auto-generated method stub
+		if(tableName.contains("AS")){
+			String baseTable = tableName.substring(0,tableName.indexOf(" "));
+			databaseCatalog.getInstance().setEntryForAlias(baseTable, alias);
+			return tableName.substring(0,tableName.indexOf(" "));
+		}else{
+			return tableName;
+		}
+		
+	}
+
 	/**
 	 * Gets the next tuple in the table
 	 */
@@ -39,7 +70,10 @@ public class ScanOperator extends Operator{
 			if(line==null){
 				return currentTuple;
 			}
-			currentTuple = new Tuple(line, tableName); 			
+			if(alias != null)
+				currentTuple = new Tuple(line, alias); 	
+			else 
+				currentTuple = new Tuple(line, tableName); 	
 		} 
 		catch (IOException e) {
 			e.printStackTrace();

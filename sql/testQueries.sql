@@ -1,1 +1,1 @@
-SELECT Boats.id FROM Boats;
+SELECT B.id,C.id FROM Boats B, Boats C;

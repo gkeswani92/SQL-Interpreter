@@ -72,17 +72,14 @@ public class databaseCatalog {
 		// TODO Auto-generated method stub
 		return tableFileCatalag.get(tableName)[0];		
 	}
-	
-//	public static void main(String[] args) {
-//		String inputSrcDir;
-//		if(args.length == 2){
-//			inputSrcDir = args[0];
-//			databaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
-//			String tableName = "Sailors";
-//			System.out.print("Table " + tableName + "'s attribute list is :");			;
-//			String [] output = databaseCatalog.getInstance().getTableAttributes(tableName);
-//			
-//		}		
-//	}		
+
+	public void setEntryForAlias(String baseTable, String alias) {
+		// TODO Auto-generated method stub
+		tableSchemaCatalag.put(alias, getTableAttributes(baseTable));
+		String[] dataFilePath = new String[1];
+		dataFilePath[0] = getDataFilePath(baseTable);
+		tableFileCatalag.put(alias,dataFilePath);		
+	}	
+		
 
 }
