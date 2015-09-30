@@ -85,8 +85,8 @@ public class Interpreter {
 	                		root = new DuplicateEliminationOperator(root);
 	                }
 	    			
-	    			root.dump();
-//	    			writeToFile.writeRelationToFile(root, queryCount);
+//	    			root.dump();
+	    			writeToFile.writeRelationToFile(root, queryCount);
 	    			
 	    			//Reading the next statement
 	    			statement = parser.Statement();
