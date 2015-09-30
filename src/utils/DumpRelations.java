@@ -3,8 +3,6 @@ package utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-
 import operators.Operator;
 
 public class DumpRelations {
@@ -27,7 +25,7 @@ public class DumpRelations {
 			currentTuple = root.getNextTuple();
 		}
 		
-		if(tableDump != null)
+		if(tableDump != null) {
 			try {
 				writer = new PrintWriter(filename);
 				writer.println(tableDump.trim());
@@ -36,5 +34,6 @@ public class DumpRelations {
 			catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
+		}
 	}
 }
