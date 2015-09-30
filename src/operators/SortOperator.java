@@ -34,6 +34,10 @@ public class SortOperator extends Operator {
 				currTuple = child.getNextTuple();
 			}
 			
+			if (sortConditions.isEmpty()) {
+				sortConditions = new ArrayList<String>(currTuple.getArributeList());
+			} 
+			
 			tuples.sort(new TupleComparator(sortConditions));
 		}
 		
