@@ -45,7 +45,9 @@ public class Interpreter {
                 @SuppressWarnings("unchecked")
 				List<SelectItem> selectAttr = body.getSelectItems();
                 
+                //If there are no joins in the query
                 if (body.getJoins() == null) {
+                	
 	                //Decision statements to decide from which operator to enter
 	                if (selectAttr.size() == 1 && selectAttr.get(0).toString() == "*") { 
 	                	
@@ -63,34 +65,59 @@ public class Interpreter {
 	                        selOp.dump();
 	                	}
 	                } 
+	                
+	                //If the query consists of projections
 	                else {    	
-	            		//Depending on whether the where clause is present or not, we decide the child i.e scan or select              	
-	                    ScanOperator scanOp = new ScanOperator(body.getFromItem().toString());
-	                    ProjectOperator projOp = null;
-	            		if(body.getWhere()!=null) {
-	                        SelectOperator child = new SelectOperator(body.getWhere(), scanOp);
-	                        projOp = new ProjectOperator(body, child);
-	            		}
-	            		else {
-	            			projOp = new ProjectOperator(body, scanOp);
-	            		}
+	            		handleProjectWithoutJoin(body);
+	                }     
+				} 
+                
+                //If the query consists of joins
+                else {
+                	//Join expression needs to be created in any case
+                	Operator root = handleJoin(body);
+                	
+                	//Decision statements to decide whether to flush the output or to make it a child of project
+	                if (selectAttr.size() == 1 && selectAttr.get(0).toString() == "*") 
+	                	root.dump();
+	                else {
+	                	System.out.println("Projection has been called on the join operator");
+	                	ProjectOperator projOp = new ProjectOperator(body, root);
 	                	projOp.dump();
-	                }    
-				} else {
-					handleJoin(body);
-				}
+	                }
+                }
 			}
 		} catch (Exception e) {
 			System.err.println("Exception occurred during parsing");
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * Depending on whether the where clause is present or not, we 
+	 * decide the child i.e scan or select 
+	 * @param body
+	 */
+	private static void handleProjectWithoutJoin(PlainSelect body) {
+		             	
+		ScanOperator scanOp = new ScanOperator(body.getFromItem().toString());
+		ProjectOperator projOp = null;
+		
+		if(body.getWhere()!=null) {
+		    SelectOperator child = new SelectOperator(body.getWhere(), scanOp);
+		    projOp = new ProjectOperator(body, child);
+		}
+		else {
+			projOp = new ProjectOperator(body, scanOp);
+		}
+		projOp.dump();
+	}
 	
 	/**
 	 * Takes in the select body, visits the where clause(to construct the query plan) and calls the joinOperator
 	 * @param body select body
 	 */
-	public static void handleJoin(PlainSelect body) {
+	public static Operator handleJoin(PlainSelect body) {
 		Map<String, List<Operator>> tableOperators = new HashMap<String, List<Operator>>();
 		List<Entry<List<String>,Expression>> joins = new ArrayList<>();
 		
@@ -142,7 +169,7 @@ public class Interpreter {
 			// Add the current right table into the list of left tables for next iteration
 			currentLeftJoinTables.add(currentRightJoinTable);
 		}
-		root.dump();
+		return root;
 	}
 	
 	/**
