@@ -42,40 +42,54 @@ public class Interpreter {
 		
 		try {
 			CCJSqlParser parser = new CCJSqlParser(new FileReader(queriesFile));
-			Statement statement;
+			Statement statement = parser.Statement();
 			Operator root;
 			
-			while ((statement = parser.Statement()) != null) {
-				System.out.println("Read statement: " + statement);
-				Select select = (Select) statement;
-                PlainSelect body = (PlainSelect) select.getSelectBody();
-                @SuppressWarnings("unchecked")
-				List<SelectItem> selectAttr = body.getSelectItems();
-             
-                //Decision statement to check if the query consists of a join or not
-                if (body.getJoins() == null) 
-	                root = handleWithoutJoin(body, selectAttr);
+							
+			while (statement != null) {
 				
-                else {
-                	root = handleJoin(body);
-                	
-                	//Making join the child of project operation
-	                if (selectAttr.size() != 1 || selectAttr.get(0).toString() != "*") {
-	                	System.out.println("Projection has been called on the join operator");
-	                	root = new ProjectOperator(body, root);
+				try {
+					System.out.println("Read statement: " + statement);
+					Select select = (Select) statement;
+	                PlainSelect body = (PlainSelect) select.getSelectBody();
+	                @SuppressWarnings("unchecked")
+					List<SelectItem> selectAttr = body.getSelectItems();
+	             
+	                //Decision statement to check if the query consists of a join or not
+	                if (body.getJoins() == null) 
+		                root = handleWithoutJoin(body, selectAttr);
+					
+	                else {
+	                	root = handleJoin(body);
+	                	
+	                	//Making join the child of project operation
+		                if (selectAttr.size() != 1 || selectAttr.get(0).toString() != "*") {
+		                	System.out.println("Projection has been called on the join operator");
+		                	root = new ProjectOperator(body, root);
+		                }
 	                }
-                }
-                
-                // If order by clause exists or distinct operator exists, first make sort the parent
-                if (body.getOrderByElements() != null || body.getDistinct() != null) {
-					Operator temp = new SortOperator(body.getOrderByElements(), root);
-                	root = temp;
-                			
-                	//If distinct exists, make it the parent
-                	if(body.getDistinct() != null)
-                		root = new DuplicateEliminationOperator(root);
-                }
-    			root.dump();
+	                
+	                // If order by clause exists or distinct operator exists, first make sort the parent
+	                if (body.getOrderByElements() != null || body.getDistinct() != null) {
+						@SuppressWarnings("unchecked")
+						Operator temp = new SortOperator(body.getOrderByElements(), root);
+	                	root = temp;
+	                			
+	                	//If distinct exists, make it the parent
+	                	if(body.getDistinct() != null)
+	                		root = new DuplicateEliminationOperator(root);
+	                }
+	    			root.dump();
+	    			
+	    			//Reading the next statement
+	    			statement = parser.Statement();
+				}
+			
+				catch(Exception e) {
+					System.err.println("Exception occurred during parsing current query. Moving to next query");
+					e.printStackTrace();
+					statement = parser.Statement();
+				}	
 			}
 		}
 		catch (Exception e) {
