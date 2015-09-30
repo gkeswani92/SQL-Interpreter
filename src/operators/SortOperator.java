@@ -19,9 +19,10 @@ public class SortOperator extends Operator {
 		this.currIndex = 0;
 		this.tuples = new ArrayList<Tuple>();
 		this.sortConditions = new ArrayList<String>();
-		for (OrderByElement el : sortConditions) {
-			this.sortConditions.add(el.toString());
-		}
+		
+		if(sortConditions != null) 
+			for (OrderByElement el : sortConditions) 
+				this.sortConditions.add(el.toString());
 	}
 	
 	@Override
@@ -35,7 +36,7 @@ public class SortOperator extends Operator {
 			}
 			
 			if (sortConditions.isEmpty()) {
-				sortConditions = new ArrayList<String>(currTuple.getArributeList());
+				sortConditions = new ArrayList<String>(tuples.get(0).getArributeList());
 			} 
 			
 			tuples.sort(new TupleComparator(sortConditions));

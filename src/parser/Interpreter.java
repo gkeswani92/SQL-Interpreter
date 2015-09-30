@@ -12,6 +12,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
+import operators.DuplicateEliminationOperator;
 import operators.JoinOperator;
 import operators.Operator;
 import operators.ProjectOperator;
@@ -65,10 +66,14 @@ public class Interpreter {
 	                }
                 }
                 
-                // If order by clause exists, make it the parent
-                if (body.getOrderByElements() != null) {
-                	Operator temp = new SortOperator(body.getOrderByElements(), root);
+                // If order by clause exists or distinct operator exists, first make sort the parent
+                if (body.getOrderByElements() != null || body.getDistinct() != null) {
+					Operator temp = new SortOperator(body.getOrderByElements(), root);
                 	root = temp;
+                			
+                	//If distinct exists, make it the parent
+                	if(body.getDistinct() != null)
+                		root = new DuplicateEliminationOperator(root);
                 }
     			root.dump();
 			}
@@ -117,9 +122,9 @@ public class Interpreter {
 		    SelectOperator child = new SelectOperator(body.getWhere(), scanOp);
 		    projOp = new ProjectOperator(body, child);
 		}
-		else {
+		else 
 			projOp = new ProjectOperator(body, scanOp);
-		}
+		
 		return projOp;
 	}
 	
