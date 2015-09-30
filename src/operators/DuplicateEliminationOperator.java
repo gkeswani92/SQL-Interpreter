@@ -1,7 +1,6 @@
 package operators;
 
 import java.util.ArrayList;
-
 import utils.Tuple;
 import utils.TupleComparator;
 

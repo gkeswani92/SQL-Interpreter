@@ -20,6 +20,7 @@ import operators.ScanOperator;
 import operators.SelectOperator;
 import operators.SortOperator;
 import utils.DatabaseCatalog;
+import utils.DumpRelations;
 
 /**
  * Class for getting started with JSQLParser. Reads SQL statements from
@@ -32,19 +33,23 @@ public class Interpreter {
 	
 	public static void main(String[] args) {
 		
-		String inputSrcDir;
+		String inputSrcDir = "";
+		String outputScrDir = "";
+		DumpRelations writeToFile = null;
 		
 		//Building the single instance of the database catalog
 		if(args.length == 2){
 			inputSrcDir = args[0];
+            outputScrDir = args[1];
 			DatabaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
+			writeToFile = new DumpRelations(outputScrDir);
 		}
 		
 		try {
 			CCJSqlParser parser = new CCJSqlParser(new FileReader(queriesFile));
 			Statement statement = parser.Statement();
 			Operator root;
-			
+			Integer queryCount = 0;
 							
 			while (statement != null) {
 				
@@ -79,16 +84,20 @@ public class Interpreter {
 	                	if(body.getDistinct() != null)
 	                		root = new DuplicateEliminationOperator(root);
 	                }
-	    			root.dump();
 	    			
 	    			//Reading the next statement
 	    			statement = parser.Statement();
+	    			queryCount ++;
+	    			
+	    			//root.dump();
+	    			writeToFile.writeRelationToFile(root, queryCount);
 				}
 			
 				catch(Exception e) {
 					System.err.println("Exception occurred during parsing current query. Moving to next query");
 					e.printStackTrace();
 					statement = parser.Statement();
+					queryCount++;
 				}	
 			}
 		}
