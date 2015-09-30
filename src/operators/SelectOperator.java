@@ -15,7 +15,6 @@ public class SelectOperator extends Operator {
 	
 	Operator child;
 	Expression whereClause;
-	String tableName;
 	
 	public SelectOperator(Expression exp, Operator child) {
 		this.child = child;
@@ -43,7 +42,7 @@ public class SelectOperator extends Operator {
     
     @Override
     public void reset() {
-    	child = new ScanOperator(tableName);
+    	child.reset();
     }
     
     public Expression getExpression(){

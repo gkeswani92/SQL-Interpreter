@@ -29,7 +29,7 @@ import utils.DumpRelations;
  */
 public class Interpreter {
 
-	private static final String queriesFile = "sql/testQueries.sql";
+	private static final String queriesFile = "sql/queries.sql";
 	
 	public static void main(String[] args) {
 		
@@ -49,7 +49,7 @@ public class Interpreter {
 			CCJSqlParser parser = new CCJSqlParser(new FileReader(queriesFile));
 			Statement statement = parser.Statement();
 			Operator root;
-			Integer queryCount = 0;
+			Integer queryCount = 1;
 							
 			while (statement != null) {
 				
@@ -85,19 +85,19 @@ public class Interpreter {
 	                		root = new DuplicateEliminationOperator(root);
 	                }
 	    			
+	    			root.dump();
+//	    			writeToFile.writeRelationToFile(root, queryCount);
+	    			
 	    			//Reading the next statement
 	    			statement = parser.Statement();
 	    			queryCount ++;
-	    			
-	    			//root.dump();
-	    			writeToFile.writeRelationToFile(root, queryCount);
 				}
 			
 				catch(Exception e) {
 					System.err.println("Exception occurred during parsing current query. Moving to next query");
 					e.printStackTrace();
 					statement = parser.Statement();
-					queryCount++;
+					queryCount ++;
 				}	
 			}
 		}

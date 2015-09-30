@@ -9,13 +9,10 @@ import utils.Tuple;
 
 public class ProjectOperator extends Operator {
 		
-	private String tableName;
 	private Operator child;
-	private PlainSelect body;
 	private List<String> requiredColumns; 
 	
 	public ProjectOperator(PlainSelect body, Operator child) {
-		this.body = body;
 		this.child = child;
 		this.requiredColumns = new ArrayList<String>();
 		@SuppressWarnings("unchecked")
@@ -46,10 +43,7 @@ public class ProjectOperator extends Operator {
 
 	@Override
 	public void reset() {
-		if(body.getWhere()!=null)
-			child = new SelectOperator(body.getWhere(), new ScanOperator(tableName));
-		else
-			child = new ScanOperator(tableName);
+		child.reset();
 	}
 	
     public Operator getChild() {

@@ -25,15 +25,13 @@ public class DumpRelations {
 			currentTuple = root.getNextTuple();
 		}
 		
-		if(tableDump != null) {
-			try {
-				writer = new PrintWriter(filename);
-				writer.println(tableDump.trim());
-				writer.close();
-			} 
-			catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+		try {
+			writer = new PrintWriter(filename);
+			writer.println(tableDump.trim());
+			writer.close();
+		} 
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
 	}
 }

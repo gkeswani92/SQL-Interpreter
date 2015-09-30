@@ -47,9 +47,11 @@ public class Tuple {
 	public String toStringValues() {
 		String values = "";
 		for(String key : attributeValues.keySet()) {
-			values = values + attributeValues.get(key) + " ";
+			values = values + attributeValues.get(key) + ",";
 		}
-		return values;
+		// Remove trailing ,
+		// TODO: REMOVE THIS ITS TOO PYTHONY
+		return values.substring(0, values.length()-1);
 	}
 	
 	public String toStringAttributes(){
