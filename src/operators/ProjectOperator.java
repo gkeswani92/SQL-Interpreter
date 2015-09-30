@@ -1,7 +1,11 @@
 package operators;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
@@ -9,22 +13,21 @@ import utils.Tuple;
 
 public class ProjectOperator extends Operator {
 		
-	String tableName;
-	Operator child;
-	Set<String> requiredColumns;
-	PlainSelect body;
-
+	private String tableName;
+	private Operator child;
+	private PlainSelect body;
+	private List<String> requiredColumns; 
+	
 	public ProjectOperator(PlainSelect body, Operator child) {
-		this.tableName = body.getFromItem().toString();
 		this.body = body;
 		this.child = child;
+		this.requiredColumns = new ArrayList<String>();
+		@SuppressWarnings("unchecked")
+		List<SelectExpressionItem> selectColumns = body.getSelectItems();
 		
-		//Adding the columns from the query into the required Column hash set
-		requiredColumns = new HashSet<String>();
-		for(Object c: body.getSelectItems()) {
-			SelectExpressionItem currentExpression = (SelectExpressionItem)c;
-			requiredColumns.add(body.getFromItem().toString() + "." + ((Column) currentExpression.getExpression()).getColumnName());
-		}
+		//Converting each select item to string
+		for(Object c: selectColumns) 
+			requiredColumns.add(c.toString());
 	}
 	
 	/**
