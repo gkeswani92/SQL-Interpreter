@@ -4,6 +4,12 @@ import net.sf.jsqlparser.expression.Expression;
 import parser.ExpressionEvaluator;
 import utils.Tuple;
 
+/**
+ * Extends operator for implementation of join operator. Contains a left child and a right child
+ * and returns the next tuple that satisfies the join condition
+ * In case of no join condition, returns the next tuple in the cartesian product
+ * @author tmm259
+ */
 public class JoinOperator extends Operator {
 	
 	Operator leftChild;
@@ -25,14 +31,16 @@ public class JoinOperator extends Operator {
 			currLeftTuple = leftChild.getNextTuple();
 		}		
 		
+		// Make left tuple the outer table and iterate through the right child(inner table)
 		while (currLeftTuple != null) {
 			currRightTuple = rightChild.getNextTuple();
 			while (currRightTuple != null) {
 				Tuple joinTuple = new Tuple(currLeftTuple, currRightTuple);
 				
-				// Cartesian product
+				// Cartesian product (in case of no join condition)
 				if (joinCondition == null) {
 					return joinTuple;
+					
 				} else {
 					// Evaluate join condition	
 					ExpressionEvaluator ob = new ExpressionEvaluator(joinTuple);

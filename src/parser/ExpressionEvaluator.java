@@ -48,10 +48,6 @@ import utils.Tuple;
  * @author tanvimehta
  *
  */
-
-// TODO: RIGHT SIDE OF EXPRESSION COULD BE ANOTHER COLUMN REFERENCE!!!!!!! 
-// CHECK FIRST!!!!!!!!!!!!!!!!!!
-
 public class ExpressionEvaluator implements ExpressionVisitor {
 
 	Tuple currTuple;

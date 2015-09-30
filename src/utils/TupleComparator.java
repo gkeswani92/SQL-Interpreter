@@ -3,6 +3,11 @@ package utils;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Compares tuples using the list of conditions passed into the constructor.
+ * Conditions specify the column names to sort on.
+ * @author tmm259
+ */
 public class TupleComparator implements Comparator<Tuple>{
 
 	List<String> columns;

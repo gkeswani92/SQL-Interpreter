@@ -4,6 +4,13 @@ import net.sf.jsqlparser.expression.Expression;
 import parser.ExpressionEvaluator;
 import utils.Tuple;
 
+/**
+ * Extends operator to implement select operator.
+ * Has 1 child. Returns the next tuple that satisfies the selection condition.
+ * Evaluates the selection condition by calling an evaluate visitor class.
+ * @author tmm259
+ *
+ */
 public class SelectOperator extends Operator {
 	
 	Operator child;
@@ -25,12 +32,12 @@ public class SelectOperator extends Operator {
     	while (currentTuple != null) {
 	        ExpressionEvaluator ob = new ExpressionEvaluator(currentTuple);
 	        whereClause.accept(ob);
+	        // Check if tuple satisfies the select condition
 	        if (currentTuple.getIsSatisfies()) {
 	        	return currentTuple;
 	        }
 	        currentTuple = child.getNextTuple();
-    	}
-    	
+    	}	
     	return null;
     }
     

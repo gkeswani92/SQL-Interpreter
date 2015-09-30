@@ -7,6 +7,12 @@ import net.sf.jsqlparser.statement.select.OrderByElement;
 import utils.Tuple;
 import utils.TupleComparator;
 
+/**
+ * Extends operator to implement sort operator.
+ * This is a blocking operator that gets all tuples from its child(just 1 child) and
+ * sorts them in ascending order. Returns one tuple at a time.
+ * @author tmm259
+ */
 public class SortOperator extends Operator {
 
 	Operator child;
@@ -28,6 +34,7 @@ public class SortOperator extends Operator {
 	@Override
 	public Tuple getNextTuple() {
 		
+		// Get all tuples from child
 		if (tuples.isEmpty()) {
 			Tuple currTuple = child.getNextTuple();
 			while (currTuple != null) {
@@ -35,13 +42,17 @@ public class SortOperator extends Operator {
 				currTuple = child.getNextTuple();
 			}
 			
+			// If query has no sort condition (in case of distinct), sort using all attributes
+			// For further explanation refer DuplicateElimationOperator.java
 			if (sortConditions.isEmpty()) {
 				sortConditions = new ArrayList<String>(tuples.get(0).getArributeList());
 			} 
 			
+			// Sort using tuple comparator
 			tuples.sort(new TupleComparator(sortConditions));
 		}
 		
+		// Return one tuple at a time
 		if (currIndex < tuples.size()) {
 			return tuples.get(currIndex++);
 		} else {
