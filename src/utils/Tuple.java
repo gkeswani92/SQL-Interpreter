@@ -72,6 +72,13 @@ public class Tuple {
 	
 	public Tuple retainAttributes(List<String> colNames) {
 		attributeValues.keySet().retainAll(colNames);
+		Map<String, Integer> orderedAttributeValues = new LinkedHashMap<String, Integer>();
+		
+		//Creating an ordered version of the attribute list depending on the column order that was specified
+		for (String column: colNames) 
+			orderedAttributeValues.put(column, attributeValues.get(column));
+		
+		this.setAttributeValues(orderedAttributeValues);
 		return this;
 	}
 	
@@ -88,5 +95,9 @@ public class Tuple {
 	
 	public Map<String, Integer> getAttributeValues() {
 		return attributeValues;
+	}
+	
+	public void setAttributeValues(Map<String, Integer> orderedAttributeValues) {
+		attributeValues = orderedAttributeValues;
 	}
 }
