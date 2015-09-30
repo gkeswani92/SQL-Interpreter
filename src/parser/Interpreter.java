@@ -17,6 +17,7 @@ import operators.Operator;
 import operators.ProjectOperator;
 import operators.ScanOperator;
 import operators.SelectOperator;
+import operators.SortOperator;
 import utils.databaseCatalog;
 
 /**
@@ -64,6 +65,11 @@ public class Interpreter {
 	                }
                 }
                 
+                // If order by clause exists, make it the parent
+                if (body.getOrderByElements() != null) {
+                	Operator temp = new SortOperator(body.getOrderByElements(), root);
+                	root = temp;
+                }
     			root.dump();
 			}
 		}
