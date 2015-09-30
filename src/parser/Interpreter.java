@@ -91,12 +91,12 @@ public class Interpreter {
 			
 			//Enter from scan if there is no where clause
 			if (body.getWhere() == null) 
-				root = new ScanOperator(body.getFromItem().toString());
+				root = new ScanOperator(body);
 
 			//Enter from select if query has where clause
 			else {  		
 				System.out.println("Where clause is:  " + body.getWhere());
-		        ScanOperator scanOp = new ScanOperator(body.getFromItem().toString());
+		        ScanOperator scanOp = new ScanOperator(body);
 		        root = new SelectOperator(body.getWhere(), scanOp);	                              
 			}
 		} 
@@ -115,7 +115,7 @@ public class Interpreter {
 	 */
 	private static Operator handleProjectWithoutJoin(PlainSelect body) {
 		             	
-		ScanOperator scanOp = new ScanOperator(body.getFromItem().toString());
+		ScanOperator scanOp = new ScanOperator(body);
 		ProjectOperator projOp = null;
 		
 		if(body.getWhere()!=null) {
