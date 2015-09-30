@@ -10,15 +10,18 @@ import utils.TupleComparator;
 public class SortOperator extends Operator {
 
 	Operator child;
-	List<OrderByElement> sortConditions;
+	List<String> sortConditions;
 	List<Tuple> tuples;
 	Integer currIndex;
 	
 	public SortOperator(List<OrderByElement> sortConditions, Operator child) {
 		this.child = child;
-		this.sortConditions = sortConditions;
 		this.currIndex = 0;
 		this.tuples = new ArrayList<Tuple>();
+		this.sortConditions = new ArrayList<String>();
+		for (OrderByElement el : sortConditions) {
+			this.sortConditions.add(el.toString());
+		}
 	}
 	
 	@Override
@@ -43,8 +46,8 @@ public class SortOperator extends Operator {
 
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
-		
+		child.reset();
+		currIndex = 0;	
 	}
 
 }
