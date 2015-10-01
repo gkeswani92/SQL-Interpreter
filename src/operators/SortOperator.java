@@ -26,9 +26,11 @@ public class SortOperator extends Operator {
 		this.tuples = new ArrayList<Tuple>();
 		this.sortConditions = new ArrayList<String>();
 		
-		if(sortConditions != null) 
-			for (OrderByElement el : sortConditions) 
-				this.sortConditions.add(el.toString());
+		if(sortConditions != null) {
+			for (OrderByElement el : sortConditions) {
+				this.sortConditions.add(el.toString());				
+			}
+		}
 	}
 	
 	@Override
@@ -46,8 +48,18 @@ public class SortOperator extends Operator {
 			// For further explanation refer DuplicateElimationOperator.java
 			if (sortConditions.isEmpty()) {
 				sortConditions = new ArrayList<String>(tuples.get(0).getArributeList());
-			} 
-			
+			} else {
+				// Adds all remaining attributes that aren't already sort conditions to the sort conditions
+				// Preserves order of attributes in the tuple
+				List<String> attributes = new ArrayList<String>(tuples.get(0).getArributeList());
+				
+				for (String sort: sortConditions) {
+					if (attributes.contains(sort)) {
+						attributes.remove(sort);
+					}
+				}
+				sortConditions.addAll(attributes);
+			}
 			// Sort using tuple comparator
 			tuples.sort(new TupleComparator(sortConditions));
 		}

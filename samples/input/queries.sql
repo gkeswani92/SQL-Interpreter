@@ -47,3 +47,6 @@ SELECT * FROM Boats, Sailors WHERE Sailors.A < 2 AND Boats.E = Sailors.A AND Boa
 SELECT B1.D, B2.E FROM Boats B1, Boats B2 WHERE B1.D = B2.D AND B1.D = 101;
 
 SELECT DISTINCT Reserves.G FROM Reserves;
+SELECT DISTINCT * FROM Boats;
+
+SELECT * FROM Boats ORDER BY Boats.E;
