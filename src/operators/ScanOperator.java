@@ -9,6 +9,13 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import utils.Tuple;
 import utils.DatabaseCatalog;
 
+/**
+ * Extends operator to implement the scan
+ * Scan operator that reads the tuples from the given file
+ * @author Gaurav, Tanvi and Sahana (gk368,tmm259 and sv387)
+ *
+ */
+
 public class ScanOperator extends Operator{
 	
 	private String tableName; 
@@ -17,6 +24,8 @@ public class ScanOperator extends Operator{
 	private BufferedReader file;
 	private String filePath;
 	
+	//Constructor that initializes the fileReaderObj object
+	// to read data from the file system
 	public ScanOperator(PlainSelect body) {
 		this.tableName = body.getFromItem().toString();
 		if(body.getFromItem().getAlias()!=null){
@@ -33,6 +42,7 @@ public class ScanOperator extends Operator{
 		}
 	}
 	
+	//Overloaded constructor to handle the alias scan references 
 	public ScanOperator(String tableName) {
 		this.tableName = tableName;
 		
@@ -46,6 +56,8 @@ public class ScanOperator extends Operator{
 		}
 	}
 	
+	// When the table is aliased add additional entry for the alias as key with 
+	// the copy of the base table values to be used for references made
 	private String updateCatalogForAlias(String tableName,String alias) {
 		// TODO Auto-generated method stub
 		if(tableName.contains("AS")){

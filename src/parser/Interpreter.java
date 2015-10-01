@@ -25,7 +25,7 @@ import utils.DumpRelations;
 /**
  * Class for getting started with JSQLParser. Reads SQL statements from
  * a file and extracts the elements of the SQL query to be further evaluated.
- * @author tmm259
+ * @author Gaurav, Tanvi and Sahana (gk368,tmm259 and sv387)
  */
 public class Interpreter {
 

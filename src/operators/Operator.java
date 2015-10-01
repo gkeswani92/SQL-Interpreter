@@ -4,7 +4,7 @@ import utils.Tuple;
 /**
  * Abstract class for Operator. Consists of common methods
  * to be implemented by all operators.
- * @author tmm259
+ * @author Gaurav, Tanvi and Sahana (gk368,tmm259 and sv387)
  */
 public abstract class Operator {
 
