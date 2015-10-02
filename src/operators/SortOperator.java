@@ -44,24 +44,26 @@ public class SortOperator extends Operator {
 				currTuple = child.getNextTuple();
 			}
 			
-			// If query has no sort condition (in case of distinct), sort using all attributes
-			// For further explanation refer DuplicateElimationOperator.java
-			if (sortConditions.isEmpty()) {
-				sortConditions = new ArrayList<String>(tuples.get(0).getArributeList());
-			} else {
-				// Adds all remaining attributes that aren't already sort conditions to the sort conditions
-				// Preserves order of attributes in the tuple
-				List<String> attributes = new ArrayList<String>(tuples.get(0).getArributeList());
-				
-				for (String sort: sortConditions) {
-					if (attributes.contains(sort)) {
-						attributes.remove(sort);
+			if (!tuples.isEmpty()) {
+				// If query has no sort condition (in case of distinct), sort using all attributes
+				// For further explanation refer DuplicateElimationOperator.java
+				if (sortConditions.isEmpty()) {
+					sortConditions = new ArrayList<String>(tuples.get(0).getArributeList());
+				} else {
+					// Adds all remaining attributes that aren't already sort conditions to the sort conditions
+					// Preserves order of attributes in the tuple
+					List<String> attributes = new ArrayList<String>(tuples.get(0).getArributeList());
+					
+					for (String sort: sortConditions) {
+						if (attributes.contains(sort)) {
+							attributes.remove(sort);
+						}
 					}
+					sortConditions.addAll(attributes);
 				}
-				sortConditions.addAll(attributes);
+				// Sort using tuple comparator
+				tuples.sort(new TupleComparator(sortConditions));
 			}
-			// Sort using tuple comparator
-			tuples.sort(new TupleComparator(sortConditions));
 		}
 		
 		// Return one tuple at a time
