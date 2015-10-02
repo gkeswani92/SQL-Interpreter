@@ -55,7 +55,7 @@ import operators.SelectOperator;
 /**
  * Visitor class to traverse through where clause and keep track of select operations on each table
  * and join conditions on tables.
- * @author tmm259
+ * @author Gaurav, Tanvi and Sahana (gk368,tmm259 and sv387)
  */
 public class WhereBuilder implements ExpressionVisitor {
 

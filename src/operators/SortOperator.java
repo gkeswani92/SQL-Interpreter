@@ -11,7 +11,7 @@ import utils.TupleComparator;
  * Extends operator to implement sort operator.
  * This is a blocking operator that gets all tuples from its child(just 1 child) and
  * sorts them in ascending order. Returns one tuple at a time.
- * @author tmm259
+ * @author Gaurav, Tanvi and Sahana (gk368,tmm259 and sv387)
  */
 public class SortOperator extends Operator {
 

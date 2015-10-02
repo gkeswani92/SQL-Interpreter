@@ -45,7 +45,7 @@ import utils.Tuple;
 /**
  * Implements the ExpressionVisitor. Takes in a tuple and evaluates the expression with
  * the values of the tuple. Updates the boolean variable in the tuple accordingly.
- * @author tanvimehta
+ * @author Gaurav, Tanvi and Sahana (gk368,tmm259 and sv387)
  *
  */
 public class ExpressionEvaluator implements ExpressionVisitor {
@@ -56,8 +56,12 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 		currTuple = tuple;
 	}
 	
-	@Override
-	public void visit(EqualsTo arg0) {
+	/**
+	 * Checks if left or right expression are either column or long and compares the value of both.
+	 * If comparison satisfies, set isSatisfies as true for the tuple, else set to false
+	 */
+	@Override	
+	public void visit(EqualsTo arg0) {		
 		
 		Long left = null;
 		if (arg0.getLeftExpression() instanceof Column) {

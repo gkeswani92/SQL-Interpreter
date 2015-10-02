@@ -8,7 +8,7 @@ import utils.Tuple;
  * Extends operator for implementation of join operator. Contains a left child and a right child
  * and returns the next tuple that satisfies the join condition
  * In case of no join condition, returns the next tuple in the cartesian product
- * @author tmm259
+ * @author Gaurav, Tanvi and Sahana (gk368,tmm259 and sv387)
  */
 public class JoinOperator extends Operator {
 	

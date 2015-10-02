@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * Util class for tuples in a table.
  * Keep track of attribute names and values and whether a tuple satisfies a certain condition
- * @author tmm259
+ * @author Gaurav, Tanvi and Sahana (gk368,tmm259 and sv387)
  */
 public class Tuple {
 	

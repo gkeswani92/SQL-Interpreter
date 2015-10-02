@@ -7,6 +7,12 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import utils.Tuple;
 
+/**
+ * Extends the operator to implement the Project
+ * Project operator filters the required attributes list values from the tuples
+ * @author Gaurav, Tanvi and Sahana (gk368,tmm259 and sv387)
+ *
+ */
 public class ProjectOperator extends Operator {
 		
 	private Operator child;

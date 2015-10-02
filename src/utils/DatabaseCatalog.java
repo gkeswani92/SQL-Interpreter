@@ -11,7 +11,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 /**
- * @author sv387
+ * Singleton class to initialize the table details for access
+ * by all instances across application
+ * @author Gaurav, Tanvi and Sahana (gk368,tmm259 and sv387)
  *
  */
 public class DatabaseCatalog {
@@ -20,11 +22,7 @@ public class DatabaseCatalog {
 	private static final String ATTR_DELIM = " ";	
 	private static DatabaseCatalog instance;
 	
-	private DatabaseCatalog() {	}
-	
-	/*private static class databaseCatalogHolder{		
-		private static final databaseCatalog INSTANCE = new databaseCatalog();
-	}*/
+	private DatabaseCatalog() {	}	
 	
 	public static synchronized DatabaseCatalog getInstance() {
 		if(instance == null){

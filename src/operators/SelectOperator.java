@@ -8,7 +8,7 @@ import utils.Tuple;
  * Extends operator to implement select operator.
  * Has 1 child. Returns the next tuple that satisfies the selection condition.
  * Evaluates the selection condition by calling an evaluate visitor class.
- * @author tmm259
+ * @author Gaurav, Tanvi and Sahana (gk368,tmm259 and sv387)
  *
  */
 public class SelectOperator extends Operator {

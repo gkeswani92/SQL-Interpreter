@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Compares tuples using the list of conditions passed into the constructor.
  * Conditions specify the column names to sort on.
- * @author tmm259
+ * @author Gaurav, Tanvi and Sahana (gk368,tmm259 and sv387)
  */
 public class TupleComparator implements Comparator<Tuple>{
 
