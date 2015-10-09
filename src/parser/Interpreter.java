@@ -58,6 +58,22 @@ public class Interpreter {
 					System.out.println("Read statement: " + statement);
 					Select select = (Select) statement;
 	                PlainSelect body = (PlainSelect) select.getSelectBody();
+	                
+	                //Handling the alias for tables 
+	                if(body.getFromItem().getAlias()!=null){	        			
+	        			String basetableName = body.getFromItem().toString().substring(0,body.getFromItem().toString().indexOf(" "));
+	        			DatabaseCatalog.getInstance().setEntryForAlias(basetableName, body.getFromItem().getAlias());
+	        		}
+	                if(body.getJoins()!=null){
+		                for (Object exp: body.getJoins()) {
+		                	if(exp.toString().contains("AS")){
+		        				String basetableName = ((Join)exp).getRightItem().toString().substring(0,((Join)exp).getRightItem().toString().indexOf(" "));
+		        				DatabaseCatalog.getInstance().setEntryForAlias(basetableName, ((Join)exp).getRightItem().getAlias());
+		                	}
+		                }
+	                }
+	        			
+	                
 	                @SuppressWarnings("unchecked")
 					List<SelectItem> selectAttr = body.getSelectItems();
 	             
@@ -86,7 +102,7 @@ public class Interpreter {
 	                		root = new DuplicateEliminationOperator(root);
 	                }
 	    			
-//	    			root.dump();
+	                //root.dump();
 	    			writeToFile.writeRelationToFile(root, queryCount);
 	    			
 	    			//Reading the next statement
@@ -170,12 +186,11 @@ public class Interpreter {
 		
 		// First left table comes from the FromItem
 		if(body.getFromItem().getAlias()!=null){
-			currentLeftJoinTables.add(body.getFromItem().getAlias());
-			String basetableName = body.getFromItem().toString().substring(0,body.getFromItem().toString().indexOf(" "));
-			DatabaseCatalog.getInstance().setEntryForAlias(basetableName, body.getFromItem().getAlias());
-		}else {
+			currentLeftJoinTables.add(body.getFromItem().getAlias());			
+		} else {
 			currentLeftJoinTables.add(body.getFromItem().toString());
 		}
+		
 		String currentRightJoinTable;
 		
 		Operator temp, root = null;
@@ -183,10 +198,8 @@ public class Interpreter {
 		for (Object exp: body.getJoins()) {
 			
 			if(((Join)exp).getRightItem().getAlias()!=null){
-				currentRightJoinTable = ((Join)exp).getRightItem().getAlias();
-				String basetableName = ((Join)exp).getRightItem().toString().substring(0,((Join)exp).getRightItem().toString().indexOf(" "));
-				DatabaseCatalog.getInstance().setEntryForAlias(basetableName, ((Join)exp).getRightItem().getAlias());
-			}else{
+				currentRightJoinTable = ((Join)exp).getRightItem().getAlias();			
+			} else{
 				currentRightJoinTable = ((Join)exp).getRightItem().toString();
 			}
 			Expression finalJoinCondition = null;
@@ -210,7 +223,9 @@ public class Interpreter {
 					if (finalJoinCondition == null) {
 						finalJoinCondition = currentTableJoin;
 					} else {
-						finalJoinCondition = new AndExpression(finalJoinCondition, currentTableJoin);
+						//Check for null condition before appending an AND
+						if(currentTableJoin != null)
+							finalJoinCondition = new AndExpression(finalJoinCondition, currentTableJoin);
 					}
 				}
 				temp = new JoinOperator(finalJoinCondition, root, getBasicOperator(tableOperators, currentRightJoinTable));
