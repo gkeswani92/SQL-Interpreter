@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.nio.channels.FileChannel;
 
 public class BinaryFileReader implements TupleReader {
@@ -18,14 +17,13 @@ public class BinaryFileReader implements TupleReader {
 	private Integer numAttr;
 	private Integer numTuples;
 	private int[] tupleArr;
-	private int ipIndex, fileOffset;
+	private int tupleIndex;
 	
 	public BinaryFileReader(String filename, String tableName) throws FileNotFoundException {
 		fis = new FileInputStream(new File(filename));
 		channel = fis.getChannel();
 		bb = ByteBuffer.allocateDirect(4*1024);
 		bb.clear();
-		fileOffset = 0;
 		updateBufferWithNextPage();
 	}
 	
@@ -40,8 +38,8 @@ public class BinaryFileReader implements TupleReader {
 		int[] tuple = new int [numAttr];
 		
 		for (int i = 0; i < numAttr; i++) {
-			tuple[i] = tupleArr[ipIndex];
-			ipIndex++;
+			tuple[i] = tupleArr[tupleIndex];
+			tupleIndex++;
 		}
 		
 		numTuples--;
@@ -51,32 +49,30 @@ public class BinaryFileReader implements TupleReader {
 	
 	private Integer updateBufferWithNextPage() {
 		
-		long len = 0;
 		try {	
-		 tupleArr = new int [(int)channel.size()/4];
-		 System.out.println("File size: "+channel.size()/4);
-		  
-		  while ((len = channel.read(bb)) != -1){  
-		    bb.flip();
-		    bb.asIntBuffer().get(tupleArr,fileOffset,(int)len/4);
-		  }
-		  fileOffset = fileOffset + (int)len/4;
-		  if (fileOffset > (channel.size()/4)) {
+			if (channel.read(bb) != -1) {  
+				bb.flip();
+				numAttr = bb.asIntBuffer().get(0);
+				numTuples = bb.asIntBuffer().get(1);
+				tupleArr = new int [numAttr*numTuples+INDEX_OF_FIRST_TUPLE];
+				
+				bb.asIntBuffer().get(tupleArr,0,tupleArr.length);
+				bb.clear();
+				channel.read(bb);
+		  } else {
 			  return 1;
 		  }
 		} catch (IOException e) {
 			System.out.println("Something went wrong in updateBufferWithNextPage.");
 		}
-		  ipIndex = 2;
+		  tupleIndex = INDEX_OF_FIRST_TUPLE;
 
-		  numAttr = tupleArr[0];
-		  numTuples = tupleArr[1];
 		  return 0;
 	}
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		
-		PrintWriter writer = new PrintWriter("/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input/db/data/cryBabyBoats");
+		PrintWriter writer = new PrintWriter("/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input/db/data/test");
 		BinaryFileReader bfr = new BinaryFileReader("/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input/db/data/Boats", "Boats");
 		
 		int[] tuple = bfr.getNextTuple();
@@ -86,7 +82,6 @@ public class BinaryFileReader implements TupleReader {
 				tu = tu + " " + tuple[i];
 			}
 			writer.println(tu);
-//			System.out.println(tu);
 			tuple = bfr.getNextTuple();
 		}
 		writer.close();
