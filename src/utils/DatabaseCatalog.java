@@ -44,8 +44,9 @@ public class DatabaseCatalog {
 			while (currentLine != null){
 				String[] attributeList = currentLine.split(ATTR_DELIM);
 				String tableName = attributeList[0];
-				String[] dbFileLoc = new String[1];
-				dbFileLoc[0]= inputsrcDir + "/db/data/" + tableName + ".csv";
+				String[] dbFileLoc = new String[2];
+				dbFileLoc[0]= inputsrcDir + "/db/data/" + tableName + "_humanreadable";
+				dbFileLoc[1]= inputsrcDir + "/db/data/" + tableName;
 				attributeList = Arrays.copyOfRange(attributeList, 1, attributeList.length);
 				tableSchemaCatalag.put(tableName, attributeList);						
 				tableFileCatalag.put(tableName,dbFileLoc);	
@@ -69,6 +70,11 @@ public class DatabaseCatalog {
 	public String getDataFilePath(String tableName) {
 		// TODO Auto-generated method stub
 		return tableFileCatalag.get(tableName)[0];		
+	}
+	
+	public String getBinaryDataFilePath(String tableName) {
+		// TODO Auto-generated method stub
+		return tableFileCatalag.get(tableName)[1];		
 	}
 
 	public void setEntryForAlias(String baseTable, String alias) {

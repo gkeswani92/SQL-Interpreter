@@ -19,8 +19,8 @@ public class BinaryFileReader implements TupleReader {
 	private int[] tupleArr;
 	private int tupleIndex;
 	
-	public BinaryFileReader(String filename, String tableName) throws FileNotFoundException {
-		fis = new FileInputStream(new File(filename));
+	public BinaryFileReader(String tableName) throws FileNotFoundException {
+		fis = new FileInputStream(new File(DatabaseCatalog.getInstance().getDataFilePath(tableName)));
 		channel = fis.getChannel();
 		bb = ByteBuffer.allocateDirect(4*1024);
 		bb.clear();
@@ -72,8 +72,13 @@ public class BinaryFileReader implements TupleReader {
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		
+		
+		DatabaseCatalog.getInstance().buildDbCatalog("/SQL-Interpreter/samples/input");
+		String name = DatabaseCatalog.getInstance().getBinaryDataFilePath("Boats");
+		
+		
 		PrintWriter writer = new PrintWriter("/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input/db/data/test");
-		BinaryFileReader bfr = new BinaryFileReader("/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input/db/data/Boats", "Boats");
+		BinaryFileReader bfr = new BinaryFileReader("Boats");
 		
 		int[] tuple = bfr.getNextTuple();
 		while (tuple != null) {
