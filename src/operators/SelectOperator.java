@@ -16,9 +16,9 @@ public class SelectOperator extends Operator {
 	Operator child;
 	Expression whereClause;
 	
-	public SelectOperator(Expression exp, Operator child) {
+	public SelectOperator(Operator child, Expression whereClause) {
 		this.child = child;
-		whereClause = exp;
+		this.whereClause = whereClause;
 	}
 	
 	/**

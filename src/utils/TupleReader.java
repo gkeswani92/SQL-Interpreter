@@ -2,5 +2,5 @@ package utils;
 
 public interface TupleReader {
 	
-	public int[] getNextTuple();
+	public Tuple getNextTuple();
 }

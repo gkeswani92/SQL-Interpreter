@@ -17,6 +17,13 @@ public class Tuple {
 	private Map<String, Integer> attributeValues = new LinkedHashMap<String, Integer>();
 	private static final String TUPLE_DELIM = ",";
 	
+	public Tuple (int[] values, String[] attributes,String tableName) {
+		for (int i = 0; i < attributes.length; i++) {
+			attributeValues.put(attributes[i], values[i]);
+		}
+		this.tableName = tableName;
+	}
+	
 	public Tuple(String line, String tableName){
 		this.tableName = tableName;
 		this.createTuple(line);

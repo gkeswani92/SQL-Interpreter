@@ -20,18 +20,26 @@ public class SortOperator extends Operator {
 	List<Tuple> tuples;
 	Integer currIndex;
 	
-	public SortOperator(List<OrderByElement> sortConditions, Operator child) {
+	public SortOperator(Operator child, List<String> sortConditions,
+			List<Tuple> tuples, Integer currIndex) {
 		this.child = child;
-		this.currIndex = 0;
-		this.tuples = new ArrayList<Tuple>();
-		this.sortConditions = new ArrayList<String>();
-		
-		if(sortConditions != null) {
-			for (OrderByElement el : sortConditions) {
-				this.sortConditions.add(el.toString());				
-			}
-		}
+		this.sortConditions = sortConditions;
+		this.tuples = tuples;
+		this.currIndex = currIndex;
 	}
+	
+//	public SortOperator(List<OrderByElement> sortConditions, Operator child) {
+//		this.child = child;
+//		this.currIndex = 0;
+//		this.tuples = new ArrayList<Tuple>();
+//		this.sortConditions = new ArrayList<String>();
+//		
+//		if(sortConditions != null) {
+//			for (OrderByElement el : sortConditions) {
+//				this.sortConditions.add(el.toString());				
+//			}
+//		}
+//	}
 	
 	@Override
 	public Tuple getNextTuple() {

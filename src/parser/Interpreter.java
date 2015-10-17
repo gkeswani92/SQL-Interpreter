@@ -7,6 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import logical_operators.DuplicateEliminationLogicalOperator;
+import logical_operators.JoinLogicalOperator;
+import logical_operators.LogicalOperator;
+import logical_operators.ProjectLogicalOperator;
+import logical_operators.ScanLogicalOperator;
+import logical_operators.SelectLogicalOperator;
+import logical_operators.SortLogicalOperator;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParser;
@@ -49,7 +56,7 @@ public class Interpreter {
 		try {
 			CCJSqlParser parser = new CCJSqlParser(new FileReader(queriesFile));
 			Statement statement = parser.Statement();
-			Operator root;
+			LogicalOperator root;
 			Integer queryCount = 1;
 							
 			while (statement != null) {
@@ -87,23 +94,28 @@ public class Interpreter {
 	                	//Making join the child of project operation
 		                if (selectAttr.size() != 1 || selectAttr.get(0).toString() != "*") {
 		                	System.out.println("Projection has been called on the join operator");
-		                	root = new ProjectOperator(body, root);
+		                	root = new ProjectLogicalOperator(body, root);
 		                }
 	                }
 	                
 	                // If order by clause exists or distinct operator exists, first make sort the parent
 	                if (body.getOrderByElements() != null || body.getDistinct() != null) {
 						@SuppressWarnings("unchecked")
-						Operator temp = new SortOperator(body.getOrderByElements(), root);
+						LogicalOperator temp = new SortLogicalOperator(body.getOrderByElements(), root);
 	                	root = temp;
 	                			
 	                	//If distinct exists, make it the parent
 	                	if(body.getDistinct() != null)
-	                		root = new DuplicateEliminationOperator(root);
+	                		root = new DuplicateEliminationLogicalOperator(root);
 	                }
 	    			
+	                //TODO: WRITE TO FILE!!!!!!!!!
+	                
+	                // WE HAVE OUR ENTIRE LOGICAL PLAN CONSTRUCTED HERE
+	                
+	                constructPhysicalPlan(root);
 	                //root.dump();
-	    			writeToFile.writeRelationToFile(root, queryCount);
+	    			//writeToFile.writeRelationToFile(root, queryCount);
 	    			
 	    			//Reading the next statement
 	    			statement = parser.Statement();
@@ -124,20 +136,25 @@ public class Interpreter {
 		}
 	}
 
-	private static Operator handleWithoutJoin(PlainSelect body, List<SelectItem> selectAttr) {
-		Operator root;
+	private static Operator constructPhysicalPlan (LogicalOperator root) {
+		Operator opRoot = root.getNextPhysicalOperator();
+		return null;
+	}
+	
+	private static LogicalOperator handleWithoutJoin(PlainSelect body, List<SelectItem> selectAttr) {
+		LogicalOperator root;
 		//If the query has a SELECT *
 		if (selectAttr.size() == 1 && selectAttr.get(0).toString() == "*") { 
 			
 			//Enter from scan if there is no where clause
 			if (body.getWhere() == null) 
-				root = new ScanOperator(body);
+				root = new ScanLogicalOperator(body);
 
 			//Enter from select if query has where clause
 			else {  		
 				System.out.println("Where clause is:  " + body.getWhere());
-		        ScanOperator scanOp = new ScanOperator(body);
-		        root = new SelectOperator(body.getWhere(), scanOp);	                              
+		        ScanLogicalOperator scanOp = new ScanLogicalOperator(body);
+		        root = new SelectLogicalOperator(body.getWhere(), scanOp);	                              
 			}
 		} 
 		
@@ -153,17 +170,17 @@ public class Interpreter {
 	 * @param body
 	 * @return 
 	 */
-	private static Operator handleProjectWithoutJoin(PlainSelect body) {
+	private static LogicalOperator handleProjectWithoutJoin(PlainSelect body) {
 		             	
-		ScanOperator scanOp = new ScanOperator(body);
-		ProjectOperator projOp = null;
+		ScanLogicalOperator scanOp = new ScanLogicalOperator(body);
+		ProjectLogicalOperator projOp = null;
 		
 		if(body.getWhere()!=null) {
-		    SelectOperator child = new SelectOperator(body.getWhere(), scanOp);
-		    projOp = new ProjectOperator(body, child);
+			SelectLogicalOperator child = new SelectLogicalOperator(body.getWhere(), scanOp);
+		    projOp = new ProjectLogicalOperator(body, child);
 		}
 		else 
-			projOp = new ProjectOperator(body, scanOp);
+			projOp = new ProjectLogicalOperator(body, scanOp);
 		
 		return projOp;
 	}
@@ -172,8 +189,8 @@ public class Interpreter {
 	 * Takes in the select body, visits the where clause(to construct the query plan) and calls the joinOperator
 	 * @param body select body
 	 */
-	public static Operator handleJoin(PlainSelect body) {
-		Map<String, List<Operator>> tableOperators = new HashMap<String, List<Operator>>();
+	public static LogicalOperator handleJoin(PlainSelect body) {
+		Map<String, List<LogicalOperator>> tableOperators = new HashMap<String, List<LogicalOperator>>();
 		List<Entry<List<String>,Expression>> joins = new ArrayList<>();
 		
 		// If where clause exists, call visitor class to get map of basic operators and list of join conditions
@@ -193,7 +210,7 @@ public class Interpreter {
 		
 		String currentRightJoinTable;
 		
-		Operator temp, root = null;
+		LogicalOperator temp, root = null;
 		
 		for (Object exp: body.getJoins()) {
 			
@@ -208,7 +225,7 @@ public class Interpreter {
 			// join operator tree with left and right table basic operators as left and right children
 			if (root == null && currentLeftJoinTables.size() == 1) {
 				finalJoinCondition = getJoinCondition(joins, currentLeftJoinTables.get(0), currentRightJoinTable);
-				temp = new JoinOperator(finalJoinCondition, 
+				temp = new JoinLogicalOperator(finalJoinCondition, 
 						getBasicOperator(tableOperators, currentLeftJoinTables.get(0)), 
 						getBasicOperator(tableOperators, currentRightJoinTable));
 				root = temp;
@@ -228,7 +245,7 @@ public class Interpreter {
 							finalJoinCondition = new AndExpression(finalJoinCondition, currentTableJoin);
 					}
 				}
-				temp = new JoinOperator(finalJoinCondition, root, getBasicOperator(tableOperators, currentRightJoinTable));
+				temp = new JoinLogicalOperator(finalJoinCondition, root, getBasicOperator(tableOperators, currentRightJoinTable));
 				root = temp;
 			}
 			
@@ -244,12 +261,12 @@ public class Interpreter {
 	 * @param tableName
 	 * @return operator tree for table name
 	 */
-	public static Operator getBasicOperator(Map<String, List<Operator>> tableOperators, String tableName) {
+	public static LogicalOperator getBasicOperator(Map<String, List<LogicalOperator>> tableOperators, String tableName) {
 		
-		Operator op;
+		LogicalOperator op;
 		// If entry for table name does not exist in the map, use scan operator
 		if (tableOperators.get(tableName) == null || tableOperators.get(tableName).isEmpty()) {
-			op = new ScanOperator(tableName);
+			op = new ScanLogicalOperator(tableName);
 		} else {
 			op = tableOperators.get(tableName).get(0);
 		}

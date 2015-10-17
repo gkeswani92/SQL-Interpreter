@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import logical_operators.LogicalOperator;
+import logical_operators.ScanLogicalOperator;
+import logical_operators.SelectLogicalOperator;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
 import net.sf.jsqlparser.expression.BinaryExpression;
@@ -48,9 +51,6 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SubSelect;
-import operators.Operator;
-import operators.ScanOperator;
-import operators.SelectOperator;
 
 /**
  * Visitor class to traverse through where clause and keep track of select operations on each table
@@ -59,10 +59,10 @@ import operators.SelectOperator;
  */
 public class WhereBuilder implements ExpressionVisitor {
 
-	private Map<String, List<Operator>> tableOperators;
+	private Map<String, List<LogicalOperator>> tableOperators;
 	private List<Entry<List<String>,Expression>> joins;
 	
-	public WhereBuilder(Map<String, List<Operator>> tableOperators, List<Entry<List<String>,Expression>> joins) {
+	public WhereBuilder(Map<String, List<LogicalOperator>> tableOperators, List<Entry<List<String>,Expression>> joins) {
 		this.tableOperators = tableOperators;
 		this.joins = joins;
 	}
@@ -96,26 +96,26 @@ public class WhereBuilder implements ExpressionVisitor {
 		Entry<Boolean, String> entry = isBasicExpression((BinaryExpression) arg0);
 		
 		if (entry.getKey()) {
-			List<Operator> operators = tableOperators.get(entry.getValue());
+			List<LogicalOperator> operators = tableOperators.get(entry.getValue());
 			
 			// If this is the first operator we are adding for the table
 			if (operators == null || operators.isEmpty()) {
-				ScanOperator scanOp = new ScanOperator(entry.getValue());
-				SelectOperator selectOp = new SelectOperator(arg0, scanOp);
-				List<Operator> opList = new ArrayList<Operator>();
+				ScanLogicalOperator scanOp = new ScanLogicalOperator(entry.getValue());
+				SelectLogicalOperator selectOp = new SelectLogicalOperator(arg0, scanOp);
+				List<LogicalOperator> opList = new ArrayList<LogicalOperator>();
 				opList.add(selectOp);
 				tableOperators.put(entry.getValue(), opList);
 			}
 			
 			// If we need to conjunct multiple select operations
 			else {
-				SelectOperator currentSelectOp = (SelectOperator) operators.get(0);
+				SelectLogicalOperator currentSelectOp = (SelectLogicalOperator) operators.get(0);
 				AndExpression expression = new AndExpression();
 				expression.setLeftExpression(currentSelectOp.getExpression());
 				expression.setRightExpression(arg0);
 				
-				SelectOperator newSelect = new SelectOperator(expression, new ScanOperator(entry.getValue()));
-				List<Operator> opList = new ArrayList<Operator>();
+				SelectLogicalOperator newSelect = new SelectLogicalOperator(expression, new ScanLogicalOperator(entry.getValue()));
+				List<LogicalOperator> opList = new ArrayList<LogicalOperator>();
 				opList.add(newSelect);
 				tableOperators.put(entry.getValue(), opList);
 			}

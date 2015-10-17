@@ -18,17 +18,23 @@ public class BinaryFileReader implements TupleReader {
 	private Integer numTuples;
 	private int[] tupleArr;
 	private int tupleIndex;
+	private String[] attributes;
+	private String tableName;
 	
 	public BinaryFileReader(String tableName) throws FileNotFoundException {
-		fis = new FileInputStream(new File(DatabaseCatalog.getInstance().getDataFilePath(tableName)));
+		attributes = DatabaseCatalog.getInstance().getTableAttributes(tableName);
+		
+		fis = new FileInputStream(new File(DatabaseCatalog.getInstance().getBinaryDataFilePath(tableName)));
 		channel = fis.getChannel();
 		bb = ByteBuffer.allocateDirect(4*1024);
 		bb.clear();
 		updateBufferWithNextPage();
+		
+		this.tableName = tableName;
 	}
 	
 	@Override
-	public int[] getNextTuple() {
+	public Tuple getNextTuple() {
 		if(numTuples == 0) {
 			if (updateBufferWithNextPage() == 1) {
 				return null;
@@ -42,8 +48,9 @@ public class BinaryFileReader implements TupleReader {
 			tupleIndex++;
 		}
 		
+		
 		numTuples--;
-		return tuple;
+		return new Tuple(tuple, attributes, tableName);
 	}
 
 	
@@ -72,21 +79,14 @@ public class BinaryFileReader implements TupleReader {
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		
-		
-		DatabaseCatalog.getInstance().buildDbCatalog("/SQL-Interpreter/samples/input");
-		String name = DatabaseCatalog.getInstance().getBinaryDataFilePath("Boats");
-		
+		DatabaseCatalog.getInstance().buildDbCatalog("/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input");		
 		
 		PrintWriter writer = new PrintWriter("/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input/db/data/test");
 		BinaryFileReader bfr = new BinaryFileReader("Boats");
 		
-		int[] tuple = bfr.getNextTuple();
+		Tuple tuple = bfr.getNextTuple();
 		while (tuple != null) {
-			String tu = "";
-			for (int i = 0; i < tuple.length; i++) {
-				tu = tu + " " + tuple[i];
-			}
-			writer.println(tu);
+			writer.println(tuple.toStringValues());
 			tuple = bfr.getNextTuple();
 		}
 		writer.close();

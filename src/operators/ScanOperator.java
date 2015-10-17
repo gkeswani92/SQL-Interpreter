@@ -24,23 +24,32 @@ public class ScanOperator extends Operator{
 	private BufferedReader file;
 	private String filePath;
 	
-	//Constructor that initializes the fileReaderObj object
-	// to read data from the file system
-	public ScanOperator(PlainSelect body) {
-		this.tableName = body.getFromItem().toString();
-		if(body.getFromItem().getAlias()!=null){
-			this.tableName = updateCatalogForAlias(this.tableName,body.getFromItem().getAlias());
-			alias = body.getFromItem().getAlias();
-		}
-		filePath = DatabaseCatalog.getInstance().getDataFilePath(this.tableName);
-		try {
-			fileReaderObj = new FileReader(filePath);
-			file = new BufferedReader(fileReaderObj);
-		} 
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+	public ScanOperator(String tableName, String alias, FileReader fileReaderObj,
+			BufferedReader file, String filePath) {
+		this.tableName = tableName;
+		this.alias = alias;
+		this.fileReaderObj = fileReaderObj;
+		this.file = file;
+		this.filePath = filePath;
 	}
+	
+//	//Constructor that initializes the fileReaderObj object
+//	// to read data from the file system
+//	public ScanOperator(PlainSelect body) {
+//		this.tableName = body.getFromItem().toString();
+//		if(body.getFromItem().getAlias()!=null){
+//			this.tableName = updateCatalogForAlias(this.tableName,body.getFromItem().getAlias());
+//			alias = body.getFromItem().getAlias();
+//		}
+//		filePath = DatabaseCatalog.getInstance().getDataFilePath(this.tableName);
+//		try {
+//			fileReaderObj = new FileReader(filePath);
+//			file = new BufferedReader(fileReaderObj);
+//		} 
+//		catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 	//Overloaded constructor to handle the alias scan references 
 	public ScanOperator(String tableName) {
@@ -66,8 +75,7 @@ public class ScanOperator extends Operator{
 			return tableName.substring(0,tableName.indexOf(" "));
 		}else{
 			return tableName;
-		}
-		
+		}	
 	}
 
 	/**

@@ -18,16 +18,21 @@ public class ProjectOperator extends Operator {
 	private Operator child;
 	private List<String> requiredColumns; 
 	
-	public ProjectOperator(PlainSelect body, Operator child) {
+	public ProjectOperator(Operator child, List<String> requiredColumns) {
 		this.child = child;
-		this.requiredColumns = new ArrayList<String>();
-		@SuppressWarnings("unchecked")
-		List<SelectExpressionItem> selectColumns = body.getSelectItems();
-		
-		//Converting each select item to string
-		for(Object c: selectColumns) 
-			requiredColumns.add(c.toString());
+		this.requiredColumns = requiredColumns;
 	}
+	
+//	public ProjectOperator(PlainSelect body, Operator child) {
+//		this.child = child;
+//		this.requiredColumns = new ArrayList<String>();
+//		@SuppressWarnings("unchecked")
+//		List<SelectExpressionItem> selectColumns = body.getSelectItems();
+//		
+//		//Converting each select item to string
+//		for(Object c: selectColumns) 
+//			requiredColumns.add(c.toString());
+//	}
 	
 	/**
 	 * Gets the next tuple using the scan operator and keeps only the columns
@@ -54,5 +59,13 @@ public class ProjectOperator extends Operator {
 	
     public Operator getChild() {
     	return child;
+    }
+    
+    public void setChild(Operator child) {
+    	this.child = child;
+    }
+    
+    public void setRequiredColumns(List<String> requiredColumns) {
+    	this.requiredColumns = requiredColumns;
     }
 }
