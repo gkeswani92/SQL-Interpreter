@@ -1,10 +1,7 @@
 package operators;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import utils.Tuple;
 
 /**

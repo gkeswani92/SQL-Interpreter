@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import utils.Tuple;
 import utils.DatabaseCatalog;
 

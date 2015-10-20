@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jsqlparser.statement.select.OrderByElement;
+import operators.ExternalSortOperator;
+import operators.InMemorySortOperator;
 import operators.Operator;
-import operators.SortOperator;
+import utils.ConfigFileReader;
 import utils.Tuple;
 
 public class SortLogicalOperator extends LogicalOperator {
@@ -30,7 +32,17 @@ public class SortLogicalOperator extends LogicalOperator {
 
 	@Override
 	public Operator getNextPhysicalOperator() {
-		return new SortOperator(this.child.getNextPhysicalOperator(), this.sortConditions,
-				this.tuples, this.currIndex);
+		
+		ConfigFileReader config = ConfigFileReader.getInstance();
+		
+		// Read config file and decide which sort to invoke
+		if (config.getSortType() == 0) {
+			return new InMemorySortOperator(this.child.getNextPhysicalOperator(), this.sortConditions,
+					this.tuples, this.currIndex);
+		} else {
+			return new ExternalSortOperator(this.child.getNextPhysicalOperator(), this.sortConditions,
+					this.tuples, this.currIndex, config.getSortBuffer());
+		}
+
 	}
 }

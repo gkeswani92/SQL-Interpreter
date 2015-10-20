@@ -19,13 +19,8 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
-import operators.DuplicateEliminationOperator;
-import operators.JoinOperator;
 import operators.Operator;
-import operators.ProjectOperator;
-import operators.ScanOperator;
-import operators.SelectOperator;
-import operators.SortOperator;
+import utils.ConfigFileReader;
 import utils.DatabaseCatalog;
 import utils.DumpRelations;
 
@@ -44,12 +39,13 @@ public class Interpreter {
 		String outputScrDir = "";
 		DumpRelations writeToFile = null;
 		
-		//Building the single instance of the database catalog
+		//Building the single instance of the database catalog and config file reader
 		if(args.length == 2){
 			inputSrcDir = args[0];
             outputScrDir = args[1];
             queriesFile = inputSrcDir+"/queries.sql";
 			DatabaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
+			ConfigFileReader.getInstance().readConfigFile(inputSrcDir);
 			writeToFile = new DumpRelations(outputScrDir);
 		}
 		
