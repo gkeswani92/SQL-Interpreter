@@ -1,9 +1,5 @@
 package logical_operators;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import operators.Operator;
 import operators.ScanOperator;
@@ -13,9 +9,6 @@ public class ScanLogicalOperator extends LogicalOperator {
 
 	private String tableName; 
 	private String alias;
-	private FileReader fileReaderObj;
-	private BufferedReader file;
-	private String filePath;
 	
 	public ScanLogicalOperator(String tableName) {
 		this.tableName = tableName;
@@ -26,14 +19,6 @@ public class ScanLogicalOperator extends LogicalOperator {
 		if(body.getFromItem().getAlias()!=null) {
 			this.tableName = updateCatalogForAlias(this.tableName,body.getFromItem().getAlias());
 			this.alias = body.getFromItem().getAlias();
-		}
-		filePath = DatabaseCatalog.getInstance().getDataFilePath(this.tableName);
-		try {
-			fileReaderObj = new FileReader(filePath);
-			this.file = new BufferedReader(fileReaderObj);
-		} 
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
 		}
 	}
 	
@@ -51,7 +36,6 @@ public class ScanLogicalOperator extends LogicalOperator {
 
 	@Override
 	public Operator getNextPhysicalOperator() {
-		return new ScanOperator(this.tableName, this.alias,
-				this.fileReaderObj, this.file, this.filePath);
+		return new ScanOperator(this.tableName, this.alias);
 	}
 }

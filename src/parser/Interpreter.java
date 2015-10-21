@@ -134,6 +134,7 @@ public class Interpreter {
 
 	private static Operator constructPhysicalPlan (LogicalOperator root) {
 		Operator opRoot = root.getNextPhysicalOperator();
+		opRoot.dump();
 		return null;
 	}
 	

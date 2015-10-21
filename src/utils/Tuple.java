@@ -108,4 +108,16 @@ public class Tuple {
 	public void setAttributeValues(Map<String, Integer> orderedAttributeValues) {
 		attributeValues = orderedAttributeValues;
 	}
+	
+	public void updateTuple (String tableName) {
+		this.tableName = tableName;
+		Map<String, Integer> newAttrValues = new LinkedHashMap<String, Integer>();
+		
+		for(String key: attributeValues.keySet()) {
+			newAttrValues.put(tableName+"."+key, attributeValues.get(key));
+		}
+		
+		attributeValues.clear();
+		attributeValues.putAll(newAttrValues);
+	}
 }

@@ -1,5 +1,6 @@
 package operators;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import utils.Tuple;
@@ -24,7 +25,18 @@ public abstract class SortOperator extends Operator {
 		this.tuples = tuples;
 		this.currIndex = currIndex;
 	}
-
+	
+	public SortOperator(List<String> sortConditions, Operator child) {
+		this.child = child;
+		this.currIndex = 0;
+		this.tuples = new ArrayList<Tuple>();
+		this.sortConditions = new ArrayList<String>();
+		
+		if(sortConditions != null) {
+			this.sortConditions = sortConditions;
+		}
+	}
+	
 	@Override
 	public void reset() {
 		child.reset();

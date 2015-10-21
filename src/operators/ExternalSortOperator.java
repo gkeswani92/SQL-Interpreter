@@ -14,10 +14,21 @@ public class ExternalSortOperator extends SortOperator {
 		this.numBufferPages = numBufferPages;
 	}
 
+	public ExternalSortOperator(List<String> sortConditions, Operator child, Integer numBufferPages) {
+		super(sortConditions, child);
+		this.numBufferPages = numBufferPages;
+	}
+	
 	@Override
 	public Tuple getNextTuple() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	// TODO: READ SORT MERGE JOIN IMPLEMENTATION DESCRIPTION FOR DETAILS ON HOW TO IMPLEMENT THIS
+	@Override
+	public void reset(int index) {
+		// TODO Auto-generated method stub		
 	}
 
 }

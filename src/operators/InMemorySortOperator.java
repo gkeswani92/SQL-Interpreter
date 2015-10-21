@@ -11,6 +11,10 @@ public class InMemorySortOperator extends SortOperator {
 	public InMemorySortOperator(Operator child, List<String> sortConditions, List<Tuple> tuples, Integer currIndex) {
 		super(child, sortConditions, tuples, currIndex);
 	}
+	
+	public InMemorySortOperator(List<String> sortConditions, Operator child) {
+		super(sortConditions, child);
+	}
 
 	@Override
 	public Tuple getNextTuple() {
@@ -51,5 +55,10 @@ public class InMemorySortOperator extends SortOperator {
 		} else {
 			return null;
 		}	
+	}
+
+	@Override
+	public void reset(int index) {
+		currIndex = index;
 	}
 }

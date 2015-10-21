@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import utils.Tuple;
+import utils.BinaryFileReader;
 import utils.DatabaseCatalog;
 
 /**
@@ -22,14 +23,16 @@ public class ScanOperator extends Operator{
 	private FileReader fileReaderObj;
 	private BufferedReader file;
 	private String filePath;
+	BinaryFileReader bfr;
 	
-	public ScanOperator(String tableName, String alias, FileReader fileReaderObj,
-			BufferedReader file, String filePath) {
+	public ScanOperator(String tableName, String alias) {
 		this.tableName = tableName;
 		this.alias = alias;
-		this.fileReaderObj = fileReaderObj;
-		this.file = file;
-		this.filePath = filePath;
+		try {
+			bfr = new BinaryFileReader(tableName);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 	
 //	//Constructor that initializes the fileReaderObj object
@@ -54,14 +57,21 @@ public class ScanOperator extends Operator{
 	public ScanOperator(String tableName) {
 		this.tableName = tableName;
 		
-		filePath = DatabaseCatalog.getInstance().getDataFilePath(this.tableName);
+		BinaryFileReader bfr;
 		try {
-			fileReaderObj = new FileReader(filePath);
-			file = new BufferedReader(fileReaderObj);
-		} 
-		catch (FileNotFoundException e) {
+			bfr = new BinaryFileReader(tableName);
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		
+//		filePath = DatabaseCatalog.getInstance().getDataFilePath(this.tableName);
+//		try {
+//			fileReaderObj = new FileReader(filePath);
+//			file = new BufferedReader(fileReaderObj);
+//		} 
+//		catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
 	}
 	
 	// When the table is aliased add additional entry for the alias as key with 
@@ -83,21 +93,19 @@ public class ScanOperator extends Operator{
 	@Override
 	public Tuple getNextTuple() {
 		
-		Tuple currentTuple = null;
-		try {
-			String line = file.readLine();
-			if(line==null){
-				return currentTuple;
-			}
-			if(alias != null)
-				currentTuple = new Tuple(line, alias); 	
-			else 
-				currentTuple = new Tuple(line, tableName); 	
-		} 
-		catch (IOException e) {
-			e.printStackTrace();
+		Tuple tuple = null;
+		tuple = bfr.getNextTuple();
+		
+		if(tuple == null){
+			return tuple;
 		}
-		return currentTuple;
+		
+		if(alias != null)
+			tuple.updateTuple(alias); 	
+		else 
+			tuple.updateTuple(tableName);
+		
+		return tuple;
 	}
 
 	/**
