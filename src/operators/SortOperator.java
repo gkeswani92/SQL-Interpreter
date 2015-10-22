@@ -33,7 +33,7 @@ public abstract class SortOperator extends Operator {
 		this.sortConditions = new ArrayList<String>();
 		
 		if(sortConditions != null) {
-			this.sortConditions = sortConditions;
+			this.sortConditions.addAll(sortConditions);
 		}
 	}
 	

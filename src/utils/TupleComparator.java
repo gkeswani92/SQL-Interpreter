@@ -46,7 +46,12 @@ public class TupleComparator implements Comparator<Tuple>{
 	public int joinCompare(Tuple o1, Tuple o2) {
 		int n = 10;
 		for (int i = 0; i < leftColumns.size(); i++) {
-			n = o1.getValueForAttr(leftColumns.get(i).toString()).compareTo(o2.getValueForAttr(rightColumns.get(i).toString()));
+			Integer left = o1.getValueForAttr(leftColumns.get(i).toString());
+			if (o2 == null) {
+				return -1;
+			}
+			Integer right = o2.getValueForAttr(rightColumns.get(i).toString());
+			n = left.compareTo(right);
 			if (n != 0) {
 				return n;
 			}

@@ -14,56 +14,63 @@ import utils.TupleComparator;
 public class SMJOperator extends JoinOperator {
 
 	private List<String> leftSortConditions, rightSortConditions;
-	private int partitionIndex;
+	private int innerPartitionStartIndex, currInnerIndex, currOuterIndex;
+	Tuple Tr, Ts, Gs, returnTuple;
+	TupleComparator comp, rightComp;
 
 	public SMJOperator(Expression joinCondition, Operator leftChild, Operator rightChild, 
 			List<String> leftSortConditions, List<String> rightSortConditions) {
 		super(joinCondition, leftChild, rightChild);
 		this.leftSortConditions = leftSortConditions;
 		this.rightSortConditions = rightSortConditions;	
-		this.partitionIndex = 0;
+		this.innerPartitionStartIndex = 0;
+		this.currInnerIndex = 0;
+		this.currOuterIndex = 0;
+
+		comp = new TupleComparator(this.leftSortConditions, this.rightSortConditions);
+		rightComp = new TupleComparator(this.rightSortConditions, this.rightSortConditions);
 	}
 
 	@Override
 	public Tuple getNextTuple() {
 		
-		Tuple Tr = leftChild.getNextTuple();
-		Tuple Ts = rightChild.getNextTuple();
-		Tuple returnTuple = null;
-		
-		this.rightChild.reset(partitionIndex);
-		Tuple Gs = rightChild.getNextTuple();
-		
-		TupleComparator comp = new TupleComparator(this.leftSortConditions, this.rightSortConditions);
+		leftChild.reset(currOuterIndex);
+		rightChild.reset(currInnerIndex);
+		Tr = leftChild.getNextTuple();
+		Ts = rightChild.getNextTuple();
+		Gs = Ts;
+		returnTuple = null;
 		
 		while (Tr != null && Gs != null) {
 			while (comp.joinCompare(Tr, Gs) < 0) {
+				currOuterIndex++;
 				Tr = leftChild.getNextTuple();
 			}
-			
+						
 			while (comp.joinCompare(Tr, Gs) > 0) {
-				partitionIndex++;
+				innerPartitionStartIndex++;
+				currInnerIndex++;
 				Gs = rightChild.getNextTuple();
 			}
-			
+						
 			Ts = Gs;
 			
-			while (comp.joinCompare(Tr, Gs) == 0 && returnTuple != null) {
-				this.rightChild.reset(partitionIndex);
-				Ts = rightChild.getNextTuple();
-				
+			while (comp.joinCompare(Tr, Gs) == 0) {
+ 				
 				while (comp.joinCompare(Tr, Ts) == 0) {
 					returnTuple = new Tuple(Tr, Ts);
+
+					if (rightComp.joinCompare(Ts, rightChild.getNextTuple()) == 0) {
+						currInnerIndex++;
+					} else {
+					currOuterIndex++;
+					currInnerIndex = innerPartitionStartIndex;
+					}
 					return returnTuple;
-//					Ts = rightChild.getNextTuple();
-//					break;
-				}
-				
-//				Tr = leftChild.getNextTuple();
-			}
-			
-//			Gs = Ts;
+				}	
+			}			
 		}
+		
 		return returnTuple;
 	}
 }
