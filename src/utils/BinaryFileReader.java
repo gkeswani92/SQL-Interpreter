@@ -22,9 +22,10 @@ public class BinaryFileReader implements TupleReader {
 	private String tableName;
 	
 	public BinaryFileReader(String tableName) throws FileNotFoundException {
-		attributes = DatabaseCatalog.getInstance().getTableAttributes(tableName);
-		
-		fis = new FileInputStream(new File(DatabaseCatalog.getInstance().getBinaryDataFilePath(tableName)));
+		this.tableName = tableName;
+		attributes = DatabaseCatalog.getInstance().getTableAttributes(tableName);		
+		//fis = new FileInputStream(new File(DatabaseCatalog.getInstance().getBinaryDataFilePath(tableName)));
+		fis = new FileInputStream(new File("D:\\Database_Practicals\\SQL-Interpreter\\samples\\input\\temp\\externalsort\\56\\pass0\\3"));
 		channel = fis.getChannel();
 		bb = ByteBuffer.allocateDirect(4*1024);
 		bb.clear();
@@ -43,7 +44,7 @@ public class BinaryFileReader implements TupleReader {
 		
 		int[] tuple = new int [numAttr];
 		
-		for (int i = 0; i < numAttr; i++) {
+ 		for (int i = 0; i < numAttr; i++) {
 			tuple[i] = tupleArr[tupleIndex];
 			tupleIndex++;
 		}
@@ -77,18 +78,21 @@ public class BinaryFileReader implements TupleReader {
 		  return 0;
 	}
 	
-	public static void main(String[] args) throws FileNotFoundException {
+	/*public static void main(String[] args) throws FileNotFoundException {
 		
-		DatabaseCatalog.getInstance().buildDbCatalog("/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input");		
-		
-		PrintWriter writer = new PrintWriter("/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input/db/data/test");
-		BinaryFileReader bfr = new BinaryFileReader("Boats");
+		DatabaseCatalog.getInstance().buildDbCatalog("D:/Database_Practicals/SQL-Interpreter/samples/input");	
+		//String outfileName = "D:/Database_Practicals/SQL-Interpreter/samples/input/db/data/test2";		
+		PrintWriter writer = new PrintWriter("D:/Database_Practicals/SQL-Interpreter/samples/input/temp/externalsort/56/pass0/out3");
+		BinaryFileReader bfr = new BinaryFileReader("Sailors");
+		//BinaryFileWriter bfw = new BinaryFileWriter(outfileName);
 		
 		Tuple tuple = bfr.getNextTuple();
 		while (tuple != null) {
+			//bfw.writeNextTuple(tuple);
 			writer.println(tuple.toStringValues());
 			tuple = bfr.getNextTuple();
 		}
+		//bfw.writeNextTuple(tuple);
 		writer.close();
-	}
+	}*/
 }

@@ -80,9 +80,11 @@ public class DatabaseCatalog {
 	public void setEntryForAlias(String baseTable, String alias) {
 		// TODO Auto-generated method stub
 		tableSchemaCatalag.put(alias, getTableAttributes(baseTable));
-		String[] dataFilePath = new String[1];
+		String[] dataFilePath = new String[2];
 		dataFilePath[0] = getDataFilePath(baseTable);
-		tableFileCatalag.put(alias,dataFilePath);		
+		dataFilePath[1] = getBinaryDataFilePath(baseTable);
+		tableFileCatalag.put(alias,dataFilePath);	
+		
 	}	
 		
 
