@@ -38,6 +38,7 @@ public class Interpreter {
 		String inputSrcDir = "";
 		String outputScrDir = "";
 		DumpRelations writeToFile = null;
+		long startTime = System.nanoTime();
 		
 		//Building the single instance of the database catalog and config file reader
 		if(args.length == 2){
@@ -109,6 +110,10 @@ public class Interpreter {
 	                Operator physicalRoot = constructPhysicalPlan(root);
 	                //physicalRoot.dump();
 	    			writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
+	    			
+	    			long endTime = System.nanoTime();
+	    			System.out.println("Took "+(endTime - startTime)/10e8 + " ns"); 
+	    			
 	    			System.out.println("<------------End of query----------->");
 	    			
 	    			//Reading the next statement
