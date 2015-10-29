@@ -22,14 +22,13 @@ public class BinaryFileReader implements TupleReader {
 	private String tableName;
 	
 	public BinaryFileReader(String tableName) throws FileNotFoundException {
-		attributes = DatabaseCatalog.getInstance().getTableAttributes(tableName);
 		
+		attributes = DatabaseCatalog.getInstance().getTableAttributes(tableName);
 		fis = new FileInputStream(new File(DatabaseCatalog.getInstance().getBinaryDataFilePath(tableName)));
 		channel = fis.getChannel();
 		bb = ByteBuffer.allocateDirect(4*1024);
 		bb.clear();
 		updateBufferWithNextPage();
-		
 		this.tableName = tableName;
 	}
 	
@@ -75,20 +74,5 @@ public class BinaryFileReader implements TupleReader {
 		  tupleIndex = INDEX_OF_FIRST_TUPLE;
 
 		  return 0;
-	}
-	
-	public static void main(String[] args) throws FileNotFoundException {
-		
-		DatabaseCatalog.getInstance().buildDbCatalog("/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input");		
-		
-		PrintWriter writer = new PrintWriter("/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input/db/data/test");
-		BinaryFileReader bfr = new BinaryFileReader("Boats");
-		
-		Tuple tuple = bfr.getNextTuple();
-		while (tuple != null) {
-			writer.println(tuple.toStringValues());
-			tuple = bfr.getNextTuple();
-		}
-		writer.close();
 	}
 }

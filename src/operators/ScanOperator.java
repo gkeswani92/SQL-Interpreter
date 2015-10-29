@@ -20,8 +20,6 @@ public class ScanOperator extends Operator{
 	
 	private String tableName; 
 	private String alias;
-	private FileReader fileReaderObj;
-	private BufferedReader file;
 	private String filePath;
 	BinaryFileReader bfr;
 	
@@ -92,7 +90,6 @@ public class ScanOperator extends Operator{
 	 */
 	@Override
 	public Tuple getNextTuple() {
-		
 		Tuple tuple = null;
 		tuple = bfr.getNextTuple();
 		
@@ -113,19 +110,9 @@ public class ScanOperator extends Operator{
 	 */
 	@Override
 	public void reset() {
-		//Closing the current file
 		try {
-			file.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		//Opens the same file again to reset the pointer to the start
-		try {
-			fileReaderObj = new FileReader(filePath);
-			file = new BufferedReader(fileReaderObj);
-		} 
-		catch (FileNotFoundException e) {
+			bfr = new BinaryFileReader(tableName);
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
