@@ -22,7 +22,6 @@ public class BinaryFileReader implements TupleReader {
 	private String tableName;
 	
 	public BinaryFileReader(String tableName) throws FileNotFoundException {
-		
 		attributes = DatabaseCatalog.getInstance().getTableAttributes(tableName);
 		fis = new FileInputStream(new File(DatabaseCatalog.getInstance().getBinaryDataFilePath(tableName)));
 		channel = fis.getChannel();
@@ -42,7 +41,7 @@ public class BinaryFileReader implements TupleReader {
 		
 		int[] tuple = new int [numAttr];
 		
-		for (int i = 0; i < numAttr; i++) {
+ 		for (int i = 0; i < numAttr; i++) {
 			tuple[i] = tupleArr[tupleIndex];
 			tupleIndex++;
 		}
