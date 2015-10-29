@@ -14,7 +14,7 @@ import utils.TupleComparator;
 public class SMJOperator extends JoinOperator {
 
 	private List<String> leftSortConditions, rightSortConditions;
-	private int innerPartitionStartIndex, currInnerIndex, currOuterIndex;
+	private int innerPartitionStartIndex, currInnerIndex, currOuterIndex, count;
 	Tuple Tr, Ts, Gs, returnTuple;
 	TupleComparator comp, rightComp;
 
@@ -26,6 +26,7 @@ public class SMJOperator extends JoinOperator {
 		this.innerPartitionStartIndex = 0;
 		this.currInnerIndex = 0;
 		this.currOuterIndex = 0;
+		this.count = 0;
 
 		comp = new TupleComparator(this.leftSortConditions, this.rightSortConditions);
 		rightComp = new TupleComparator(this.rightSortConditions, this.rightSortConditions);
@@ -43,11 +44,17 @@ public class SMJOperator extends JoinOperator {
 		
 		while (Tr != null && Gs != null) {
 			while (comp.joinCompare(Tr, Gs) < 0) {
+				if (Tr == null || Gs == null) {
+					return returnTuple;
+				}
 				currOuterIndex++;
 				Tr = leftChild.getNextTuple();
 			}
 						
 			while (comp.joinCompare(Tr, Gs) > 0) {
+				if (Tr == null || Gs == null) {
+					return returnTuple;
+				}
 				innerPartitionStartIndex++;
 				currInnerIndex++;
 				Gs = rightChild.getNextTuple();
