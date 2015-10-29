@@ -23,7 +23,6 @@ public class ScanLogicalOperator extends LogicalOperator {
 	}
 	
 	private String updateCatalogForAlias(String tableName,String alias) {
-		// TODO Auto-generated method stub
 		if(tableName.contains("AS")){
 			String baseTable = tableName.substring(0,tableName.indexOf(" "));
 			DatabaseCatalog.getInstance().setEntryForAlias(baseTable, alias);

@@ -73,6 +73,7 @@ public class SMJOperator extends JoinOperator {
 					currOuterIndex++;
 					currInnerIndex = innerPartitionStartIndex;
 					}
+					System.out.println(count++ + " " + returnTuple.toStringValues());
 					return returnTuple;
 				}	
 			}			
