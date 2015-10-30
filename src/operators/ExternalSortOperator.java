@@ -19,7 +19,7 @@ public class ExternalSortOperator extends SortOperator {
 	private Integer randomInt;
 	// TO DO ------ read from catalog
 	private String tempdir = "D:/Database_Practicals/SQL-Interpreter/samples/input/temp";
-	private String externalSortDir = tempdir +"/externalsort/";
+	private String externalSortDir = tempdir + "/externalsort";
 	private String sortedFile;
 
 	public ExternalSortOperator(Operator child, List<String> sortConditions, 
@@ -28,7 +28,7 @@ public class ExternalSortOperator extends SortOperator {
 		this.numBufferPages = numBufferPages;
 		Random randomGenerator = new Random();
 		randomInt = randomGenerator.nextInt(100);
-		externalSortDir = externalSortDir + randomInt;
+		externalSortDir = externalSortDir + "/" + randomInt;
 		try {
 			sortedFile = externalSort();
 		} catch (FileNotFoundException e) {
@@ -45,6 +45,7 @@ public class ExternalSortOperator extends SortOperator {
 		this.numBufferPages = numBufferPages;
 		Random randomGenerator = new Random();
 		randomInt = randomGenerator.nextInt(100);
+		externalSortDir = externalSortDir + "/" + randomInt;
 		try {
 			externalSort();
 		} catch (FileNotFoundException e) {
@@ -78,7 +79,7 @@ public class ExternalSortOperator extends SortOperator {
 			List<String> newRunFilenames = new LinkedList<String>();			
 			int newRuncount = 0;
 			for(int i=0;i<=(int)Math.ceil(runFilenames.size()/mergeBufferPages);i++){
-				String outputFileName = externalSortDir+"/" +pass+"/" + i+1;
+				String outputFileName = externalSortDir+"/pass" +pass+"/" + i+1;
 				newRunFilenames.add(outputFileName);
 				if((i*mergeBufferPages+mergeBufferPages) <  runFilenames.size()){						
 					mergeAndWrite(runFilenames.subList(i*mergeBufferPages, i*mergeBufferPages+mergeBufferPages),outputFileName);						
@@ -94,7 +95,8 @@ public class ExternalSortOperator extends SortOperator {
 		    }
 			runFilenames.addAll(newRunFilenames);			
 		}
-		 return runFilenames.listIterator().next();		
+		System.out.println(runFilenames.listIterator().next()); 
+		return runFilenames.listIterator().next();		
 	}
 
 
@@ -106,7 +108,7 @@ public class ExternalSortOperator extends SortOperator {
 		// creating buffer readers for each of the input passes needed to merge
 		for(int i=0;i<subList.size();i++){
 			BinaryFileReader fileReader = new BinaryFileReader(subList.get(i),true);
-			readers.set(i, fileReader);
+			readers.add(fileReader);
 			List<Tuple> tupleList = new ArrayList<Tuple>();
 			tupleList = getBlockTuples(fileReader);	
 			Entry<List<Tuple>, Integer> myKey = new AbstractMap.SimpleEntry<List<Tuple>, Integer>(tupleList, 0);
