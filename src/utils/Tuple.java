@@ -128,4 +128,8 @@ public class Tuple {
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
+	
+	public Integer getNumAttributes() {
+		return attributeValues.size();
+	}
 }

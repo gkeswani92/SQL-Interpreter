@@ -62,6 +62,14 @@ public class BinaryFileReader implements TupleReader {
 	}
 
 	
+	public void setChannelToPage(int index) {
+		try {
+			channel.position(index * 4096);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private Integer updateBufferWithNextPage() {
 		
 		try {	

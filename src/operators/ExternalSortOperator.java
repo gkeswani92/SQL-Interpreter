@@ -15,13 +15,13 @@ import utils.TupleComparator;
 
 public class ExternalSortOperator extends SortOperator {
 
-	private Integer numBufferPages;
-	private Integer randomInt;
+	private Integer numBufferPages, randomInt, numAttributes;
 	// TODO: ------ read from catalog
 	private String tempdir = "D:/Database_Practicals/SQL-Interpreter/samples/input/temp";
 	private String externalSortDir = tempdir + "/externalsort";
 	private String sortedFile;
 	private String tableName;
+	private BinaryFileReader bfr;
 
 	// External calls
 	public ExternalSortOperator(List<String> sortConditions, Operator child, Integer numBufferPages) {
@@ -30,7 +30,13 @@ public class ExternalSortOperator extends SortOperator {
 		Random randomGenerator = new Random();
 		randomInt = randomGenerator.nextInt(100);
 		externalSortDir = externalSortDir + "/" + randomInt;
-		this.tableName = child.getNextTuple().getTableName();
+		
+		Tuple tuple = child.getNextTuple();
+		if (tuple != null) {
+			this.tableName = tuple.getTableName();
+			this.numAttributes = tuple.getNumAttributes();
+		}
+		
 		child.reset();
 	}	
 
@@ -39,34 +45,43 @@ public class ExternalSortOperator extends SortOperator {
 		if (sortedFile == null) {
 			try {
 				sortedFile = externalSort();
+				bfr = new BinaryFileReader(sortedFile, tableName);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
-		} 
+		}
 
 		Tuple tableLessTuple = null;
-		try {
-			BinaryFileReader bfr = new BinaryFileReader(sortedFile, tableName);
-			tableLessTuple = bfr.getNextTuple();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		tableLessTuple = bfr.getNextTuple();
 		
 		if (tableLessTuple != null) {
 			tableLessTuple.setTableName(this.tableName);
+			tableLessTuple.updateTuple(tableName);
 		}
-		
+	
 		return tableLessTuple;
 	}
 
-	// TODO: READ SORT MERGE JOIN IMPLEMENTATION DESCRIPTION FOR DETAILS ON HOW TO IMPLEMENT THIS
 	@Override
 	public void reset(int index) {
-		// TODO Auto-generated method stub		
+		
+		if (sortedFile == null && index == 0) {
+			return;
+		}
+		
+		try {
+			bfr = new BinaryFileReader(sortedFile, tableName);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		Integer sizeOfTuple = numAttributes * 4;
+		Integer availablePageSize = 4096 - 8;
+		Integer tuplesPerPage = Math.floorDiv(availablePageSize, sizeOfTuple);
+		Integer pageIndex = Math.floorDiv(index+1, tuplesPerPage);
+		bfr.setChannelToPage(pageIndex);
 	}
 	
 	//External sort implementation
-	
 	private String externalSort() throws FileNotFoundException {
 		List<String> runFilenames= executePass0();
 		int runCount = runFilenames.size();
@@ -93,20 +108,14 @@ public class ExternalSortOperator extends SortOperator {
 		    }
 			runFilenames.addAll(newRunFilenames);			
 		}
-//		System.out.println(runFilenames.listIterator().next()); 
-//		
-//		if (!runFilenames.listIterator().hasNext()) {
-//			int test = 1;
-//		}
+		
 		return runFilenames.get(0);
 	}
-
 
 	private void mergeAndWrite(List<String> subList, String outputFileName) throws FileNotFoundException {
 		TupleComparator comp;
 		List<Entry<List<Tuple>,Integer>> tupleBuffers = new ArrayList<>();
 		List<BinaryFileReader> readers = new ArrayList<BinaryFileReader>();
-		int mergeFanIn = subList.size();
 		// creating buffer readers for each of the input passes needed to merge
 		for(int i=0;i<subList.size();i++){
 			BinaryFileReader fileReader = new BinaryFileReader(subList.get(i),tableName);
@@ -186,7 +195,7 @@ public class ExternalSortOperator extends SortOperator {
 				tuplesRead++;
 			}			
 			return pageTuples;		
-		}else{
+		} else {
 			return null;
 		}		
 	}
@@ -269,8 +278,7 @@ public class ExternalSortOperator extends SortOperator {
 				 blockTuples = tuples.subList(currIndex, tuples.size());
 				 currIndex=tuples.size();
 			 }
-		}
-			 
+		}		 
 		return  blockTuples;
 	}
 }
