@@ -127,10 +127,14 @@ public class BNLJOperator extends JoinOperator {
 		    	}
 		    }
 		    
-			left = outerBuffer.get(outerIndex);
-			right = innerBuffer.get(innerIndex);
-			joinTuple = new Tuple(left, right);
-			
+		    try{
+		    	left = outerBuffer.get(outerIndex);
+		    	right = innerBuffer.get(innerIndex);
+		    	joinTuple = new Tuple(left, right);
+		    } catch(Exception e) {
+		    	return null;
+		    }
+		    
 			//Base case where we run out of tuples 
 			if(left == null && right == null)
 				break;
@@ -142,16 +146,11 @@ public class BNLJOperator extends JoinOperator {
 			//If the joined tuple, satisfies the join condition, return it
 			ExpressionEvaluator ob = new ExpressionEvaluator(joinTuple);
 		    joinCondition.accept(ob);
-		    if (joinTuple.getIsSatisfies()) {
+		    if (joinTuple != null && joinTuple.getIsSatisfies()) {
 		    	outerIndex++;
 		        return joinTuple;
 		    }  
-		    
 		    outerIndex++;
-		    
-		  
-		    
-		    
 		}	
 		return null;
 	}

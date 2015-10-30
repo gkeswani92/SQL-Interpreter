@@ -43,9 +43,11 @@ public class BinaryFileReader implements TupleReader {
 	
 	@Override
 	public Tuple getNextTuple() {
-		if(numTuples == 0) {
-			if (updateBufferWithNextPage() == 1) {
-				return null;
+		if(numTuples != null){
+			if(numTuples == 0) {
+				if (updateBufferWithNextPage() == 1) {
+					return null;
+				}
 			}
 		}
 		
