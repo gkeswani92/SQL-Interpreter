@@ -19,6 +19,7 @@ public class BinaryFileReader implements TupleReader {
 	private int tupleIndex;
 	private String[] attributes;
 	private String tableName;
+	private String fileName;
 	
 	public BinaryFileReader(String tableName) throws FileNotFoundException {
 		attributes = DatabaseCatalog.getInstance().getTableAttributes(tableName);
@@ -28,6 +29,16 @@ public class BinaryFileReader implements TupleReader {
 		bb.clear();
 		updateBufferWithNextPage();
 		this.tableName = tableName;
+	}
+	
+	public BinaryFileReader(String fileName,boolean isFile) throws FileNotFoundException {	
+		
+		fis = new FileInputStream(new File(fileName));
+		channel = fis.getChannel();
+		bb = ByteBuffer.allocateDirect(4*1024);
+		bb.clear();
+		updateBufferWithNextPage();
+		this.fileName = fileName;
 	}
 	
 	@Override

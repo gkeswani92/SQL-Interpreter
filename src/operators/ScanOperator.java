@@ -37,6 +37,7 @@ public class ScanOperator extends Operator{
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	/**
