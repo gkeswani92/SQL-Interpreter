@@ -46,7 +46,7 @@ public class ExternalSortOperator extends SortOperator {
 
 		Tuple tableLessTuple = null;
 		try {
-			BinaryFileReader bfr = new BinaryFileReader(sortedFile, true);
+			BinaryFileReader bfr = new BinaryFileReader(sortedFile, tableName);
 			tableLessTuple = bfr.getNextTuple();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -109,7 +109,7 @@ public class ExternalSortOperator extends SortOperator {
 		int mergeFanIn = subList.size();
 		// creating buffer readers for each of the input passes needed to merge
 		for(int i=0;i<subList.size();i++){
-			BinaryFileReader fileReader = new BinaryFileReader(subList.get(i),true);
+			BinaryFileReader fileReader = new BinaryFileReader(subList.get(i),tableName);
 			readers.add(fileReader);
 			List<Tuple> tupleList = new ArrayList<Tuple>();
 			tupleList = getBlockTuples(fileReader);	

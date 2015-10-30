@@ -31,8 +31,8 @@ public class BinaryFileReader implements TupleReader {
 		this.tableName = tableName;
 	}
 	
-	public BinaryFileReader(String fileName, boolean isFile) throws FileNotFoundException {	
-		
+	public BinaryFileReader(String fileName, String tableName) throws FileNotFoundException {	
+		attributes = DatabaseCatalog.getInstance().getTableAttributes(tableName);
 		fis = new FileInputStream(new File(fileName));
 		channel = fis.getChannel();
 		bb = ByteBuffer.allocateDirect(4*1024);
