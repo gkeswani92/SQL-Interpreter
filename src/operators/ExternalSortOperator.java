@@ -21,6 +21,7 @@ public class ExternalSortOperator extends SortOperator {
 	private String tempdir = "D:/Database_Practicals/SQL-Interpreter/samples/input/temp";
 	private String externalSortDir = tempdir + "/externalsort";
 	private String sortedFile;
+	private String tableName;
 
 	public ExternalSortOperator(Operator child, List<String> sortConditions, 
 			List<Tuple> tuples, Integer currIndex, Integer numBufferPages) {
@@ -29,13 +30,9 @@ public class ExternalSortOperator extends SortOperator {
 		Random randomGenerator = new Random();
 		randomInt = randomGenerator.nextInt(100);
 		externalSortDir = externalSortDir + "/" + randomInt;
-		try {
-			sortedFile = externalSort();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (tuples != null && !tuples.isEmpty()) {
+			this.tableName = tuples.get(0).getTableName();
 		}
-	
 	}
 
 
@@ -49,7 +46,6 @@ public class ExternalSortOperator extends SortOperator {
 		try {
 			externalSort();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -57,8 +53,24 @@ public class ExternalSortOperator extends SortOperator {
 
 	@Override
 	public Tuple getNextTuple() {
-		// TODO Auto-generated method stub
-		return null;
+		if (sortedFile == null) {
+			try {
+				sortedFile = externalSort();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		} 
+
+		Tuple tableLessTuple = null;
+		try {
+			BinaryFileReader bfr = new BinaryFileReader(sortedFile, true);
+			tableLessTuple = bfr.getNextTuple();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		tableLessTuple.setTableName(this.tableName);
+		return tableLessTuple;
 	}
 
 	// TODO: READ SORT MERGE JOIN IMPLEMENTATION DESCRIPTION FOR DETAILS ON HOW TO IMPLEMENT THIS

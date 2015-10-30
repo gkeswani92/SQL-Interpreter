@@ -120,4 +120,12 @@ public class Tuple {
 		attributeValues.clear();
 		attributeValues.putAll(newAttrValues);
 	}
+	
+	public String getTableName() {
+		return tableName;
+	}
+	
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
 }
