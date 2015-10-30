@@ -17,38 +17,21 @@ public class ExternalSortOperator extends SortOperator {
 
 	private Integer numBufferPages;
 	private Integer randomInt;
-	// TO DO ------ read from catalog
+	// TODO: ------ read from catalog
 	private String tempdir = "D:/Database_Practicals/SQL-Interpreter/samples/input/temp";
 	private String externalSortDir = tempdir + "/externalsort";
 	private String sortedFile;
 	private String tableName;
 
-	public ExternalSortOperator(Operator child, List<String> sortConditions, 
-			List<Tuple> tuples, Integer currIndex, Integer numBufferPages) {
-		super(child, sortConditions, tuples, currIndex);
-		this.numBufferPages = numBufferPages;
-		Random randomGenerator = new Random();
-		randomInt = randomGenerator.nextInt(100);
-		externalSortDir = externalSortDir + "/" + randomInt;
-		if (tuples != null && !tuples.isEmpty()) {
-			this.tableName = tuples.get(0).getTableName();
-		}
-	}
-
-
-
+	// External calls
 	public ExternalSortOperator(List<String> sortConditions, Operator child, Integer numBufferPages) {
 		super(sortConditions, child);
 		this.numBufferPages = numBufferPages;
 		Random randomGenerator = new Random();
 		randomInt = randomGenerator.nextInt(100);
 		externalSortDir = externalSortDir + "/" + randomInt;
-		try {
-			externalSort();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
+		this.tableName = child.getNextTuple().getTableName();
+		child.reset();
 	}	
 
 	@Override
@@ -69,7 +52,10 @@ public class ExternalSortOperator extends SortOperator {
 			e.printStackTrace();
 		}
 		
-		tableLessTuple.setTableName(this.tableName);
+		if (tableLessTuple != null) {
+			tableLessTuple.setTableName(this.tableName);
+		}
+		
 		return tableLessTuple;
 	}
 
@@ -107,8 +93,12 @@ public class ExternalSortOperator extends SortOperator {
 		    }
 			runFilenames.addAll(newRunFilenames);			
 		}
-		System.out.println(runFilenames.listIterator().next()); 
-		return runFilenames.listIterator().next();		
+//		System.out.println(runFilenames.listIterator().next()); 
+//		
+//		if (!runFilenames.listIterator().hasNext()) {
+//			int test = 1;
+//		}
+		return runFilenames.get(0);
 	}
 
 
@@ -176,11 +166,11 @@ public class ExternalSortOperator extends SortOperator {
 
 
 	private List<Tuple> getBlockTuples(BinaryFileReader fileReader) {
-		// TODO Auto-generated method stub
 		int attributeCount = 0;	
 		int numberOfTuples = 0;
 		int tuplesRead = 0;
 		Tuple tuple = fileReader.getNextTuple();
+		this.tableName = tuple.getTableName();
 		tuplesRead =1;
 		List<Tuple> pageTuples = new ArrayList<Tuple>();
 		if(tuple!=null){
@@ -253,6 +243,7 @@ public class ExternalSortOperator extends SortOperator {
 		if (tuples.isEmpty()) {
 			int tuplesRead=0;
 			Tuple currTuple = child.getNextTuple();
+			
 			if(currTuple!=null){
 				attributeCount = currTuple.getArributeList().size();
 				maxTuples = (int) Math.floor((numBufferPages*4088)/(attributeCount*4));
