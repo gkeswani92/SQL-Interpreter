@@ -38,6 +38,7 @@ public class Interpreter {
 		String inputSrcDir = "";
 		String outputScrDir = "";
 		DumpRelations writeToFile = null;
+		long startTime = System.nanoTime();
 		
 		//Building the single instance of the database catalog and config file reader
 		if(args.length == 2){
@@ -105,13 +106,15 @@ public class Interpreter {
 	                		root = new DuplicateEliminationLogicalOperator(root);
 	                }
 	    			
-	                //TODO: WRITE TO FILE!!!!!!!!!
-	                
-	                // WE HAVE OUR ENTIRE LOGICAL PLAN CONSTRUCTED HERE
-	                
-	                constructPhysicalPlan(root);
-	                //root.dump();
-	    			//writeToFile.writeRelationToFile(root, queryCount);
+	               
+	                Operator physicalRoot = constructPhysicalPlan(root);
+	                //physicalRoot.dump();
+	    			writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
+	    			
+	    			long endTime = System.nanoTime();
+	    			System.out.println("Took "+(endTime - startTime)/10e8 + " ns"); 
+	    			
+	    			System.out.println("<------------End of query----------->");
 	    			
 	    			//Reading the next statement
 	    			statement = parser.Statement();
@@ -134,8 +137,7 @@ public class Interpreter {
 
 	private static Operator constructPhysicalPlan (LogicalOperator root) {
 		Operator opRoot = root.getNextPhysicalOperator();
-		opRoot.dump();
-		return null;
+		return opRoot;
 	}
 	
 	private static LogicalOperator handleWithoutJoin(PlainSelect body, List<SelectItem> selectAttr) {

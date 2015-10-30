@@ -15,6 +15,7 @@ import operators.Operator;
 public class DumpRelations {
 	
 	PrintWriter writer;
+	BinaryFileWriter binaryWriter;
 	String filepath;
 	
 	public DumpRelations(String outputDir) {
@@ -39,5 +40,22 @@ public class DumpRelations {
 		catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void writeRelationToBinaryFile(Operator root, Integer queryNumber){
+		String filename = this.filepath + queryNumber.toString();
+		Tuple currentTuple = root.getNextTuple();
+		
+		try{
+			binaryWriter = new BinaryFileWriter(filename);
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		while(currentTuple != null) {
+			binaryWriter.writeNextTuple(currentTuple);
+			currentTuple = root.getNextTuple();
+		}		
 	}
 }
