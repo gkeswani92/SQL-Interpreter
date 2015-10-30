@@ -133,7 +133,7 @@ public class ExternalSortOperator extends SortOperator {
 						Tuple minTuple = tupleBuffers.get(min).getKey().get(tupleBuffers.get(min).getValue());
 						comp = new TupleComparator(new ArrayList<String>(tuple1.getArributeList()));
 						if(comp.compare(tuple1, minTuple) < 0)
-							min = i;
+							min = i;						
 					}else{
 						List<Tuple> newBlock = getBlockTuples(readers.get(i));
 						if(newBlock==null){
@@ -153,14 +153,22 @@ public class ExternalSortOperator extends SortOperator {
 							
 						}else{
 							Entry<List<Tuple>, Integer> myKey = new AbstractMap.SimpleEntry<List<Tuple>, Integer>(newBlock, 0);
+							tupleBuffers.remove(i);
 							tupleBuffers.add(i, myKey);
 						}
 					}
 				}									
 			}
-			bfw.writeNextTuple(tupleBuffers.get(min).getKey().get(tupleBuffers.get(min).getValue()));			
-			tupleBuffers.get(min).setValue(tupleBuffers.get(min).getValue()+1);
-		}		
+			try {
+				bfw.writeNextTuple(tupleBuffers.get(min).getKey().get(tupleBuffers.get(min).getValue()));			
+				tupleBuffers.get(min).setValue(tupleBuffers.get(min).getValue()+1);				
+			} catch(Exception e){
+				System.out.println(min);
+				System.out.println(tupleBuffers.get(min).getValue()+1);				
+			}
+			
+		}	
+		bfw.writeNextTuple(null);
 	}
 
 
@@ -169,14 +177,13 @@ public class ExternalSortOperator extends SortOperator {
 		int attributeCount = 0;	
 		int numberOfTuples = 0;
 		int tuplesRead = 0;
-		Tuple tuple = fileReader.getNextTuple();
-		this.tableName = tuple.getTableName();
+		Tuple tuple = fileReader.getNextTuple();		
 		tuplesRead =1;
 		List<Tuple> pageTuples = new ArrayList<Tuple>();
 		if(tuple!=null){
 			attributeCount = tuple.getArributeList().size();
-			numberOfTuples = (int)Math.floor(4088/(numberOfTuples*4));			
-			while(numberOfTuples > tuplesRead+1 && tuple!=null){
+			numberOfTuples = (int)Math.floor(4088/(attributeCount*4));			
+			while(numberOfTuples >(tuplesRead+1) && tuple!=null){
 				pageTuples.add(tuple);
 				tuplesRead++;
 				tuple=fileReader.getNextTuple();
