@@ -37,8 +37,10 @@ public class SortLogicalOperator extends LogicalOperator {
 		
 		// Read config file and decide which sort to invoke
 		if (config.getSortType() == 0) {
-			return new InMemorySortOperator(this.child.getNextPhysicalOperator(), this.sortConditions,
-					this.tuples, this.currIndex);
+			/*return new InMemorySortOperator(this.child.getNextPhysicalOperator(), this.sortConditions,
+					this.tuples, this.currIndex);*/
+			return new ExternalSortOperator(this.child.getNextPhysicalOperator(), this.sortConditions,
+					this.tuples, this.currIndex, config.getSortBuffer());
 		} else {
 			return new ExternalSortOperator(this.child.getNextPhysicalOperator(), this.sortConditions,
 					this.tuples, this.currIndex, config.getSortBuffer());

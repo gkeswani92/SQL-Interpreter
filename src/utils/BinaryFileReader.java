@@ -58,8 +58,7 @@ public class BinaryFileReader implements TupleReader {
 				bb.flip();
 				numAttr = bb.asIntBuffer().get(0);
 				numTuples = bb.asIntBuffer().get(1);
-				tupleArr = new int [numAttr*numTuples+INDEX_OF_FIRST_TUPLE];
-				
+				tupleArr = new int [numAttr*numTuples+INDEX_OF_FIRST_TUPLE];				
 				bb.asIntBuffer().get(tupleArr,0,tupleArr.length);
 				bb.clear();
 				channel.read(bb);
