@@ -226,7 +226,8 @@ public class Interpreter {
 				finalJoinCondition = getJoinCondition(joins, currentLeftJoinTables.get(0), currentRightJoinTable);
 				temp = new JoinLogicalOperator(finalJoinCondition, 
 						getBasicOperator(tableOperators, currentLeftJoinTables.get(0)), 
-						getBasicOperator(tableOperators, currentRightJoinTable));
+						getBasicOperator(tableOperators, currentRightJoinTable),
+						currentRightJoinTable);
 				root = temp;
 			} 
 			// Add 1 table from join(joins from select body) into the left current join list
@@ -244,7 +245,7 @@ public class Interpreter {
 							finalJoinCondition = new AndExpression(finalJoinCondition, currentTableJoin);
 					}
 				}
-				temp = new JoinLogicalOperator(finalJoinCondition, root, getBasicOperator(tableOperators, currentRightJoinTable));
+				temp = new JoinLogicalOperator(finalJoinCondition, root, getBasicOperator(tableOperators, currentRightJoinTable), currentRightJoinTable);
 				root = temp;
 			}
 			

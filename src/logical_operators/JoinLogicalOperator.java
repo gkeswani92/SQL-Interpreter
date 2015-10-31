@@ -18,11 +18,14 @@ public class JoinLogicalOperator extends LogicalOperator {
 	LogicalOperator leftChild;
 	LogicalOperator rightChild;
 	Expression joinCondition;
+	String leftTableName, rightTableName;
 	
-	public JoinLogicalOperator(Expression joinCondition, LogicalOperator leftChild, LogicalOperator rightChild) {
+	public JoinLogicalOperator(Expression joinCondition, LogicalOperator leftChild, 
+			LogicalOperator rightChild, String rightTableName) {
 		this.leftChild = leftChild;
 		this.rightChild = rightChild;
-		this.joinCondition = joinCondition;
+		this.joinCondition = joinCondition;	
+		this.rightTableName = rightTableName;
 	}
 
 	@Override
@@ -44,7 +47,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 			List<String> rightSortConditions = new ArrayList<String>();
 			
 			// Call ExpressionVisitor to get list of left sort conditions and list of right sort conditions.
-			SMJSortConditionsBuilder conditions = new SMJSortConditionsBuilder(leftSortConditions, rightSortConditions);
+			SMJSortConditionsBuilder conditions = new SMJSortConditionsBuilder(leftSortConditions, rightSortConditions, rightTableName);
 			this.joinCondition.accept(conditions);
 			
 			if (ConfigFileReader.getInstance().getSortType()==0) {

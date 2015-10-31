@@ -51,19 +51,19 @@ public class InMemorySortOperator extends SortOperator {
 			}
 		}
 		
-		String tableDump = "";
-		for (Tuple test: tuples) {
-			tableDump = tableDump + test.toStringValues() +  "\n";	
-		}
-		
-		PrintWriter out = null;
-		try {
-			out = new PrintWriter("inMemorySort.txt");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		out.write(tableDump);
-		out.close();
+//		String tableDump = "";
+//		for (Tuple test: tuples) {
+//			tableDump = tableDump + test.toStringValues() +  "\n";	
+//		}
+//		
+//		PrintWriter out = null;
+//		try {
+//			out = new PrintWriter("inMemorySort.txt");
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//		out.write(tableDump);
+//		out.close();
 		
 		// Return one tuple at a time
 		if (currIndex < tuples.size()) {

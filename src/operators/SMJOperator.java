@@ -74,7 +74,11 @@ public class SMJOperator extends JoinOperator {
 					currOuterIndex++;
 					currInnerIndex = innerPartitionStartIndex;
 					}
-
+					
+					if ( count == 3331) {
+						int test = 0;
+						test = test;
+					}
 					System.out.println(count++ + " " + returnTuple.toStringValues());
 					return returnTuple;
 				}	

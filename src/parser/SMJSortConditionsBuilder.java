@@ -46,20 +46,36 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 public class SMJSortConditionsBuilder implements ExpressionVisitor{
 
 	private List<String> leftSortConditions, rightSortConditions;
+	private String rightTableName;
 	
-	public SMJSortConditionsBuilder(List<String> leftSortConditions, List<String> rightSortConditions) {
+	public SMJSortConditionsBuilder(List<String> leftSortConditions, 
+			List<String> rightSortConditions, String rightTableName) {
 		this.leftSortConditions = leftSortConditions;
 		this.rightSortConditions = rightSortConditions;
+		this.rightTableName = rightTableName;
 	}
 	
 	@Override
 	public void visit(EqualsTo arg0) {
-		if (!leftSortConditions.contains(arg0.getLeftExpression().toString())) {
-			leftSortConditions.add(arg0.getLeftExpression().toString());
-		} 
 		
-		if (!rightSortConditions.contains(arg0.getLeftExpression().toString())) {
-			rightSortConditions.add(arg0.getRightExpression().toString());
+		if (((Column)arg0.getLeftExpression()).getTable().toString().equals(rightTableName)) {
+			if (!rightSortConditions.contains(arg0.getLeftExpression().toString())) {
+				rightSortConditions.add(arg0.getLeftExpression().toString());
+			}
+		} else {
+			if (!leftSortConditions.contains(arg0.getLeftExpression().toString())) {
+				leftSortConditions.add(arg0.getLeftExpression().toString());
+			}
+		}
+		
+		if (((Column)arg0.getRightExpression()).getTable().toString().equals(rightTableName)) {
+			if (!rightSortConditions.contains(arg0.getRightExpression().toString())) {
+				rightSortConditions.add(arg0.getRightExpression().toString());
+			}
+		} else {
+			if (!leftSortConditions.contains(arg0.getRightExpression().toString())) {
+				leftSortConditions.add(arg0.getRightExpression().toString());
+			}
 		}
 	}
 	

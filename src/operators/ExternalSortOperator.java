@@ -96,27 +96,32 @@ public class ExternalSortOperator extends SortOperator {
 			e.printStackTrace();
 		}
 		
-		Integer sizeOfTuple = numAttributes * 4;
-		Integer availablePageSize = 4096 - 8;
-		Integer tuplesPerPage = Math.floorDiv(availablePageSize, sizeOfTuple);
-		
-		Integer pageIndex = Math.floorDiv(index+1, tuplesPerPage);
-		
-		Integer temp = (index+1) % tuplesPerPage;
-		if (temp == 0) {
-			pageIndex--;
-		}
-
-		if (pageIndex > 3) {
-			int test = 0;
-			test = test;
-		}
-		
-		bfr.setChannelToPage(pageIndex);
-		Integer tuplesBefore = index - (pageIndex * tuplesPerPage);
-		for (int i = 0; i < tuplesBefore; i++) {
+		for (int i = 0; i < index; i++) {
 			bfr.getNextTuple();
 		}
+		
+//		Integer sizeOfTuple = numAttributes * 4;
+//		Integer availablePageSize = 4096 - 8;
+//		Integer tuplesPerPage = Math.floorDiv(availablePageSize, sizeOfTuple);
+//		
+//		Integer pageIndex = Math.floorDiv(index+1, tuplesPerPage);
+//		
+//		Integer temp = (index+1) % tuplesPerPage;
+//		if (temp == 0) {
+//			pageIndex--;
+//		}
+//
+//		if (pageIndex > 3) {
+//			int test = 0;
+//			test = test;
+//		}
+//		
+//		bfr.setChannelToPage(pageIndex);
+//		Integer tuplesBefore = index - (pageIndex * tuplesPerPage);
+//
+//		for (int i = 0; i < tuplesBefore; i++) {
+//			bfr.getNextTuple();
+//		}
 	}
 	
 	//External sort implementation
@@ -130,10 +135,11 @@ public class ExternalSortOperator extends SortOperator {
 			pass++;
 			List<String> newRunFilenames = new LinkedList<String>();			
 			int newRuncount = 0;
-			for(int i=0;i<(int)Math.ceil(runFilenames.size()/mergeBufferPages);i++){
+			int test = (int)Math.ceil((runCount*1.0)/mergeBufferPages);
+			for(int i=0 ; i < test; i++){
 				String outputFileName = externalSortDir+"/pass" +pass+"/" + i+1;
 				newRunFilenames.add(outputFileName);
-				if((i*mergeBufferPages+mergeBufferPages) <  runFilenames.size()){						
+				if((i*mergeBufferPages+mergeBufferPages) <  runCount){						
 					mergeAndWrite(runFilenames.subList(i*mergeBufferPages, i*mergeBufferPages+mergeBufferPages),outputFileName);						
 				}
 				else {
