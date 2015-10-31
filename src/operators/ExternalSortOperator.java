@@ -19,7 +19,7 @@ public class ExternalSortOperator extends SortOperator {
 	private Integer numBufferPages, numAttributes;
 	private static Integer countSortCalls = 0;
 	// TODO: ------ read from catalog
-//	private String tempdir = ConfigFileReader.getInstance().getTempDir();
+	//private String tempdir = ConfigFileReader.getInstance().getTempDir();
 	private String tempdir = "D:/Database_Practicals/SQL-Interpreter/samples/input/temp";
 	private String externalSortDir = tempdir + "/externalsort";
 	private String sortedFile;
@@ -171,8 +171,19 @@ public class ExternalSortOperator extends SortOperator {
 		for(int i =0;i<tupleBuffers.size();i++)
 			includedBuffers.add(i);
 		boolean flag = true;
-		int emptylist = 0;	
-		while(flag){
+		int emptylist = 0;
+		//if included there's only one file then copy over the entire sorted without merge
+		if(includedBuffers.size()==1){
+			List<Tuple> newBlock = getBlockTuples(readers.get(includedBuffers.get(0)));
+			while(newBlock!=null){
+				for(int j = 0;j<newBlock.size();j++){
+					bfw.writeNextTuple(newBlock.get(j));
+				}
+				newBlock = getBlockTuples(readers.get(includedBuffers.get(0)));
+			}
+			return;
+		}
+		while(flag){			
 			int min = includedBuffers.get(0);					
 			for(int i=0;i<tupleBuffers.size();i++){
 				if(includedBuffers.contains(i)){
@@ -193,6 +204,13 @@ public class ExternalSortOperator extends SortOperator {
 								int start= tupleBuffers.get(includedBuffers.get(0)).getValue();
 								for(int j = start;j<tupleBuffers.get(includedBuffers.get(0)).getKey().size();j++){
 									bfw.writeNextTuple(tupleBuffers.get(includedBuffers.get(0)).getKey().get(j));
+								}
+								newBlock = getBlockTuples(readers.get(includedBuffers.get(0)));
+								while(newBlock!=null){
+									for(int j = 0;j<newBlock.size();j++){
+										bfw.writeNextTuple(newBlock.get(j));
+									}
+									newBlock = getBlockTuples(readers.get(includedBuffers.get(0)));
 								}
 								emptylist++;
 								if(emptylist==tupleBuffers.size()){
@@ -226,12 +244,12 @@ public class ExternalSortOperator extends SortOperator {
 		int numberOfTuples = 0;
 		int tuplesRead = 0;
 		Tuple tuple = fileReader.getNextTuple();		
-		tuplesRead =1;
+		tuplesRead = 1;
 		List<Tuple> pageTuples = new ArrayList<Tuple>();
 		if(tuple!=null){
 			attributeCount = tuple.getArributeList().size();
 			numberOfTuples = (int)Math.floor(4088/(attributeCount*4));			
-			while(numberOfTuples >(tuplesRead+1) && tuple!=null){
+			while(numberOfTuples > tuplesRead && tuple!=null){
 				pageTuples.add(tuple);
 				tuplesRead++;
 				tuple=fileReader.getNextTuple();
@@ -257,11 +275,11 @@ public class ExternalSortOperator extends SortOperator {
 				// If query has no sort condition (in case of distinct), sort using all attributes
 				// For further explanation refer DuplicateElimationOperator.java
 				if (this.sortConditions.isEmpty()) {
-					this.sortConditions = new ArrayList<String>(tuples.get(0).getArributeList());
+					this.sortConditions = new ArrayList<String>(blockTuples.get(0).getArributeList());
 				} else {
 					// Adds all remaining attributes that aren't already sort conditions to the sort conditions
 					// Preserves order of attributes in the tuple
-					List<String> attributes = new ArrayList<String>(tuples.get(0).getArributeList());
+					List<String> attributes = new ArrayList<String>(blockTuples.get(0).getArributeList());
 					
 					for (String sort: this.sortConditions) {
 						if (attributes.contains(sort)) {
