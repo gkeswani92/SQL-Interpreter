@@ -2,8 +2,9 @@ package utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Random;
 
 import operators.Operator;
 
@@ -22,7 +23,7 @@ public class DumpRelations {
 	
 	public DumpRelations(String outputDir) {
 		new File(outputDir).mkdir();
-		this.filepath =  outputDir+"/query";		
+		this.filepath =  outputDir;		
 	}
 	
 	public void writeRelationToFile(Operator root, Integer queryNumber) {
@@ -60,5 +61,54 @@ public class DumpRelations {
 			currentTuple = root.getNextTuple();
 		}
 		binaryWriter.writeNextTuple(null);
+	}
+	
+	public void writeTestFile(Operator root, Integer queryNumber, String writeMethod) {
+		
+		ConfigFileReader config = ConfigFileReader.getInstance();
+		String filename = this.filepath;
+		
+		//Decides which folder to put it in
+		if(config.getSortType() == 0)
+			filename += "/In-Memory/query" + queryNumber.toString();
+		else
+			filename += "/External/query" + queryNumber.toString();
+
+		//Decides which method to use to write the output
+		if(writeMethod.equals("Binary")){
+			try{
+				Tuple currentTuple = root.getNextTuple();
+				binaryWriter = new BinaryFileWriter(filename);
+				while(currentTuple != null) {
+					binaryWriter.writeNextTuple(currentTuple);
+					currentTuple = root.getNextTuple();
+				}
+				binaryWriter.writeNextTuple(null);
+			}
+			catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		//If the write method is human readable
+		else{
+			try {
+				Tuple currentTuple = root.getNextTuple();
+				String tableDump = null;
+				if (currentTuple != null)
+					tableDump = new String(currentTuple.toStringAttributes()+"\n");
+				while(currentTuple != null) {
+					tableDump = tableDump + currentTuple.toStringValues() +  "\n";
+					currentTuple = root.getNextTuple();
+				}
+				FileWriter writer = new FileWriter(filename);
+				writer.write(tableDump);
+				writer.close();
+			} 
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
 	}
 }

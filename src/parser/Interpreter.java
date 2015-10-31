@@ -106,14 +106,14 @@ public class Interpreter {
 	                		root = new DuplicateEliminationLogicalOperator(root);
 	                }
 	    			
-	               
 	                Operator physicalRoot = constructPhysicalPlan(root);
-//	                physicalRoot.dump();
-	    			writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
+
+	                //physicalRoot.dump();
+	    			//writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
+	    			writeToFile.writeTestFile(physicalRoot, queryCount, "Binary");
 	    			
 	    			long endTime = System.nanoTime();
 	    			System.out.println("Took "+(endTime - startTime)/10e8 + " ns"); 
-	    			
 	    			System.out.println("<------------End of query----------->");
 	    			
 	    			//Reading the next statement
