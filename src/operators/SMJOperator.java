@@ -35,8 +35,11 @@ public class SMJOperator extends JoinOperator {
 	@Override
 	public Tuple getNextTuple() {
 		
-		leftChild.reset(currOuterIndex);
-		rightChild.reset(currInnerIndex);
+		if (currOuterIndex != 0 && currInnerIndex != 0) {
+			leftChild.reset(currOuterIndex);
+			rightChild.reset(currInnerIndex);
+		}
+		
 		Tr = leftChild.getNextTuple();
 		Ts = rightChild.getNextTuple();
 		Gs = Ts;

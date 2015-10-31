@@ -42,5 +42,4 @@ public abstract class SortOperator extends Operator {
 		child.reset();
 		currIndex = 0;	
 	}
-
 }

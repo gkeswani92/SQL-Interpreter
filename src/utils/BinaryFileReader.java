@@ -43,9 +43,11 @@ public class BinaryFileReader implements TupleReader {
 	
 	@Override
 	public Tuple getNextTuple() {
-		if(numTuples == 0) {
-			if (updateBufferWithNextPage() == 1) {
-				return null;
+		if(numTuples != null){
+			if(numTuples == 0) {
+				if (updateBufferWithNextPage() == 1) {
+					return null;
+				}
 			}
 		}
 		
@@ -61,6 +63,14 @@ public class BinaryFileReader implements TupleReader {
 		return new Tuple(tuple, attributes, tableName);
 	}
 
+	
+	public void setChannelToPage(int index) {
+		try {
+			channel.position(index * 4096);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	private Integer updateBufferWithNextPage() {
 		
