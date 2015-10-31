@@ -187,6 +187,7 @@ public class ExternalSortOperator extends SortOperator {
 				}
 				newBlock = getBlockTuples(readers.get(includedBuffers.get(0)));
 			}
+			bfw.writeNextTuple(null);
 			return;
 		}
 		while(flag){			
