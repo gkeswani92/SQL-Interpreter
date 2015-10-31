@@ -18,10 +18,10 @@ import java.util.Map;
  *
  */
 public class DatabaseCatalog {
-	private static Map<String,String[]> tableFileCatalag = new HashMap<String,String[]>();
-	private static Map<String,String[]> tableSchemaCatalag = new HashMap<String,String[]>();
-	private static final String ATTR_DELIM = " ";	
-	private static DatabaseCatalog instance;
+	private  Map<String,String[]> tableFileCatalag = new HashMap<String,String[]>();
+	private  Map<String,String[]> tableSchemaCatalag = new HashMap<String,String[]>();
+	private  final String ATTR_DELIM = " ";	
+	private static  DatabaseCatalog instance;	
 	
 	private DatabaseCatalog() {	}	
 	
@@ -81,5 +81,6 @@ public class DatabaseCatalog {
 		String[] dataFilePath = new String[1];
 		dataFilePath[0] = getBinaryDataFilePath(baseTable);
 		tableFileCatalag.put(alias,dataFilePath);		
-	}	
+	}
+	
 }

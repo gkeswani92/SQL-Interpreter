@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import utils.BinaryFileReader;
 import utils.BinaryFileWriter;
+import utils.ConfigFileReader;
 import utils.Tuple;
 import utils.TupleComparator;
 
@@ -17,13 +18,12 @@ public class ExternalSortOperator extends SortOperator {
 
 	private Integer numBufferPages, randomInt, numAttributes;
 	// TODO: ------ read from catalog
-	private String tempdir = "D:/Database_Practicals/SQL-Interpreter/samples/input/temp";
+	private String tempdir = ConfigFileReader.getInstance().getTempDir();
 	private String externalSortDir = tempdir + "/externalsort";
 	private String sortedFile;
 	private String tableName;
 	private BinaryFileReader bfr;
-
-	// External calls
+	
 	public ExternalSortOperator(List<String> sortConditions, Operator child, Integer numBufferPages) {
 		super(sortConditions, child);
 		this.numBufferPages = numBufferPages;
@@ -83,6 +83,7 @@ public class ExternalSortOperator extends SortOperator {
 	
 	//External sort implementation
 	private String externalSort() throws FileNotFoundException {
+		
 		List<String> runFilenames= executePass0();
 		int runCount = runFilenames.size();
 		int pass = 0;
@@ -140,7 +141,7 @@ public class ExternalSortOperator extends SortOperator {
 					if(tupleBuffers.get(i).getValue() < tupleBuffers.get(i).getKey().size()){
 						Tuple tuple1 = tupleBuffers.get(i).getKey().get(tupleBuffers.get(i).getValue());
 						Tuple minTuple = tupleBuffers.get(min).getKey().get(tupleBuffers.get(min).getValue());
-						comp = new TupleComparator(new ArrayList<String>(tuple1.getArributeList()));
+						comp = new TupleComparator(this.sortConditions);
 						if(comp.compare(tuple1, minTuple) < 0)
 							min = i;						
 					}else{
@@ -217,23 +218,11 @@ public class ExternalSortOperator extends SortOperator {
 				runCount++;
 				// If query has no sort condition (in case of distinct), sort using all attributes
 				// For further explanation refer DuplicateElimationOperator.java
-				if (sortConditions.isEmpty()) {
-					sortConditions = new ArrayList<String>(blockTuples.get(0).getArributeList());
-				} else {
-					// Adds all remaining attributes that aren't already sort conditions to the sort conditions
-					// Preserves order of attributes in the tuple
-					List<String> attributes = new ArrayList<String>(blockTuples.get(0).getArributeList());					
-					for (String sort: sortConditions) {
-						if (attributes.contains(sort)) {
-							attributes.remove(sort);
-						}
-					}
-					sortConditions.addAll(attributes);
-				}
+				if (this.sortConditions.isEmpty()) {
+					this.sortConditions = new ArrayList<String>(blockTuples.get(0).getArributeList());
+				} 
 				// Sort using tuple comparator
-				blockTuples.sort(new TupleComparator(sortConditions));
-				// TO DO ------ read from catalog
-				//String filename = tempdir+"/externalsort/"+randomInt+"/pass0/"+runCount;
+				blockTuples.sort(new TupleComparator(this.sortConditions));				
 				String filename = externalSortDir + "/pass0/"+runCount;
 				runFilenames.add(filename);
 				BinaryFileWriter bfw = new BinaryFileWriter(filename);

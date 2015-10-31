@@ -58,6 +58,7 @@ public class DumpRelations {
 		while(currentTuple != null) {
 			binaryWriter.writeNextTuple(currentTuple);
 			currentTuple = root.getNextTuple();
-		}		
+		}
+		binaryWriter.writeNextTuple(null);
 	}
 }

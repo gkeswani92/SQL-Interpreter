@@ -16,6 +16,7 @@ public class ConfigFileReader {
 	FileReader configFileReaderObj;
 	BufferedReader file;
 	Integer joinType, joinBuffer, sortType, sortBuffer;
+	private String tempDir;
 	private static ConfigFileReader instance;
 
 	private ConfigFileReader() {
@@ -23,6 +24,7 @@ public class ConfigFileReader {
 		this.joinType = -1;
 		this.sortBuffer = -1;
 		this.sortType = -1;
+		tempDir="";
 	}
 	
 	public static synchronized ConfigFileReader getInstance() {
@@ -73,5 +75,13 @@ public class ConfigFileReader {
 
 	public Integer getSortBuffer() {
 		return sortBuffer;
+	}
+	
+	public void setTempDir(String tempDir){
+		this.tempDir = tempDir;
+	}
+	
+	public String getTempDir(){
+		return tempDir;
 	}
 }
