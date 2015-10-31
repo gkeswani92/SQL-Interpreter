@@ -91,7 +91,7 @@ public class ExternalSortOperator extends SortOperator {
 			pass++;
 			List<String> newRunFilenames = new LinkedList<String>();			
 			int newRuncount = 0;
-			for(int i=0;i<=(int)Math.ceil(runFilenames.size()/mergeBufferPages);i++){
+			for(int i=0;i<(int)Math.ceil(runFilenames.size()/mergeBufferPages);i++){
 				String outputFileName = externalSortDir+"/pass" +pass+"/" + i+1;
 				newRunFilenames.add(outputFileName);
 				if((i*mergeBufferPages+mergeBufferPages) <  runFilenames.size()){						
@@ -151,11 +151,10 @@ public class ExternalSortOperator extends SortOperator {
 							if(includedBuffers.size()==1){
 								int start= tupleBuffers.get(includedBuffers.get(0)).getValue();
 								for(int j = start;j<tupleBuffers.get(includedBuffers.get(0)).getKey().size();j++){
-									System.out.println(tupleBuffers.get(includedBuffers.get(0)).getKey().get(j));
+									bfw.writeNextTuple(tupleBuffers.get(includedBuffers.get(0)).getKey().get(j));
 								}
 								emptylist++;
-								if(emptylist==tupleBuffers.size()){									
-									flag=false;
+								if(emptylist==tupleBuffers.size()){
 									break;
 								}
 							}
@@ -167,17 +166,18 @@ public class ExternalSortOperator extends SortOperator {
 						}
 					}
 				}									
-			}
-			try {
+			}	
+			
+			if(emptylist==tupleBuffers.size()){				
+				flag=false;
+				bfw.writeNextTuple(null);
+			} else{
 				bfw.writeNextTuple(tupleBuffers.get(min).getKey().get(tupleBuffers.get(min).getValue()));			
-				tupleBuffers.get(min).setValue(tupleBuffers.get(min).getValue()+1);				
-			} catch(Exception e){
-				System.out.println(min);
-				System.out.println(tupleBuffers.get(min).getValue()+1);				
+				tupleBuffers.get(min).setValue(tupleBuffers.get(min).getValue()+1);	
 			}
 			
 		}	
-		bfw.writeNextTuple(null);
+		
 	}
 
 
