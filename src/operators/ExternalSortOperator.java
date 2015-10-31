@@ -128,7 +128,7 @@ public class ExternalSortOperator extends SortOperator {
 			int min = includedBuffers.get(0);					
 			for(int i=0;i<tupleBuffers.size();i++){
 				if(includedBuffers.contains(i)){
-					if(tupleBuffers.get(i).getValue()<tupleBuffers.get(i).getKey().size()){
+					if(tupleBuffers.get(i).getValue() < tupleBuffers.get(i).getKey().size()){
 						Tuple tuple1 = tupleBuffers.get(i).getKey().get(tupleBuffers.get(i).getValue());
 						Tuple minTuple = tupleBuffers.get(min).getKey().get(tupleBuffers.get(min).getValue());
 						comp = new TupleComparator(new ArrayList<String>(tuple1.getArributeList()));
