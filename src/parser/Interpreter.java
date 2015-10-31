@@ -108,7 +108,7 @@ public class Interpreter {
 	    			
 	               
 	                Operator physicalRoot = constructPhysicalPlan(root);
-	                //physicalRoot.dump();
+//	                physicalRoot.dump();
 	    			writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
 	    			
 	    			long endTime = System.nanoTime();

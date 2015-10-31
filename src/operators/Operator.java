@@ -41,9 +41,8 @@ public abstract class Operator {
 		}
 		PrintWriter out = null;
 		try {
-			out = new PrintWriter("D:/Database_Practicals/SQL-Interpreter/hello.txt");
+			out = new PrintWriter("hello.txt");
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		out.write(tableDump);

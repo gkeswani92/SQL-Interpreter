@@ -1,13 +1,13 @@
 package operators;
 
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Random;
 import utils.BinaryFileReader;
 import utils.BinaryFileWriter;
 import utils.ConfigFileReader;
@@ -16,20 +16,22 @@ import utils.TupleComparator;
 
 public class ExternalSortOperator extends SortOperator {
 
-	private Integer numBufferPages, randomInt, numAttributes;
+	private Integer numBufferPages, numAttributes;
+	private static Integer countSortCalls = 0;
 	// TODO: ------ read from catalog
-	private String tempdir = ConfigFileReader.getInstance().getTempDir();
+//	private String tempdir = ConfigFileReader.getInstance().getTempDir();
+	private String tempdir = "D:/Database_Practicals/SQL-Interpreter/samples/input/temp";
 	private String externalSortDir = tempdir + "/externalsort";
 	private String sortedFile;
 	private String tableName;
 	private BinaryFileReader bfr;
-	
+	private static int count = 1;
+
 	public ExternalSortOperator(List<String> sortConditions, Operator child, Integer numBufferPages) {
 		super(sortConditions, child);
 		this.numBufferPages = numBufferPages;
-		Random randomGenerator = new Random();
-		randomInt = randomGenerator.nextInt(100);
-		externalSortDir = externalSortDir + "/" + randomInt;
+
+		externalSortDir = externalSortDir + "/" + countSortCalls++;
 		
 		Tuple tuple = child.getNextTuple();
 		if (tuple != null) {
@@ -42,6 +44,7 @@ public class ExternalSortOperator extends SortOperator {
 
 	@Override
 	public Tuple getNextTuple() {
+		
 		if (sortedFile == null) {
 			try {
 				sortedFile = externalSort();
@@ -51,6 +54,24 @@ public class ExternalSortOperator extends SortOperator {
 			}
 		}
 
+		////////////////////////////////////////////////////////////////
+		String tableDump = "";
+		Tuple test = bfr.getNextTuple();
+		while ( test != null) {
+			tableDump = tableDump + test.toStringValues() +  "\n";	
+			test = bfr.getNextTuple();
+		}
+		
+		PrintWriter out = null;
+		try {
+			out = new PrintWriter("externalSort.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		out.write(tableDump);
+		out.close();
+		//////////////////////////////////////////////////////////////
+		
 		Tuple tableLessTuple = null;
 		tableLessTuple = bfr.getNextTuple();
 		
@@ -64,27 +85,44 @@ public class ExternalSortOperator extends SortOperator {
 
 	@Override
 	public void reset(int index) {
-		
 		if (sortedFile == null && index == 0) {
 			return;
 		}
 		
 		try {
+			bfr.closeStuff();
 			bfr = new BinaryFileReader(sortedFile, tableName);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		
 		Integer sizeOfTuple = numAttributes * 4;
 		Integer availablePageSize = 4096 - 8;
 		Integer tuplesPerPage = Math.floorDiv(availablePageSize, sizeOfTuple);
+		
 		Integer pageIndex = Math.floorDiv(index+1, tuplesPerPage);
+		
+		Integer temp = (index+1) % tuplesPerPage;
+		if (temp == 0) {
+			pageIndex--;
+		}
+
+		if (pageIndex > 3) {
+			int test = 0;
+			test = test;
+		}
+		
 		bfr.setChannelToPage(pageIndex);
+		Integer tuplesBefore = index - (pageIndex * tuplesPerPage);
+		for (int i = 0; i < tuplesBefore; i++) {
+			bfr.getNextTuple();
+		}
 	}
 	
 	//External sort implementation
 	private String externalSort() throws FileNotFoundException {
 		
-		List<String> runFilenames= executePass0();
+		List<String> runFilenames = executePass0();
 		int runCount = runFilenames.size();
 		int pass = 0;
 		int mergeBufferPages = numBufferPages-1;
@@ -141,6 +179,8 @@ public class ExternalSortOperator extends SortOperator {
 					if(tupleBuffers.get(i).getValue() < tupleBuffers.get(i).getKey().size()){
 						Tuple tuple1 = tupleBuffers.get(i).getKey().get(tupleBuffers.get(i).getValue());
 						Tuple minTuple = tupleBuffers.get(min).getKey().get(tupleBuffers.get(min).getValue());
+						tuple1.updateTuple(this.tableName);
+						minTuple.updateTuple(this.tableName);
 						comp = new TupleComparator(this.sortConditions);
 						if(comp.compare(tuple1, minTuple) < 0)
 							min = i;						
@@ -181,8 +221,6 @@ public class ExternalSortOperator extends SortOperator {
 		
 	}
 
-
-
 	private List<Tuple> getBlockTuples(BinaryFileReader fileReader) {
 		int attributeCount = 0;	
 		int numberOfTuples = 0;
@@ -209,7 +247,7 @@ public class ExternalSortOperator extends SortOperator {
 	}
 
 	private List<String> executePass0() throws FileNotFoundException {		
-		//Execute sort on the tuplesList of numBufferPages
+		// Execute sort on the tuplesList of numBufferPages
 		Integer runCount = 0;
 		List<String> runFilenames = new LinkedList<String>();
 		while(true){			
@@ -223,21 +261,19 @@ public class ExternalSortOperator extends SortOperator {
 				} 
 				// Sort using tuple comparator
 				blockTuples.sort(new TupleComparator(this.sortConditions));				
-				String filename = externalSortDir + "/pass0/"+runCount;
+				String filename = externalSortDir + "/pass0/" + runCount;
 				runFilenames.add(filename);
 				BinaryFileWriter bfw = new BinaryFileWriter(filename);
 				Iterator<Tuple> myiterator = blockTuples.iterator();
-				while(myiterator.hasNext()){
+				while (myiterator.hasNext()){
 					Tuple tuple = myiterator.next();
 					bfw.writeNextTuple(tuple);					
 				}
 				bfw.writeNextTuple(null);				
 			}else{
 				return runFilenames;
-			}
-			
+			}		
 		}	
-		
 	}
 
 	private List<Tuple> getBlockTuples() {
@@ -249,10 +285,10 @@ public class ExternalSortOperator extends SortOperator {
 			int tuplesRead=0;
 			Tuple currTuple = child.getNextTuple();
 			
-			if(currTuple!=null){
+			if (currTuple!=null){
 				attributeCount = currTuple.getArributeList().size();
 				maxTuples = (int) Math.floor((numBufferPages*4088)/(attributeCount*4));
-				while(maxTuples > tuplesRead+1 && currTuple!=null){
+				while (maxTuples > tuplesRead+1 && currTuple!=null){
 					blockTuples.add(currTuple);
 					tuplesRead++;
 					currTuple=child.getNextTuple();
@@ -267,10 +303,10 @@ public class ExternalSortOperator extends SortOperator {
 			//get a subset from the tuples List 
 			 attributeCount = tuples.get(0).getArributeList().size();
 			 maxTuples = (int) Math.floor((numBufferPages*4096)/(attributeCount*4));
-			 if(currIndex+maxTuples < tuples.size()){
+			 if (currIndex+maxTuples < tuples.size()){
 				 blockTuples = tuples.subList(currIndex, currIndex+maxTuples);
 				 currIndex+=maxTuples;
-			 }else{
+			 } else {
 				 blockTuples = tuples.subList(currIndex, tuples.size());
 				 currIndex=tuples.size();
 			 }

@@ -16,23 +16,27 @@ public class Tuple {
 	private Boolean isSatisfies;
 	private Map<String, Integer> attributeValues = new LinkedHashMap<String, Integer>();
 	private static final String TUPLE_DELIM = ",";
+	private boolean isUpdated;
 	
 	public Tuple (int[] values, String[] attributes,String tableName) {
 		for (int i = 0; i < attributes.length; i++) {
 			attributeValues.put(attributes[i], values[i]);
 		}
 		this.tableName = tableName;
+		this.isUpdated = false;
 	}
 	
 	public Tuple(String line, String tableName){
 		this.tableName = tableName;
 		this.createTuple(line);
 		this.isSatisfies = false;
+		this.isUpdated = false;
 	}
 	
 	public Tuple (Tuple leftTuple, Tuple rightTuple){
 		this.attributeValues.putAll(leftTuple.getAttributeValues());
 		this.attributeValues.putAll(rightTuple.getAttributeValues());	
+		this.isUpdated = false;
 	}
 	
 	public String[] getTableAttributes(String tableName) {
@@ -110,15 +114,19 @@ public class Tuple {
 	}
 	
 	public void updateTuple (String tableName) {
-		this.tableName = tableName;
-		Map<String, Integer> newAttrValues = new LinkedHashMap<String, Integer>();
-		
-		for(String key: attributeValues.keySet()) {
-			newAttrValues.put(tableName+"."+key, attributeValues.get(key));
+		if (!isUpdated) {
+			this.tableName = tableName;
+			Map<String, Integer> newAttrValues = new LinkedHashMap<String, Integer>();
+			
+			for(String key: attributeValues.keySet()) {
+				newAttrValues.put(tableName+"."+key, attributeValues.get(key));
+			}
+			
+			attributeValues.clear();
+			attributeValues.putAll(newAttrValues);
+			
+			this.isUpdated = true;
 		}
-		
-		attributeValues.clear();
-		attributeValues.putAll(newAttrValues);
 	}
 	
 	public String getTableName() {

@@ -66,7 +66,7 @@ public class BinaryFileReader implements TupleReader {
 	
 	public void setChannelToPage(int index) {
 		try {
-			channel.position(index * 4096);
+			channel.position((index) * 4096);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -92,5 +92,14 @@ public class BinaryFileReader implements TupleReader {
 		  tupleIndex = INDEX_OF_FIRST_TUPLE;
 
 		  return 0;
+	}
+	
+	public void closeStuff() {
+		try {
+			channel.close();
+			fis.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

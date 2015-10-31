@@ -1,5 +1,7 @@
 package operators;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +50,20 @@ public class InMemorySortOperator extends SortOperator {
 				tuples.sort(new TupleComparator(sortConditions));
 			}
 		}
+		
+		String tableDump = "";
+		for (Tuple test: tuples) {
+			tableDump = tableDump + test.toStringValues() +  "\n";	
+		}
+		
+		PrintWriter out = null;
+		try {
+			out = new PrintWriter("inMemorySort.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		out.write(tableDump);
+		out.close();
 		
 		// Return one tuple at a time
 		if (currIndex < tuples.size()) {

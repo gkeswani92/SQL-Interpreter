@@ -35,10 +35,8 @@ public class SMJOperator extends JoinOperator {
 	@Override
 	public Tuple getNextTuple() {
 		
-		if (currOuterIndex != 0 && currInnerIndex != 0) {
-			leftChild.reset(currOuterIndex);
-			rightChild.reset(currInnerIndex);
-		}
+		leftChild.reset(currOuterIndex);
+		rightChild.reset(currInnerIndex);
 		
 		Tr = leftChild.getNextTuple();
 		Ts = rightChild.getNextTuple();
@@ -76,6 +74,7 @@ public class SMJOperator extends JoinOperator {
 					currOuterIndex++;
 					currInnerIndex = innerPartitionStartIndex;
 					}
+
 					System.out.println(count++ + " " + returnTuple.toStringValues());
 					return returnTuple;
 				}	
