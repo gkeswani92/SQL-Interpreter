@@ -257,8 +257,19 @@ public class ExternalSortOperator extends SortOperator {
 				// If query has no sort condition (in case of distinct), sort using all attributes
 				// For further explanation refer DuplicateElimationOperator.java
 				if (this.sortConditions.isEmpty()) {
-					this.sortConditions = new ArrayList<String>(blockTuples.get(0).getArributeList());
-				} 
+					this.sortConditions = new ArrayList<String>(tuples.get(0).getArributeList());
+				} else {
+					// Adds all remaining attributes that aren't already sort conditions to the sort conditions
+					// Preserves order of attributes in the tuple
+					List<String> attributes = new ArrayList<String>(tuples.get(0).getArributeList());
+					
+					for (String sort: this.sortConditions) {
+						if (attributes.contains(sort)) {
+							attributes.remove(sort);
+						}
+					}
+					this.sortConditions.addAll(attributes);
+				}
 				// Sort using tuple comparator
 				blockTuples.sort(new TupleComparator(this.sortConditions));				
 				String filename = externalSortDir + "/pass0/" + runCount;
