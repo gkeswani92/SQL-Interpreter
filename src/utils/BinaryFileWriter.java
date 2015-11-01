@@ -101,6 +101,6 @@ public class BinaryFileWriter implements TupleWriter {
 	public void writeTupleCollection(List<Tuple> tuples){
 		for(Tuple t: tuples)
 			writeNextTuple(t);
-		writeNextTuple(null);
+//		writeNextTuple(null);
 	}
 }

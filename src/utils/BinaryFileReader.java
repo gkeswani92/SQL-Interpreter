@@ -108,5 +108,6 @@ public class BinaryFileReader implements TupleReader {
 	
 	public void setAttributes(String[] attributes) {
 		this.attributes = attributes;
+		this.numAttr = attributes.length;
 	}
 }

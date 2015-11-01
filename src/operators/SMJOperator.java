@@ -75,7 +75,7 @@ public class SMJOperator extends JoinOperator {
 					currInnerIndex = innerPartitionStartIndex;
 					}
 					
-					if ( count == 3331) {
+					if ( count == 922) {
 						int test = 0;
 						test = test;
 					}

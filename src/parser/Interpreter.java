@@ -108,9 +108,9 @@ public class Interpreter {
 	    			
 	                Operator physicalRoot = constructPhysicalPlan(root);
 
-	                //physicalRoot.dump();
+	                physicalRoot.dump();
 	    			//writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
-	    			writeToFile.writeTestFile(physicalRoot, queryCount, "Binary");
+	    			//writeToFile.writeTestFile(physicalRoot, queryCount, "Binary");
 	    			
 	    			long endTime = System.nanoTime();
 	    			System.out.println("Took "+(endTime - startTime)/10e8 + " ns"); 
