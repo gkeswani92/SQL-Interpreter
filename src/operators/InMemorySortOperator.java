@@ -50,7 +50,8 @@ public class InMemorySortOperator extends SortOperator {
 				tuples.sort(new TupleComparator(sortConditions));
 			}
 		}
-		
+	
+		///////////////////////////////////////////////////////////////
 //		String tableDump = "";
 //		for (Tuple test: tuples) {
 //			tableDump = tableDump + test.toStringValues() +  "\n";	
@@ -64,6 +65,7 @@ public class InMemorySortOperator extends SortOperator {
 //		}
 //		out.write(tableDump);
 //		out.close();
+		///////////////////////////////////////////////////////////////
 		
 		// Return one tuple at a time
 		if (currIndex < tuples.size()) {

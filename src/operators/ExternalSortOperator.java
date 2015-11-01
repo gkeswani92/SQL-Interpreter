@@ -61,24 +61,24 @@ public class ExternalSortOperator extends SortOperator {
 			}
 		}
 
-		/*////////////////////////////////////////////////////////////////
-		String tableDump = "";
-		Tuple test = bfr.getNextTuple();
-		while ( test != null) {
-			tableDump = tableDump + test.toStringValues() +  "\n";	
-			test = bfr.getNextTuple();
-		}
-		
-		PrintWriter out = null;
-		try {
-			out = new PrintWriter("externalSort.txt");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		out.write(tableDump);
-		out.close();
+		////////////////////////////////////////////////////////////////
+//		String tableDump = "";
+//		Tuple test = bfr.getNextTuple();
+//		while ( test != null) {
+//			tableDump = tableDump + test.toStringValues() +  "\n";	
+//			test = bfr.getNextTuple();
+//		}
+//		
+//		PrintWriter out = null;
+//		try {
+//			out = new PrintWriter("externalSort.txt");
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//		out.write(tableDump);
+//		out.close();
 		//////////////////////////////////////////////////////////////
-*/		
+		
 		Tuple tableLessTuple = bfr.getNextTuple();
 		
 		if (tableLessTuple != null) {
