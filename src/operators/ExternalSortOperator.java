@@ -33,9 +33,9 @@ public class ExternalSortOperator extends SortOperator {
 		fanInBuffers 		= new ArrayList<BinaryFileReader>();
 		pass0RunCount 		= 0;
 		passCount			= 1;
-		pass0Done = false;
-		sortedFile = null;
-		sortedFileReader = null;
+		pass0Done 			= false;
+		sortedFile 			= null;
+		sortedFileReader    = null;
 	}	
 
 	public void fillBufferForPass0(){
@@ -59,15 +59,6 @@ public class ExternalSortOperator extends SortOperator {
 			attributes = t.getArributeArray();
 			
 			while(numTuples != 0){
-				
-				if ( t !=null && t.getArributeList().contains("Sailors.A") && t.getValueForAttr("Sailors.A") == 5 && 
-						t.getArributeList().contains("Sailors.B") && t.getValueForAttr("Sailors.B") == 28 &&
-								t.getArributeList().contains("Sailors.C") && t.getValueForAttr("Sailors.C") == 80 &&
-										t.getArributeList().contains("Reserves.G") && t.getValueForAttr("Reserves.G") == 5 &&
-												t.getArributeList().contains("Reserves.H") && t.getValueForAttr("Reserves.H") == 51) {
-					int test = 0;
-					test = test;
-				}
 				
 				t = child.getNextTuple();
 				
@@ -128,7 +119,6 @@ public class ExternalSortOperator extends SortOperator {
 				//If file status is -1, it means it has no more tuples to give us. If not,
 				//read the remaining tuples from the file
 				if(fileStatusPass0 == -1){
-					//bfw.writeNextTuple(null);
 					return;
 				}			
 				
@@ -218,7 +208,6 @@ public class ExternalSortOperator extends SortOperator {
 				}
 				
 				if(newTuple == null){
-					System.out.println(mergeTuples.get(minTupleIndex).getAttributeValues());
 					fanInBuffers.remove(minTupleIndex.intValue());
 					mergeTuples.remove(minTupleIndex.intValue());
 				}
