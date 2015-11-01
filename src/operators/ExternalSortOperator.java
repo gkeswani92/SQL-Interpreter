@@ -230,6 +230,7 @@ public class ExternalSortOperator extends SortOperator {
 							Entry<List<Tuple>, Integer> myKey = new AbstractMap.SimpleEntry<List<Tuple>, Integer>(newBlock, 0);
 							tupleBuffers.remove(i);
 							tupleBuffers.add(i, myKey);
+							i--;
 						}
 					}
 				}									
