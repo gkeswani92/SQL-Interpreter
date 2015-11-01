@@ -27,7 +27,7 @@ public class ExternalSortOperator extends SortOperator {
 		super(sortConditions, child);
 		this.numBufferPages = numBufferPages;
 		buffer 				= new ArrayList<Tuple>();
-		sortConditions 		= new ArrayList<String>(); 
+		this.sortConditions = sortConditions; 
 		inputFilePaths 		= new ArrayList<String>(); //Keeps track of the files created in pass 0
 		outputFilePaths 	= new ArrayList<String>();
 		fanInBuffers 		= new ArrayList<BinaryFileReader>();
@@ -49,6 +49,7 @@ public class ExternalSortOperator extends SortOperator {
 			//the buffer pages for pass 0
 			Integer numTuples = ((4096-8) * numBufferPages) / (4 * t.getNumAttributes()); //TODO: Check if we need ceil. Maybe? :P
 			tuplesPerPage = Math.floorDiv(numTuples, numBufferPages);
+			numTuples = tuplesPerPage * numBufferPages;
 			buffer.add(t);
 			numTuples--;
 			
@@ -243,14 +244,6 @@ public class ExternalSortOperator extends SortOperator {
 			outputBuffer.add(t);
 		}
 		
-		if ( t !=null && t.getArributeList().contains("Sailors.A") && t.getValueForAttr("Sailors.A") == 5 && 
-				t.getArributeList().contains("Sailors.B") && t.getValueForAttr("Sailors.B") == 28 &&
-				t.getArributeList().contains("Sailors.C") && t.getValueForAttr("Sailors.C") == 80 &&
-				t.getArributeList().contains("Reserves.G") && t.getValueForAttr("Reserves.G") == 5 &&
-				t.getArributeList().contains("Reserves.H") && t.getValueForAttr("Reserves.H") == 57) {
-			int test = 0;
-			test = test;
-		}
 		if (t == null || outputBuffer.size() == tuplesPerPage) {
 			bfw.writeTupleCollection(outputBuffer);
 			outputBuffer.clear();
