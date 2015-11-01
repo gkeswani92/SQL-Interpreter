@@ -19,7 +19,12 @@ public class TupleComparator implements Comparator<Tuple>{
 	public int compare(Tuple o1, Tuple o2) {
 		int n = 10;
 		for (Object column : columns) {
-			n = o1.getValueForAttr(column.toString()).compareTo(o2.getValueForAttr(column.toString()));
+			try {
+				n = o1.getValueForAttr(column.toString()).compareTo(o2.getValueForAttr(column.toString()));
+			} catch(NullPointerException npe) {
+				int test = 1;
+				test = test;
+			}
 			if (n != 0) {
 				return n;
 			}
@@ -54,7 +59,9 @@ public class TupleComparator implements Comparator<Tuple>{
 			
 			Integer left = o1.getValueForAttr(leftColumns.get(i).toString());
 			Integer right = o2.getValueForAttr(rightColumns.get(i).toString());
+			
 			n = left.compareTo(right);
+
 			if (n != 0) {
 				return n;
 			}

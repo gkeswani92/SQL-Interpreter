@@ -105,4 +105,8 @@ public class BinaryFileReader implements TupleReader {
 			e.printStackTrace();
 		}
 	}
+	
+	public void setAttributes(String[] attributes) {
+		this.attributes = attributes;
+	}
 }

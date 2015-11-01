@@ -26,6 +26,7 @@ public class ExternalSortOperator extends SortOperator {
 	private String tableName;
 	private BinaryFileReader bfr;
 	private static int count = 1;
+	private String[] attributes;
 
 	public ExternalSortOperator(List<String> sortConditions, Operator child, Integer numBufferPages) {
 		super(sortConditions, child);
@@ -35,6 +36,9 @@ public class ExternalSortOperator extends SortOperator {
 		
 		Tuple tuple = child.getNextTuple();
 		if (tuple != null) {
+			if (tuple.getTableName() == null) {
+				this.attributes = tuple.getArributeArray();
+			}
 			this.tableName = tuple.getTableName();
 			this.numAttributes = tuple.getNumAttributes();
 		}
@@ -49,6 +53,9 @@ public class ExternalSortOperator extends SortOperator {
 			try {
 				sortedFile = externalSort();
 				bfr = new BinaryFileReader(sortedFile, tableName);
+				if (tableName == null) {
+					bfr.setAttributes(attributes);
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -72,12 +79,13 @@ public class ExternalSortOperator extends SortOperator {
 		out.close();
 		//////////////////////////////////////////////////////////////
 */		
-		Tuple tableLessTuple = null;
-		tableLessTuple = bfr.getNextTuple();
+		Tuple tableLessTuple = bfr.getNextTuple();
 		
 		if (tableLessTuple != null) {
 			tableLessTuple.setTableName(this.tableName);
-			tableLessTuple.updateTuple(tableName);
+			if (tableName != null) {
+				tableLessTuple.updateTuple(tableName);
+			}
 		}
 	
 		return tableLessTuple;
@@ -92,6 +100,9 @@ public class ExternalSortOperator extends SortOperator {
 		try {
 			bfr.closeStuff();
 			bfr = new BinaryFileReader(sortedFile, tableName);
+			if (tableName == null) {
+				bfr.setAttributes(attributes);
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -164,6 +175,9 @@ public class ExternalSortOperator extends SortOperator {
 		// creating buffer readers for each of the input passes needed to merge
 		for(int i=0;i<subList.size();i++){
 			BinaryFileReader fileReader = new BinaryFileReader(subList.get(i),tableName);
+			if (tableName == null) {
+				fileReader.setAttributes(attributes);
+			}
 			readers.add(fileReader);
 			List<Tuple> tupleList = new ArrayList<Tuple>();
 			tupleList = getBlockTuples(fileReader);	
@@ -197,8 +211,10 @@ public class ExternalSortOperator extends SortOperator {
 					if(tupleBuffers.get(i).getValue() < tupleBuffers.get(i).getKey().size()){
 						Tuple tuple1 = tupleBuffers.get(i).getKey().get(tupleBuffers.get(i).getValue());
 						Tuple minTuple = tupleBuffers.get(min).getKey().get(tupleBuffers.get(min).getValue());
-						tuple1.updateTuple(this.tableName);
-						minTuple.updateTuple(this.tableName);
+						if (tableName != null) {
+							tuple1.updateTuple(this.tableName);
+							minTuple.updateTuple(this.tableName);
+						}
 						comp = new TupleComparator(this.sortConditions);
 						if(comp.compare(tuple1, minTuple) < 0)
 							min = i;						
@@ -251,7 +267,13 @@ public class ExternalSortOperator extends SortOperator {
 		int attributeCount = 0;	
 		int numberOfTuples = 0;
 		int tuplesRead = 0;
-		Tuple tuple = fileReader.getNextTuple();		
+		
+		if (tableName == null) {
+			fileReader.setAttributes(attributes);
+		}
+		
+		Tuple tuple = fileReader.getNextTuple();	
+
 		tuplesRead = 1;
 		List<Tuple> pageTuples = new ArrayList<Tuple>();
 		if(tuple!=null){

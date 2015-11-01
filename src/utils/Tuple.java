@@ -19,9 +19,11 @@ public class Tuple {
 	private boolean isUpdated;
 	
 	public Tuple (int[] values, String[] attributes,String tableName) {
+		
 		for (int i = 0; i < attributes.length; i++) {
 			attributeValues.put(attributes[i], values[i]);
 		}
+
 		this.tableName = tableName;
 		this.isUpdated = false;
 	}
@@ -97,6 +99,11 @@ public class Tuple {
 	public Set<String> getArributeList() {
 		return attributeValues.keySet();
 	}
+	
+	public String[] getArributeArray() {
+		return attributeValues.keySet().toArray(new String[attributeValues.size()]);
+	}
+	
 	public Boolean getIsSatisfies() {
 		return isSatisfies;
 	}
