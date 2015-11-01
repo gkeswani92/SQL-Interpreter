@@ -54,7 +54,7 @@ public class ExternalSortOperator extends SortOperator {
 			}
 		}
 
-		////////////////////////////////////////////////////////////////
+		/*////////////////////////////////////////////////////////////////
 		String tableDump = "";
 		Tuple test = bfr.getNextTuple();
 		while ( test != null) {
@@ -71,7 +71,7 @@ public class ExternalSortOperator extends SortOperator {
 		out.write(tableDump);
 		out.close();
 		//////////////////////////////////////////////////////////////
-		
+*/		
 		Tuple tableLessTuple = null;
 		tableLessTuple = bfr.getNextTuple();
 		
@@ -180,7 +180,7 @@ public class ExternalSortOperator extends SortOperator {
 		int emptylist = 0;
 		//if included there's only one file then copy over the entire sorted without merge
 		if(includedBuffers.size()==1){
-			List<Tuple> newBlock = getBlockTuples(readers.get(includedBuffers.get(0)));
+			List<Tuple> newBlock = tupleBuffers.get(includedBuffers.get(0)).getKey();
 			while(newBlock!=null){
 				for(int j = 0;j<newBlock.size();j++){
 					bfw.writeNextTuple(newBlock.get(j));
@@ -219,6 +219,7 @@ public class ExternalSortOperator extends SortOperator {
 									}
 									newBlock = getBlockTuples(readers.get(includedBuffers.get(0)));
 								}
+								bfw.writeNextTuple(null);
 								emptylist++;
 								if(emptylist==tupleBuffers.size()){
 									break;
@@ -235,8 +236,7 @@ public class ExternalSortOperator extends SortOperator {
 			}	
 			
 			if(emptylist==tupleBuffers.size()){				
-				flag=false;
-				bfw.writeNextTuple(null);
+				flag=false;				
 			} else{
 				bfw.writeNextTuple(tupleBuffers.get(min).getKey().get(tupleBuffers.get(min).getValue()));			
 				tupleBuffers.get(min).setValue(tupleBuffers.get(min).getValue()+1);	
