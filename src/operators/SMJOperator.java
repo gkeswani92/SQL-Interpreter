@@ -3,8 +3,8 @@ package operators;
 import java.util.List;
 
 import net.sf.jsqlparser.expression.Expression;
+import utils.JoinTupleComparator;
 import utils.Tuple;
-import utils.TupleComparator;
 
 /**
  * R is the left(outer) relation and S is the right(inner) relation
@@ -16,7 +16,7 @@ public class SMJOperator extends JoinOperator {
 	private List<String> leftSortConditions, rightSortConditions;
 	private int innerPartitionStartIndex, currInnerIndex, currOuterIndex, count;
 	Tuple Tr, Ts, Gs, returnTuple;
-	TupleComparator comp, rightComp;
+	JoinTupleComparator comp, rightComp;
 
 	public SMJOperator(Expression joinCondition, Operator leftChild, Operator rightChild, 
 			List<String> leftSortConditions, List<String> rightSortConditions) {
@@ -28,8 +28,8 @@ public class SMJOperator extends JoinOperator {
 		this.currOuterIndex = 0;
 		this.count = 0;
 
-		comp = new TupleComparator(this.leftSortConditions, this.rightSortConditions);
-		rightComp = new TupleComparator(this.rightSortConditions, this.rightSortConditions);
+		comp = new JoinTupleComparator(this.leftSortConditions, this.rightSortConditions);
+		rightComp = new JoinTupleComparator(this.rightSortConditions, this.rightSortConditions);
 	}
 
 	@Override
