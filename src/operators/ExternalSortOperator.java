@@ -111,6 +111,11 @@ public class ExternalSortOperator extends SortOperator {
 	}
 	
 	public void sortAndMerge(){
+		//Need to code for further passes so as to merge files until we end up
+		//with no tuples left. Leaving it here for tonight. 
+		
+		//PS - I have just cranked out the above code with my understanding. There
+		//might be a few bugs in there somewhere. 
 		
 	}
 	
