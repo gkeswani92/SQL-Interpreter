@@ -58,7 +58,14 @@ public class TupleComparator implements Comparator<Tuple>{
 			}
 			
 			Integer left = o1.getValueForAttr(leftColumns.get(i).toString());
-			Integer right = o2.getValueForAttr(rightColumns.get(i).toString());
+			Integer right = null;
+			try {
+				right = o2.getValueForAttr(rightColumns.get(i).toString());
+			} catch (IndexOutOfBoundsException e) {
+				int test = 0;
+				test = test;
+			}
+			
 			
 			n = left.compareTo(right);
 
