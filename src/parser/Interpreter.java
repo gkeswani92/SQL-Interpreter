@@ -22,6 +22,7 @@ import net.sf.jsqlparser.statement.select.*;
 import operators.Operator;
 import utils.ConfigFileReader;
 import utils.DatabaseCatalog;
+import utils.DirectoryCleanUp;
 import utils.DumpRelations;
 
 /**
@@ -38,15 +39,19 @@ public class Interpreter {
 		String inputSrcDir = "";
 		String outputScrDir = "";
 		DumpRelations writeToFile = null;
+		String outputFileFormat = "Binary";
 		long startTime = System.nanoTime();
+		String tempMergeOutput = "";
 		
 		//Building the single instance of the database catalog and config file reader
-		if(args.length == 2){
+		if(args.length == 3){
 			inputSrcDir = args[0];
             outputScrDir = args[1];
+            tempMergeOutput = args[2];            
             queriesFile = inputSrcDir+"/queries.sql";
 			DatabaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
 			ConfigFileReader.getInstance().readConfigFile(inputSrcDir);
+			ConfigFileReader.getInstance().setTempDir(tempMergeOutput);
 			writeToFile = new DumpRelations(outputScrDir);
 		}
 		
@@ -109,12 +114,13 @@ public class Interpreter {
 	                Operator physicalRoot = constructPhysicalPlan(root);
 
 	                //physicalRoot.dump();
-	    			//writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
-	    			writeToFile.writeTestFile(physicalRoot, queryCount, "Binary");
+	    			writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
+	    			//writeToFile.writeTestFile(physicalRoot, queryCount,outputFileFormat);
 	    			
 	    			long endTime = System.nanoTime();
 	    			System.out.println("Took "+(endTime - startTime)/10e8 + " ns"); 
 	    			System.out.println("<------------End of query----------->");
+	    			DirectoryCleanUp.cleanupTempDir();
 	    			
 	    			//Reading the next statement
 	    			statement = parser.Statement();
@@ -133,7 +139,7 @@ public class Interpreter {
 			System.err.println("Exception occurred during parsing");
 			e.printStackTrace();
 		}
-	}
+	}	
 
 	private static Operator constructPhysicalPlan (LogicalOperator root) {
 		Operator opRoot = root.getNextPhysicalOperator();
@@ -297,5 +303,6 @@ public class Interpreter {
 			}
 		}
 		return finalJoinExpression;
-	}
+	}	
+	
 }
