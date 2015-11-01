@@ -12,11 +12,12 @@ import utils.TupleComparator;
 public class ExternalSortOperator extends SortOperator {
 
 	private Integer numBufferPages, fileStatusPass0, pass0RunCount;
-	private Integer childCount = 0;
-	private ArrayList<Tuple> buffer;
+	private static Integer childCount = 0;
+	private List<Tuple> buffer;
 	private List<String> sortConditions, passZeroFiles;
 	private List<BinaryFileReader> passOneBuffers;
-	private String tempDir = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/external_sort/";
+	private String tempDir = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/external_sort";
+	private boolean pass0Done;
 
 	public ExternalSortOperator(List<String> sortConditions, Operator child, Integer numBufferPages) {
 		super(sortConditions, child);
@@ -26,8 +27,7 @@ public class ExternalSortOperator extends SortOperator {
 		passZeroFiles 		= new ArrayList<String>(); //Keeps track of the files created in pass 0
 		pass0RunCount 		= 0;
 		childCount++; //Added to the path of the temp directory because we dont want 2nd relation overwriting the first
-		fillBufferForPass0();
-		sortCondition();
+		pass0Done = false;
 	}	
 
 	public void fillBufferForPass0(){
@@ -49,7 +49,7 @@ public class ExternalSortOperator extends SortOperator {
 				
 				//Indicator that all the tuples of the file have been read in. So once
 				//you finish processing all the currently added tuples, dont come back for more
-				if(t == null){
+				if (t == null){
 					fileStatusPass0 = -1;
 					return;
 				}
@@ -82,6 +82,9 @@ public class ExternalSortOperator extends SortOperator {
 	}
 	
 	public void passZero(){
+		
+		fillBufferForPass0();
+		sortCondition();
 		
 		while(true){
 			try {
@@ -119,14 +122,21 @@ public class ExternalSortOperator extends SortOperator {
 		
 	}
 	
+	public void doExternalSort() {
+		//Sort the relation using in memory sort in pass 0 and get the list of files
+		//it was broken down into
+		if (!pass0Done) {
+			passZero();
+			pass0Done = true;
+		}
+		
+		sortAndMerge();
+	}
+	
 	@Override
 	public Tuple getNextTuple() {
 		
-		//Sort the relation using in memory sort in pass 0 and get the list of files
-		//it was broken down into
-		passZero();
-		sortAndMerge();
-		
+		doExternalSort();
 		return null;	
 	}
 }

@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 
 public class BinaryFileWriter implements TupleWriter {	
@@ -97,7 +98,7 @@ public class BinaryFileWriter implements TupleWriter {
 		}
 	}
 	
-	public void writeTupleCollection(ArrayList<Tuple> tuples){
+	public void writeTupleCollection(List<Tuple> tuples){
 		for(Tuple t: tuples)
 			writeNextTuple(t);
 		writeNextTuple(null);
