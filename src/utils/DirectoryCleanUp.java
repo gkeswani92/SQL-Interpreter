@@ -29,10 +29,5 @@ public class DirectoryCleanUp {
 			mergeTempFolder.mkdirs();
 		}
 
-	}
-	
-	public static void main(String args[]) {
-		DirectoryCleanUp.cleanupTempDir();
-	}
-
+	}	
 }
