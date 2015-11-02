@@ -8,8 +8,8 @@ public class LargeRelationGenerator {
 	private Integer cols;
 	private String tableName;
 	private String tablePath;
-	private String inputSrc = "D:/Database_Practicals/SQL-Interpreter/samples/input";
-	
+	private String inputSrc = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/input";
+
 	public LargeRelationGenerator(String file, Integer rows, Integer cols) {
 		this.tableName = file;
 		this.tablePath = inputSrc + "/db/data/" + file;
@@ -45,9 +45,9 @@ public class LargeRelationGenerator {
 	}
 	
 	public static void main(String args[]){
-		LargeRelationGenerator sailors = new LargeRelationGenerator("Sailors", 400, 3);
-		LargeRelationGenerator boats = new LargeRelationGenerator("Boats", 400, 3);
-		LargeRelationGenerator reserves = new LargeRelationGenerator("Reserves", 400, 2);
+		LargeRelationGenerator sailors = new LargeRelationGenerator("Sailors", 2000, 3);
+		LargeRelationGenerator boats = new LargeRelationGenerator("Boats", 2000, 3);
+		LargeRelationGenerator reserves = new LargeRelationGenerator("Reserves", 2000, 2);
 		sailors.generateLargeRelation();
 		boats.generateLargeRelation();
 		reserves.generateLargeRelation();

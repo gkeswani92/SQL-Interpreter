@@ -16,7 +16,7 @@ public class ScanOperator extends Operator{
 	
 	private String tableName; 
 	private String alias;
-	BinaryFileReader bfr;
+	private BinaryFileReader bfr;
 	
 	public ScanOperator(String tableName, String alias) {
 		this.tableName = tableName;
@@ -66,6 +66,7 @@ public class ScanOperator extends Operator{
 	@Override
 	public void reset() {
 		try {
+			bfr.closeStuff();
 			bfr = new BinaryFileReader(tableName);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
