@@ -37,7 +37,6 @@ public class Interpreter {
 	public static void main(String[] args) {
 		
 		String inputSrcDir = "";
-		String outputFileFormat = "Binary";
 		String outputScrDir = "";
 		String tempMergeOutput = "";
 		DumpRelations writeToFile = null;

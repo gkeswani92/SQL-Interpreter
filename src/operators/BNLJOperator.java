@@ -12,7 +12,6 @@ public class BNLJOperator extends JoinOperator {
 	private Integer outerBufferMaxTupleCount,innerBufferMaxTupleCount;	
 	private Integer outerBlockStatus, innerBlockStatus;
 	private Integer outerIndex, innerIndex;
-	private int count = 0;
 	
 	public BNLJOperator(Expression joinCondition, Operator leftChild, 
 			Operator rightChild, Integer numBufferPages) {
