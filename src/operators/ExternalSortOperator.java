@@ -11,13 +11,12 @@ import utils.TupleComparator;
 
 public class ExternalSortOperator extends SortOperator {
 
-	private Integer numBufferPages, fileStatusPass0, pass0RunCount, tuplesPerPage, passCount, count = 0;
+	private Integer numBufferPages, fileStatusPass0, pass0RunCount, tuplesPerPage, passCount;
 	private static Integer childCount = 0;
 	private List<Tuple> buffer;
 	private List<String> sortConditions, inputFilePaths, outputFilePaths;
 	private List<BinaryFileReader> fanInBuffers;
 	
-	//private String tempDir = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/external_sort";
 	private String tempDir = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/external_sort/";
 	private boolean pass0Done;
 	private String tableName, sortedFile;
@@ -195,20 +194,12 @@ public class ExternalSortOperator extends SortOperator {
 				//Add the smallest tuple to the output buffer and increment its buffered
 				//reader to the next tuple
 				Integer minTupleIndex = mergeTuples.indexOf(sortedTemp.get(0));
-				//System.out.println(mergeTuples.get(minTupleIndex).getAttributeValues());
 				
 				addToOutputBuffer(outputBuffer, mergeTuples.get(minTupleIndex), fanInCount, bfw);
 				
 				//Gets the next tuple for the appropriate BFR. If next tuple is null,
 				//removes that entry from BFR and Merge Tuple List
 				Tuple newTuple = fanInBuffers.get(minTupleIndex).getNextTuple();
-				
-				if ( newTuple !=null && newTuple.getArributeList().contains("Sailors.A") && newTuple.getValueForAttr("Sailors.A") == 1 && 
-						newTuple.getArributeList().contains("Sailors.B") && newTuple.getValueForAttr("Sailors.B") == 263 &&
-								newTuple.getArributeList().contains("Sailors.C") && newTuple.getValueForAttr("Sailors.C") == 675) {
-					int test = 0;
-					test = test;
-				}
 				
 				if(newTuple == null){
 					fanInBuffers.remove(minTupleIndex.intValue());
@@ -244,12 +235,6 @@ public class ExternalSortOperator extends SortOperator {
 		// If t == null, flush output buffer, else add the tuple to the output 
 		// buffer and flush as needed(when full)
 		if (t != null) {
-			if ( t !=null && t.getArributeList().contains("Sailors.A") && t.getValueForAttr("Sailors.A") == 1 && 
-					t.getArributeList().contains("Sailors.B") && t.getValueForAttr("Sailors.B") == 813 &&
-							t.getArributeList().contains("Sailors.C") && t.getValueForAttr("Sailors.C") == 283) {
-				int test = 0;
-				test = test;
-			}
 			outputBuffer.add(t);
 		}
 		
@@ -320,9 +305,6 @@ public class ExternalSortOperator extends SortOperator {
 			tableLessTuple.setTableName(tableName);
 			if (tableName != null) {
 				tableLessTuple.updateTuple(tableName);
-			} else {
-				//System.out.println("" + count + tableLessTuple.getAttributeValues());
-				//count++;
 			}
 		}
 		

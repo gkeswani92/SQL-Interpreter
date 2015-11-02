@@ -147,7 +147,6 @@ public class BNLJOperator extends JoinOperator {
 			ExpressionEvaluator ob = new ExpressionEvaluator(joinTuple);
 		    joinCondition.accept(ob);
 		    if (joinTuple != null && joinTuple.getIsSatisfies()) {
-		    	System.out.println("" + count++ + joinTuple.getAttributeValues());
 		    	outerIndex++;
 		        return joinTuple;
 		    }  

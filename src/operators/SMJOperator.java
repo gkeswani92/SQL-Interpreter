@@ -14,7 +14,7 @@ import utils.Tuple;
 public class SMJOperator extends JoinOperator {
 
 	private List<String> leftSortConditions, rightSortConditions;
-	private int innerPartitionStartIndex, currInnerIndex, currOuterIndex, count;
+	private int innerPartitionStartIndex, currInnerIndex, currOuterIndex;
 	Tuple Tr, Ts, Gs, returnTuple;
 	JoinTupleComparator comp, rightComp;
 
@@ -26,7 +26,6 @@ public class SMJOperator extends JoinOperator {
 		this.innerPartitionStartIndex = 0;
 		this.currInnerIndex = 0;
 		this.currOuterIndex = 0;
-		this.count = 0;
 
 		comp = new JoinTupleComparator(this.leftSortConditions, this.rightSortConditions);
 		rightComp = new JoinTupleComparator(this.rightSortConditions, this.rightSortConditions);
@@ -40,21 +39,6 @@ public class SMJOperator extends JoinOperator {
 		
 		Tr = leftChild.getNextTuple();
 		Ts = rightChild.getNextTuple();
-		
-		//1,813,283,1,128
-		if ( Tr !=null && Tr.getArributeList().contains("Sailors.A") && Tr.getValueForAttr("Sailors.A") == 1 && 
-				Tr.getArributeList().contains("Sailors.B") && Tr.getValueForAttr("Sailors.B") == 813 &&
-						Tr.getArributeList().contains("Sailors.C") && Tr.getValueForAttr("Sailors.C") == 283) {
-			int test = 0;
-			test = test;
-		}
-		
-		//1,128
-		if ( Ts !=null && Ts.getArributeList().contains("Reserves.G") && Ts.getValueForAttr("Reserves.G") == 1 && 
-				Ts.getArributeList().contains("Reserves.H") && Ts.getValueForAttr("Reserves.H") == 128) {
-			int test = 0;
-			test = test;
-		}
 		
 		Gs = Ts;
 		returnTuple = null;
@@ -83,15 +67,6 @@ public class SMJOperator extends JoinOperator {
  				
 				while (comp.joinCompare(Tr, Ts) == 0) {
 					returnTuple = new Tuple(Tr, Ts);
-					
-//					if ( returnTuple !=null && returnTuple.getArributeList().contains("Sailors.A") && returnTuple.getValueForAttr("Sailors.A") == 1 && 
-//							returnTuple.getArributeList().contains("Sailors.B") && returnTuple.getValueForAttr("Sailors.B") == 263 &&
-//									returnTuple.getArributeList().contains("Sailors.C") && returnTuple.getValueForAttr("Sailors.C") == 675 &&
-//											returnTuple.getArributeList().contains("Reserves.G") && returnTuple.getValueForAttr("Reserves.G") == 1 &&
-//													returnTuple.getArributeList().contains("Reserves.H") && returnTuple.getValueForAttr("Reserves.H") == 181) {
-//						int test = 0;
-//						test = test;
-//					}
 
 					if (rightComp.joinCompare(Ts, rightChild.getNextTuple()) == 0) {
 						currInnerIndex++;
@@ -100,7 +75,6 @@ public class SMJOperator extends JoinOperator {
 					currInnerIndex = innerPartitionStartIndex;
 					}
 				
-					System.out.println(count++ + " " + returnTuple.toStringValues());
 					return returnTuple;
 				}	
 			}			
