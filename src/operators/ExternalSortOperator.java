@@ -18,7 +18,7 @@ public class ExternalSortOperator extends SortOperator {
 	private List<String> sortConditions, inputFilePaths, outputFilePaths;
 	private List<BinaryFileReader> fanInBuffers;
 
-	private String tempDir = ConfigFileReader.getInstance().getTempDir();
+	private String tempDir = ConfigFileReader.getInstance().getTempDir()+"/";
 	private boolean pass0Done;
 	private String tableName, sortedFile;
 	private String[] attributes;
