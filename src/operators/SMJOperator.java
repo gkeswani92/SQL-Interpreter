@@ -67,6 +67,15 @@ public class SMJOperator extends JoinOperator {
  				
 				while (comp.joinCompare(Tr, Ts) == 0) {
 					returnTuple = new Tuple(Tr, Ts);
+					
+					if ( returnTuple !=null && returnTuple.getArributeList().contains("Sailors.A") && returnTuple.getValueForAttr("Sailors.A") == 1 && 
+							returnTuple.getArributeList().contains("Sailors.B") && returnTuple.getValueForAttr("Sailors.B") == 263 &&
+									returnTuple.getArributeList().contains("Sailors.C") && returnTuple.getValueForAttr("Sailors.C") == 675 &&
+											returnTuple.getArributeList().contains("Reserves.G") && returnTuple.getValueForAttr("Reserves.G") == 1 &&
+													returnTuple.getArributeList().contains("Reserves.H") && returnTuple.getValueForAttr("Reserves.H") == 181) {
+						int test = 0;
+						test = test;
+					}
 
 					if (rightComp.joinCompare(Ts, rightChild.getNextTuple()) == 0) {
 						currInnerIndex++;
