@@ -164,7 +164,9 @@ public class ExternalSortOperator extends SortOperator {
 					indexToBeDropped.add(i);
 				}
 				else{
-					currentTuple.updateTuple(tableName);
+					if (tableName != null) {
+						currentTuple.updateTuple(tableName);
+					}
 					mergeTuples.add(i, currentTuple);
 				}
 			}
@@ -207,7 +209,9 @@ public class ExternalSortOperator extends SortOperator {
 					mergeTuples.remove(minTupleIndex.intValue());
 				}
 				else{
-					newTuple.updateTuple(tableName);
+					if (tableName != null) {
+						newTuple.updateTuple(tableName);
+					}
 					mergeTuples.remove(minTupleIndex.intValue());
 					mergeTuples.add(minTupleIndex, newTuple);
 				}
