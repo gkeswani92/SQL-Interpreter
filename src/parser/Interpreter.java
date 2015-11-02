@@ -40,20 +40,14 @@ public class Interpreter {
 		String outputScrDir = "";
 		String tempMergeOutput = "";
 		DumpRelations writeToFile = null;
-		String outputFileFormat = "Human";
+		String outputFileFormat = "Binary";
 		long startTime = System.nanoTime();
-		String tempMergeOutput = "";
-		
 		
 		//Building the single instance of the database catalog and config file reader
 		if(args.length == 3){
 			inputSrcDir = args[0];
             outputScrDir = args[1];
-<<<<<<< HEAD
-            tempMergeOutput = args[2];            
-=======
             tempMergeOutput = args[2];
->>>>>>> External-Sort-Scratch
             queriesFile = inputSrcDir+"/queries.sql";
 			DatabaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
 			ConfigFileReader.getInstance().readConfigFile(inputSrcDir);
@@ -121,13 +115,9 @@ public class Interpreter {
 
 	                writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
 	                //physicalRoot.dump();
-<<<<<<< HEAD
 	    			//writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
-	    			writeToFile.writeTestFile(physicalRoot, queryCount,outputFileFormat);
-=======
-	    			//writeToFile.writeTestFile(physicalRoot, queryCount, outputFileFormat);
->>>>>>> External-Sort-Scratch
-	    			
+	    			//writeToFile.writeTestFile(physicalRoot, queryCount,outputFileFormat);
+
 	    			long endTime = System.nanoTime();
 	    			System.out.println("Took "+(endTime - startTime)/10e8 + " ns"); 
 	    			System.out.println("<------------End of query----------->");

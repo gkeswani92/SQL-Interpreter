@@ -46,10 +46,7 @@ public class DumpRelations {
 	}
 	
 	public void writeRelationToBinaryFile(Operator root, Integer queryNumber){
-<<<<<<< HEAD
-=======
-		
->>>>>>> External-Sort-Scratch
+
 		String filename = this.filepath + "/query" + queryNumber.toString();
 		Tuple currentTuple = root.getNextTuple();
 		
@@ -106,14 +103,9 @@ public class DumpRelations {
 					currentTuple = root.getNextTuple();
 				}
 				FileWriter writer = new FileWriter(filename);
-<<<<<<< HEAD
-				if(tableDump!=null){
-					writer.write(tableDump);
-				}
-=======
+
 				if(tableDump!=null)
 					writer.write(tableDump);
->>>>>>> External-Sort-Scratch
 				writer.close();
 			} 
 			catch (IOException e) {
