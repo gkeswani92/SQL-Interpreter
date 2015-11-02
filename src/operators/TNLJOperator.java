@@ -6,13 +6,14 @@ import utils.Tuple;
 
 public class TNLJOperator extends JoinOperator {
 
+	private Integer countInner = 0;
+	
 	public TNLJOperator(Expression joinCondition, Operator leftChild, Operator rightChild) {
 		super(joinCondition, leftChild, rightChild);
 	}
 
 	@Override
 	public Tuple getNextTuple() {
-		
 		if (currLeftTuple == null) {
 			currLeftTuple = leftChild.getNextTuple();
 		}		
@@ -35,12 +36,14 @@ public class TNLJOperator extends JoinOperator {
 				        return joinTuple;
 				    }       
 				    
+				    countInner++;
 				    currRightTuple = rightChild.getNextTuple();
 				}
 			}
 			
 			// When right child is completely traversed, reset the child and move to next left tuple
 			rightChild.reset();
+			countInner = 0;
 			currLeftTuple = leftChild.getNextTuple();
 		}
 		return null;		

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Iterator;
+import java.util.List;
 
 
 public class BinaryFileWriter implements TupleWriter {	
@@ -51,25 +52,29 @@ public class BinaryFileWriter implements TupleWriter {
 
 	@Override
 	public int writeNextTuple(Tuple tuple) {		
+		
 		Integer element;
 		// check if the buffer can take the entire tuple
 		if(tuple != null && ! (buffer.remaining()>(tuple.getArributeList().size()*4))){			
 			// get a new bytebuffer and set the value for prev page buffer with tuple details
 			writeByteBufferToFile();
 			updateBufferWithNewByteBuffer();			
-		} else if(tuple == null){
+		} 
+		else if(tuple == null){
 			writeByteBufferToFile();
 			try {
 				channel.close();
 				fos.close();
-			} catch (IOException e) {
+			} 
+			catch (IOException e) {
 				System.out.println("Unable to close streams after writing");
 				e.printStackTrace();
 			}			
 			return 0;			
 		}
+		
 		//add all the tuple values into the buffer
-		Iterator iterator = tuple.getAttributeValues().values().iterator();
+		Iterator<?> iterator = tuple.getAttributeValues().values().iterator();
 		while(iterator.hasNext()){
 			element = (Integer) iterator.next();
 			buffer.putInt(element);				
@@ -85,9 +90,15 @@ public class BinaryFileWriter implements TupleWriter {
 		buffer.position(0);
 		try {
 			channel.write(buffer);
-		} catch (IOException e) {
+		} 
+		catch (IOException e) {
 			System.out.println("Couldn't write the buffer to the output file"+ fileName);
 			e.printStackTrace();
 		}
+	}
+	
+	public void writeTupleCollection(List<Tuple> tuples){
+		for(Tuple t: tuples)
+			writeNextTuple(t);
 	}
 }

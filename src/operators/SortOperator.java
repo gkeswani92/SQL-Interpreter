@@ -21,7 +21,10 @@ public abstract class SortOperator extends Operator {
 	public SortOperator(Operator child, List<String> sortConditions,
 			List<Tuple> tuples, Integer currIndex) {
 		this.child = child;
-		this.sortConditions = sortConditions;
+		this.sortConditions = new ArrayList<String>();
+		if (sortConditions != null) {
+			this.sortConditions = sortConditions;
+		}
 		this.tuples = tuples;
 		this.currIndex = currIndex;
 	}

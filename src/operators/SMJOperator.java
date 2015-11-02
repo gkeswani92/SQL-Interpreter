@@ -3,8 +3,8 @@ package operators;
 import java.util.List;
 
 import net.sf.jsqlparser.expression.Expression;
+import utils.JoinTupleComparator;
 import utils.Tuple;
-import utils.TupleComparator;
 
 /**
  * R is the left(outer) relation and S is the right(inner) relation
@@ -14,9 +14,9 @@ import utils.TupleComparator;
 public class SMJOperator extends JoinOperator {
 
 	private List<String> leftSortConditions, rightSortConditions;
-	private int innerPartitionStartIndex, currInnerIndex, currOuterIndex, count;
+	private int innerPartitionStartIndex, currInnerIndex, currOuterIndex;
 	Tuple Tr, Ts, Gs, returnTuple;
-	TupleComparator comp, rightComp;
+	JoinTupleComparator comp, rightComp;
 
 	public SMJOperator(Expression joinCondition, Operator leftChild, Operator rightChild, 
 			List<String> leftSortConditions, List<String> rightSortConditions) {
@@ -26,10 +26,9 @@ public class SMJOperator extends JoinOperator {
 		this.innerPartitionStartIndex = 0;
 		this.currInnerIndex = 0;
 		this.currOuterIndex = 0;
-		this.count = 0;
 
-		comp = new TupleComparator(this.leftSortConditions, this.rightSortConditions);
-		rightComp = new TupleComparator(this.rightSortConditions, this.rightSortConditions);
+		comp = new JoinTupleComparator(this.leftSortConditions, this.rightSortConditions);
+		rightComp = new JoinTupleComparator(this.rightSortConditions, this.rightSortConditions);
 	}
 
 	@Override
@@ -40,6 +39,7 @@ public class SMJOperator extends JoinOperator {
 		
 		Tr = leftChild.getNextTuple();
 		Ts = rightChild.getNextTuple();
+		
 		Gs = Ts;
 		returnTuple = null;
 		
@@ -74,12 +74,7 @@ public class SMJOperator extends JoinOperator {
 					currOuterIndex++;
 					currInnerIndex = innerPartitionStartIndex;
 					}
-					
-					if ( count == 3331) {
-						int test = 0;
-						test = test;
-					}
-					System.out.println(count++ + " " + returnTuple.toStringValues());
+				
 					return returnTuple;
 				}	
 			}			

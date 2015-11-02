@@ -80,7 +80,7 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 		} 
 		else if (arg0.getRightExpression() instanceof Column) {
 			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getTable().toString() + "." + ((Column)arg0.getRightExpression()).getColumnName()).toString());
-			if (left == rightColumn) {
+			if (left.compareTo(rightColumn) == 0) {
 				currTuple.setIsSatisfies(true);
 			} else {
 				currTuple.setIsSatisfies(false);
@@ -107,7 +107,7 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 		} 
 		else if (arg0.getRightExpression() instanceof Column) {
 			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getTable().toString() + "." + ((Column)arg0.getRightExpression()).getColumnName()).toString());
-			if (left > rightColumn) {
+			if (left.compareTo(rightColumn) > 0) {
 				currTuple.setIsSatisfies(true);
 			} else {
 				currTuple.setIsSatisfies(false);
@@ -137,7 +137,7 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 		} 
 		else if (arg0.getRightExpression() instanceof Column) {
 			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getTable().toString() + "." + ((Column)arg0.getRightExpression()).getColumnName()).toString());
-			if (left >= rightColumn) {
+			if (left.compareTo(rightColumn) > 0 || left.compareTo(rightColumn) == 0) {
 				currTuple.setIsSatisfies(true);
 			} else {
 				currTuple.setIsSatisfies(false);
@@ -167,7 +167,7 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 		} 
 		else if (arg0.getRightExpression() instanceof Column) {
 			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getTable().toString() + "." + ((Column)arg0.getRightExpression()).getColumnName()).toString());
-			if (left < rightColumn) {
+			if (left.compareTo(rightColumn) < 0) {
 				currTuple.setIsSatisfies(true);
 			} else {
 				currTuple.setIsSatisfies(false);
@@ -197,7 +197,7 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 		} 
 		else if (arg0.getRightExpression() instanceof Column) {
 			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getTable().toString() + "." + ((Column)arg0.getRightExpression()).getColumnName()).toString());
-			if (left <= rightColumn) {
+			if (left.compareTo(rightColumn) < 0 || left.compareTo(rightColumn) == 0) {
 				currTuple.setIsSatisfies(true);
 			} else {
 				currTuple.setIsSatisfies(false);
@@ -225,7 +225,7 @@ public class ExpressionEvaluator implements ExpressionVisitor {
 				
 		} else if (arg0.getRightExpression() instanceof Column) {
 			Long rightColumn = Long.valueOf(currTuple.getValueForAttr(((Column)arg0.getRightExpression()).getTable().toString() + "." + ((Column)arg0.getRightExpression()).getColumnName()).toString());
-			if (left != rightColumn) {
+			if (!(left.compareTo(rightColumn) == 0)) {
 				currTuple.setIsSatisfies(true);
 			} else {
 				currTuple.setIsSatisfies(false);
