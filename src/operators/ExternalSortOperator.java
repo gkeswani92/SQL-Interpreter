@@ -62,9 +62,7 @@ public class ExternalSortOperator extends SortOperator {
 			attributes = t.getArributeArray();
 			
 			while(numTuples != 0){
-				
-				
-				
+								
 				t = child.getNextTuple();
 				
 				//Indicator that all the tuples of the file have been read in. So once
@@ -161,10 +159,12 @@ public class ExternalSortOperator extends SortOperator {
 			//indexes to be dropped if file reader hits null (no more tuples)
 			for(int i=0; i<fanInBuffers.size(); i++){
 				Tuple currentTuple = fanInBuffers.get(i).getNextTuple();
-				if(currentTuple == null){
+				
+				if(currentTuple == null) {
 					indexToBeDropped.add(i);
 				}
 				else{
+					currentTuple.updateTuple(tableName);
 					mergeTuples.add(i, currentTuple);
 				}
 			}
@@ -197,7 +197,6 @@ public class ExternalSortOperator extends SortOperator {
 				Integer minTupleIndex = mergeTuples.indexOf(sortedTemp.get(0));
 				//System.out.println(mergeTuples.get(minTupleIndex).getAttributeValues());
 				
-				
 				addToOutputBuffer(outputBuffer, mergeTuples.get(minTupleIndex), fanInCount, bfw);
 				
 				//Gets the next tuple for the appropriate BFR. If next tuple is null,
@@ -216,6 +215,7 @@ public class ExternalSortOperator extends SortOperator {
 					mergeTuples.remove(minTupleIndex.intValue());
 				}
 				else{
+					newTuple.updateTuple(tableName);
 					mergeTuples.remove(minTupleIndex.intValue());
 					mergeTuples.add(minTupleIndex, newTuple);
 				}
