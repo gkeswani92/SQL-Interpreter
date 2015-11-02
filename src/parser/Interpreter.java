@@ -39,7 +39,7 @@ public class Interpreter {
 		String inputSrcDir = "";
 		String outputScrDir = "";
 		DumpRelations writeToFile = null;
-		String outputFileFormat = "Binary";
+		String outputFileFormat = "Human";
 		long startTime = System.nanoTime();
 		String tempMergeOutput = "";
 		
@@ -114,8 +114,8 @@ public class Interpreter {
 	                Operator physicalRoot = constructPhysicalPlan(root);
 
 	                //physicalRoot.dump();
-	    			writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
-	    			//writeToFile.writeTestFile(physicalRoot, queryCount,outputFileFormat);
+	    			//writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
+	    			writeToFile.writeTestFile(physicalRoot, queryCount,outputFileFormat);
 	    			
 	    			long endTime = System.nanoTime();
 	    			System.out.println("Took "+(endTime - startTime)/10e8 + " ns"); 
