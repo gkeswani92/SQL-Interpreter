@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import indexing.BuildIndex;
 import logical_operators.DuplicateEliminationLogicalOperator;
 import logical_operators.JoinLogicalOperator;
 import logical_operators.LogicalOperator;
@@ -65,7 +67,7 @@ public class Interpreter {
 		}
 		
 		if(buildIndex == 1)
-			buildIndexes();
+			BuildIndex.buildIndexes();
 		
 		if(executeQueries == 1)
 			executeQueries();
@@ -163,10 +165,6 @@ public class Interpreter {
 			System.err.println("Exception occurred during parsing");
 			e.printStackTrace();
 		}
-	}
-
-	private static void buildIndexes(){
-		//TODO: DO STUFF HERE DAYS BEFORE THE DEADLINE!!s
 	}
 	
 	private static Operator constructPhysicalPlan (LogicalOperator root) {
