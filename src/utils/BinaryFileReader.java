@@ -6,6 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
+
+import indexing.Record;
 
 public class BinaryFileReader implements TupleReader {
 
@@ -20,6 +24,8 @@ public class BinaryFileReader implements TupleReader {
 	private String[] attributes;
 	private String tableName;
 	
+	private Integer tupleId, pageId;
+	
 	public BinaryFileReader(String tableName) throws FileNotFoundException {
 		attributes = DatabaseCatalog.getInstance().getTableAttributes(tableName);
 		fis = new FileInputStream(new File(DatabaseCatalog.getInstance().getBinaryDataFilePath(tableName)));
@@ -28,6 +34,8 @@ public class BinaryFileReader implements TupleReader {
 		bb.clear();
 		updateBufferWithNextPage();
 		this.tableName = tableName;
+		this.pageId = 0;
+		this.tupleId = 0;
 	}
 	
 	public BinaryFileReader(String fileName, String tableName) throws FileNotFoundException {	
@@ -97,7 +105,7 @@ public class BinaryFileReader implements TupleReader {
 		this.numAttr = attributes.length;
 	}
 	
-	public void setChannelToPage(int index){
+	public void setChannelToPage(int index) {
 		try {
 			bb.clear();
 			this.channel.position(index*4096);
@@ -106,5 +114,53 @@ public class BinaryFileReader implements TupleReader {
 			System.out.println("Something went wrong in resetting the channel position");
 			e.printStackTrace();
 		}
+	}
+		
+	public Record getNextRecord() {
+		if(numTuples != null){
+			if(numTuples == 0) {
+				pageId++;
+				tupleId = 0;
+				if (updateBufferWithNextPage() == 1) {
+					return null;
+				}
+			}
+		}
+		
+		int[] tuple = new int [numAttr];
+		
+ 		for (int i = 0; i < numAttr; i++) {
+			tuple[i] = tupleArr[tupleIndex];
+			tupleIndex++;
+		}
+		
+		numTuples--;
+		return new Record(pageId, tupleId++, new Tuple(tuple, attributes, tableName));
+	}
+	
+	public List<Record> getAllRecords() {
+		
+		List<Record> allRecords = new ArrayList<Record>();
+		Record r = getNextRecord();
+		
+		while (r != null) {
+			allRecords.add(r);
+			r = getNextRecord();
+		}
+		
+		return allRecords;
+	}
+	
+	public List<Tuple> getAllTuples() {
+		
+		List<Tuple> allTuples = new ArrayList<Tuple>();
+		Tuple t = getNextTuple();
+		
+		while (t != null) {
+			allTuples.add(t);
+			t = getNextTuple();
+		}
+		
+		return allTuples;
 	}
 }

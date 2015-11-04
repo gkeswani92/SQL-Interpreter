@@ -323,11 +323,7 @@ public class ExternalSortOperator extends SortOperator {
 		}
 		
 		sortedFileReader.closeStuff();
-		sortedFileReader = getSortedFileReader(sortedFile);
-		
-		//----------------------------------------------------------------------------------
-		//TODO: NEED TO MAKE SURE THIS PART IS WORKING
-		
+		sortedFileReader = getSortedFileReader(sortedFile);		
 		
 		Integer sizeOfTuple = attributes.length * 4;
 		Integer availablePageSize = 4096 - 8;
@@ -346,11 +342,5 @@ public class ExternalSortOperator extends SortOperator {
 		for (int i = 0; i < tuplesBefore; i++) {
 			sortedFileReader.getNextTuple();
 		}
-		
-		//----------------------------------------------------------------------------------
-		
-//		for (int i = 0; i < index; i++) {
-//			sortedFileReader.getNextTuple();
-//		}
 	}
 }
