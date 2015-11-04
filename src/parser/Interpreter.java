@@ -118,7 +118,7 @@ public class Interpreter {
 	    			//writeToFile.writeTestFile(physicalRoot, queryCount, outputFileFormat);
 	    			
 	    			long endTime = System.nanoTime();
-	    			System.out.println("Took "+(endTime - startTime)/10e8 + " ns"); 
+	    			System.out.println("Took "+(endTime - startTime)/10e8 + " sec"); 
 	    			System.out.println("<------------End of query----------->");
 	    			DirectoryCleanUp.cleanupTempDir();
 	    			

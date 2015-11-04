@@ -74,7 +74,7 @@ public class SMJOperator extends JoinOperator {
 					currOuterIndex++;
 					currInnerIndex = innerPartitionStartIndex;
 					}
-				
+					
 					return returnTuple;
 				}	
 			}			

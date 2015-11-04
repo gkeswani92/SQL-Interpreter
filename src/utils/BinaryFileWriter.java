@@ -55,7 +55,7 @@ public class BinaryFileWriter implements TupleWriter {
 		
 		Integer element;
 		// check if the buffer can take the entire tuple
-		if(tuple != null && ! (buffer.remaining()>(tuple.getArributeList().size()*4))){			
+		if(tuple != null && ! (buffer.remaining()>=(tuple.getArributeList().size()*4))){			
 			// get a new bytebuffer and set the value for prev page buffer with tuple details
 			writeByteBufferToFile();
 			updateBufferWithNewByteBuffer();			

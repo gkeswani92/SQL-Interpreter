@@ -96,4 +96,15 @@ public class BinaryFileReader implements TupleReader {
 		this.attributes = attributes;
 		this.numAttr = attributes.length;
 	}
+	
+	public void setChannelToPage(int index){
+		try {
+			bb.clear();
+			this.channel.position(index*4096);
+			updateBufferWithNextPage();
+		} catch (Exception e) {
+			System.out.println("Something went wrong in resetting the channel position");
+			e.printStackTrace();
+		}
+	}
 }

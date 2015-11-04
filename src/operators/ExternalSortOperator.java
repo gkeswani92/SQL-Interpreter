@@ -27,9 +27,9 @@ public class ExternalSortOperator extends SortOperator {
 	public ExternalSortOperator(List<String> sortConditions, Operator child, Integer numBufferPages) {
 		super(sortConditions, child);
 		this.numBufferPages = numBufferPages;
-		buffer 				= new ArrayList<Tuple>();
 		this.sortConditions = new ArrayList<String>();
 		this.sortConditions.addAll(sortConditions);
+		buffer 				= new ArrayList<Tuple>();
 		inputFilePaths 		= new ArrayList<String>(); //Keeps track of the files created in pass 0
 		outputFilePaths 	= new ArrayList<String>();
 		fanInBuffers 		= new ArrayList<BinaryFileReader>();
@@ -325,8 +325,32 @@ public class ExternalSortOperator extends SortOperator {
 		sortedFileReader.closeStuff();
 		sortedFileReader = getSortedFileReader(sortedFile);
 		
-		for (int i = 0; i < index; i++) {
+		//----------------------------------------------------------------------------------
+		//TODO: NEED TO MAKE SURE THIS PART IS WORKING
+		
+		
+		Integer sizeOfTuple = attributes.length * 4;
+		Integer availablePageSize = 4096 - 8;
+		Integer tuplesPerPage = Math.floorDiv(availablePageSize, sizeOfTuple);
+		
+		Integer pageIndex = Math.floorDiv(index+1, tuplesPerPage);
+		
+		Integer temp = (index+1) % tuplesPerPage;
+		if (temp == 0) {
+			pageIndex--;
+		}
+		
+		sortedFileReader.setChannelToPage(pageIndex);
+		Integer tuplesBefore = index - (pageIndex * tuplesPerPage);
+
+		for (int i = 0; i < tuplesBefore; i++) {
 			sortedFileReader.getNextTuple();
 		}
+		
+		//----------------------------------------------------------------------------------
+		
+//		for (int i = 0; i < index; i++) {
+//			sortedFileReader.getNextTuple();
+//		}
 	}
 }
