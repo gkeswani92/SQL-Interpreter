@@ -15,7 +15,7 @@ public class PlanBuilderConfigFileReader {
 	
 	FileReader configFileReaderObj;
 	BufferedReader file;
-	Integer joinType, joinBuffer, sortType, sortBuffer;
+	Integer joinType, joinBuffer, sortType, sortBuffer, isUseIndex;
 	private String tempDir;
 	private static PlanBuilderConfigFileReader instance;
 
@@ -24,6 +24,7 @@ public class PlanBuilderConfigFileReader {
 		this.joinType = -1;
 		this.sortBuffer = -1;
 		this.sortType = -1;
+		this.isUseIndex = -1;
 		tempDir="";
 	}
 	
@@ -54,6 +55,11 @@ public class PlanBuilderConfigFileReader {
 				this.sortBuffer = Integer.parseInt(parts[1]);
 			}
 			this.sortType = Integer.parseInt(parts[0]);
+			
+			// Get the third line from the file and read whether the index should be used
+			String indexLine = file.readLine();
+			parts = indexLine.split(" ");
+			this.isUseIndex = Integer.parseInt(parts[0]);
 			
 		} catch (IOException ie) {
 			ie.printStackTrace();
