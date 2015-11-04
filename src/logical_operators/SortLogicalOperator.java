@@ -7,7 +7,7 @@ import net.sf.jsqlparser.statement.select.OrderByElement;
 import operators.ExternalSortOperator;
 import operators.InMemorySortOperator;
 import operators.Operator;
-import utils.ConfigFileReader;
+import utils.PlanBuilderConfigFileReader;
 import utils.Tuple;
 
 public class SortLogicalOperator extends LogicalOperator {
@@ -33,7 +33,7 @@ public class SortLogicalOperator extends LogicalOperator {
 	@Override
 	public Operator getNextPhysicalOperator() {
 		
-		ConfigFileReader config = ConfigFileReader.getInstance();
+		PlanBuilderConfigFileReader config = PlanBuilderConfigFileReader.getInstance();
 		
 		// Read config file and decide which sort to invoke
 		if (config.getSortType() == 0) {

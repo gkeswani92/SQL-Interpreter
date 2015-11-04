@@ -11,25 +11,26 @@ import java.io.IOException;
  * @author tanvimehta
  *
  */
-public class ConfigFileReader {
+public class PlanBuilderConfigFileReader {
 	
 	FileReader configFileReaderObj;
 	BufferedReader file;
-	Integer joinType, joinBuffer, sortType, sortBuffer;
+	Integer joinType, joinBuffer, sortType, sortBuffer, isUseIndex;
 	private String tempDir;
-	private static ConfigFileReader instance;
+	private static PlanBuilderConfigFileReader instance;
 
-	private ConfigFileReader() {
+	private PlanBuilderConfigFileReader() {
 		this.joinBuffer = -1;
 		this.joinType = -1;
 		this.sortBuffer = -1;
 		this.sortType = -1;
+		this.isUseIndex = -1;
 		tempDir="";
 	}
 	
-	public static synchronized ConfigFileReader getInstance() {
+	public static synchronized PlanBuilderConfigFileReader getInstance() {
 		if(instance == null){
-			instance = new ConfigFileReader();
+			instance = new PlanBuilderConfigFileReader();
 		}
         return instance;
 	}	
@@ -54,6 +55,11 @@ public class ConfigFileReader {
 				this.sortBuffer = Integer.parseInt(parts[1]);
 			}
 			this.sortType = Integer.parseInt(parts[0]);
+			
+			// Get the third line from the file and read whether the index should be used
+			String indexLine = file.readLine();
+			parts = indexLine.split(" ");
+			this.isUseIndex = Integer.parseInt(parts[0]);
 			
 		} catch (IOException ie) {
 			ie.printStackTrace();

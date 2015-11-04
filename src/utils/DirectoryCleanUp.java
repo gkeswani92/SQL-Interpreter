@@ -20,7 +20,7 @@ public class DirectoryCleanUp {
 
 	public static void cleanupTempDir() {
 
-		File mergeTempFolder = new File(ConfigFileReader.getInstance().getTempDir());
+		File mergeTempFolder = new File(PlanBuilderConfigFileReader.getInstance().getTempDir());
 		//File mergeTempFolder = new File("C:\\Users\\windows\\Downloads\\externalsort");
 		if (mergeTempFolder.exists()) {
 			deleteMergeTempFolder(mergeTempFolder);

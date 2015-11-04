@@ -6,7 +6,7 @@ import java.util.List;
 
 import utils.BinaryFileReader;
 import utils.BinaryFileWriter;
-import utils.ConfigFileReader;
+import utils.PlanBuilderConfigFileReader;
 import utils.Tuple;
 import utils.TupleComparator;
 
@@ -18,7 +18,7 @@ public class ExternalSortOperator extends SortOperator {
 	private List<String> sortConditions, inputFilePaths, outputFilePaths;
 	private List<BinaryFileReader> fanInBuffers;
 
-	private String tempDir = ConfigFileReader.getInstance().getTempDir()+"/";
+	private String tempDir = PlanBuilderConfigFileReader.getInstance().getTempDir()+"/";
 	private boolean pass0Done;
 	private String tableName, sortedFile;
 	private String[] attributes;
