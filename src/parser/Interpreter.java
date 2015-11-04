@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import logical_operators.DuplicateEliminationLogicalOperator;
 import logical_operators.JoinLogicalOperator;
 import logical_operators.LogicalOperator;
@@ -32,28 +31,51 @@ import utils.DumpRelations;
  */
 public class Interpreter {
 
-	private static String queriesFile = null;
+	private static String queriesFile;
+	private static String inputSrcDir;
+	private static String outputScrDir;
+	private static String tempMergeOutput;
+	private static String interpreterConfigPath;
+	private static DumpRelations writeToFile;
+	private static Integer buildIndex;
+	private static Integer executeQueries;
 	
 	public static void main(String[] args) {
 		
-		String inputSrcDir = "";
-		String outputScrDir = "";
-		String tempMergeOutput = "";
-		DumpRelations writeToFile = null;
-		long startTime = System.nanoTime();
-		
-		
 		//Building the single instance of the database catalog and config file reader
-		if(args.length == 3){
-			inputSrcDir = args[0];
-            outputScrDir = args[1];
-            tempMergeOutput = args[2];
-            queriesFile = inputSrcDir+"/queries.sql";
+		if(args.length == 1){
+			
+			//Reading in the new config file for input, out, temp dirs and flags
+			interpreterConfigPath = args[0];
+			ArrayList<String> params = DatabaseCatalog.getInstance().getConfigPaths(interpreterConfigPath);
+			
+			inputSrcDir  	= params.get(0);
+            outputScrDir 	= params.get(1);
+            tempMergeOutput = params.get(2);
+            buildIndex 		= Integer.parseInt(params.get(3));
+            executeQueries  = Integer.parseInt(params.get(4));
+            queriesFile 	= inputSrcDir+"/queries.sql";
+            
 			DatabaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
 			ConfigFileReader.getInstance().readConfigFile(inputSrcDir);
 			ConfigFileReader.getInstance().setTempDir(tempMergeOutput);
 			writeToFile = new DumpRelations(outputScrDir);
 		}
+		
+		if(buildIndex == 1)
+			buildIndexes();
+		
+		if(executeQueries == 1)
+			executeQueries();
+	}
+
+	/**
+	 * Method to read the queries file and execute them if the execute queries 
+	 * flag is set to True
+	 */
+	private static void executeQueries() {
+		
+		long startTime = System.nanoTime();
 		
 		try {
 			CCJSqlParser parser = new CCJSqlParser(new FileReader(queriesFile));
@@ -113,8 +135,8 @@ public class Interpreter {
 	    			
 	                Operator physicalRoot = constructPhysicalPlan(root);
 
-	                writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
-	                //physicalRoot.dump();
+	                //writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
+	                physicalRoot.dump();
 	    			//writeToFile.writeTestFile(physicalRoot, queryCount, outputFileFormat);
 	    			
 	    			long endTime = System.nanoTime();
@@ -141,6 +163,10 @@ public class Interpreter {
 		}
 	}
 
+	private static void buildIndexes(){
+		//TODO: DO STUFF HERE DAYS BEFORE THE DEADLINE!!s
+	}
+	
 	private static Operator constructPhysicalPlan (LogicalOperator root) {
 		Operator opRoot = root.getNextPhysicalOperator();
 		return opRoot;
