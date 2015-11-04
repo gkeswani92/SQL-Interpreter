@@ -1,6 +1,7 @@
 package indexing;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import utils.RecordComparator;
@@ -75,7 +76,7 @@ public class BPlusTree {
 				}
 			} 
 		}
-		System.out.println(leaves.toString());
+		checkForLastLeafUnderflow(leaves);
 	}
 	
 	/**
@@ -90,5 +91,44 @@ public class BPlusTree {
 				return leaf;
 		}
 		return null;
+	}
+	
+	/**
+	 * Checks if we have an underflow on the leaf node and redistributes
+	 * between the last 2 to prevent that from happening
+	 * @param leaves
+	 */
+	public void checkForLastLeafUnderflow(List<LeafNode> leaves) {
+		
+		LeafNode lastLeaf = leaves.get(leaves.size()-1);
+		
+		if (lastLeaf.size() < order){
+
+			LinkedHashMap<Integer, List<Record>> secondLastDataEntries = new LinkedHashMap<Integer, List<Record>>();
+			LinkedHashMap<Integer, List<Record>> lastDataEntries = new LinkedHashMap<Integer, List<Record>>();
+			LinkedHashMap<Integer, List<Record>> allDataEntries = new LinkedHashMap<Integer, List<Record>>();
+			
+			//Getting the second last leaf node and finding the distribution factor for the nodes
+			LeafNode secondLastLeafNode = leaves.get(leaves.size()-2);
+			int numKeys = lastLeaf.size() + secondLastLeafNode.size();
+			
+			allDataEntries.putAll(secondLastLeafNode.getDataEntries());
+			allDataEntries.putAll(lastLeaf.getDataEntries());
+			
+			//Adds k/2 records into the second last leaf node
+			for(int i = 0; i < numKeys/2; i++){
+				Integer key = (Integer)allDataEntries.keySet().toArray()[i];
+				secondLastDataEntries.put(key, allDataEntries.get(key));
+			}
+			
+			//Adds the remaining records to the last leaf node
+			for(int i = numKeys/2; i < numKeys - (numKeys/2); i++){
+				Integer key = (Integer)allDataEntries.keySet().toArray()[i];
+				lastDataEntries.put(key, allDataEntries.get(key));
+			}
+			
+			secondLastLeafNode.setDataEntries(secondLastDataEntries);
+			lastLeaf.setDataEntries(lastDataEntries);
+		}
 	}
 }
