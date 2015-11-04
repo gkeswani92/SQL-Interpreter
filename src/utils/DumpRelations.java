@@ -66,7 +66,7 @@ public class DumpRelations {
 	
 	public void writeTestFile(Operator root, Integer queryNumber, String writeMethod) {
 		
-		ConfigFileReader config = ConfigFileReader.getInstance();
+		PlanBuilderConfigFileReader config = PlanBuilderConfigFileReader.getInstance();
 		String filename = this.filepath;
 		
 		//Decides which folder to put it in

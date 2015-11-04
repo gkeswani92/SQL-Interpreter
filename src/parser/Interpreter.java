@@ -20,10 +20,11 @@ import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import operators.Operator;
-import utils.ConfigFileReader;
+import utils.PlanBuilderConfigFileReader;
 import utils.DatabaseCatalog;
 import utils.DirectoryCleanUp;
 import utils.DumpRelations;
+import utils.IndexConfigFileReader;
 
 /**
  * Class for getting started with JSQLParser. Reads SQL statements from
@@ -50,8 +51,9 @@ public class Interpreter {
             tempMergeOutput = args[2];
             queriesFile = inputSrcDir+"/queries.sql";
 			DatabaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
-			ConfigFileReader.getInstance().readConfigFile(inputSrcDir);
-			ConfigFileReader.getInstance().setTempDir(tempMergeOutput);
+			PlanBuilderConfigFileReader.getInstance().readConfigFile(inputSrcDir);
+			PlanBuilderConfigFileReader.getInstance().setTempDir(tempMergeOutput);
+			IndexConfigFileReader.getInstance().readConfigFile(inputSrcDir);
 			writeToFile = new DumpRelations(outputScrDir);
 		}
 		

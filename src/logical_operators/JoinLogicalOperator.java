@@ -11,7 +11,7 @@ import operators.Operator;
 import operators.SMJOperator;
 import operators.TNLJOperator;
 import parser.SMJSortConditionsBuilder;
-import utils.ConfigFileReader;
+import utils.PlanBuilderConfigFileReader;
 
 public class JoinLogicalOperator extends LogicalOperator {
 	
@@ -31,7 +31,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 	@Override
 	public Operator getNextPhysicalOperator() {
 		
-		ConfigFileReader config = ConfigFileReader.getInstance();
+		PlanBuilderConfigFileReader config = PlanBuilderConfigFileReader.getInstance();
 		// Read config file and create appropriate join operator
 		if (config.getJoinType() == 0) {
 			return new TNLJOperator(this.joinCondition, 
@@ -50,7 +50,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 			SMJSortConditionsBuilder conditions = new SMJSortConditionsBuilder(leftSortConditions, rightSortConditions, rightTableName);
 			this.joinCondition.accept(conditions);
 			
-			if (ConfigFileReader.getInstance().getSortType()==0) {
+			if (PlanBuilderConfigFileReader.getInstance().getSortType()==0) {
 				return new SMJOperator(this.joinCondition, 
 						new InMemorySortOperator(leftSortConditions, 
 								this.leftChild.getNextPhysicalOperator()),
@@ -62,10 +62,10 @@ public class JoinLogicalOperator extends LogicalOperator {
 				return new SMJOperator(this.joinCondition, 
 						new ExternalSortOperator(leftSortConditions, 
 								this.leftChild.getNextPhysicalOperator(), 
-								ConfigFileReader.getInstance().getSortBuffer()),
+								PlanBuilderConfigFileReader.getInstance().getSortBuffer()),
 						new ExternalSortOperator(rightSortConditions, 
 								this.rightChild.getNextPhysicalOperator(), 
-								ConfigFileReader.getInstance().getSortBuffer()),
+								PlanBuilderConfigFileReader.getInstance().getSortBuffer()),
 						leftSortConditions,
 						rightSortConditions);
 			}

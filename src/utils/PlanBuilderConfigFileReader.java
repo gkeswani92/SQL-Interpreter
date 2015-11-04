@@ -11,15 +11,15 @@ import java.io.IOException;
  * @author tanvimehta
  *
  */
-public class ConfigFileReader {
+public class PlanBuilderConfigFileReader {
 	
 	FileReader configFileReaderObj;
 	BufferedReader file;
 	Integer joinType, joinBuffer, sortType, sortBuffer;
 	private String tempDir;
-	private static ConfigFileReader instance;
+	private static PlanBuilderConfigFileReader instance;
 
-	private ConfigFileReader() {
+	private PlanBuilderConfigFileReader() {
 		this.joinBuffer = -1;
 		this.joinType = -1;
 		this.sortBuffer = -1;
@@ -27,9 +27,9 @@ public class ConfigFileReader {
 		tempDir="";
 	}
 	
-	public static synchronized ConfigFileReader getInstance() {
+	public static synchronized PlanBuilderConfigFileReader getInstance() {
 		if(instance == null){
-			instance = new ConfigFileReader();
+			instance = new PlanBuilderConfigFileReader();
 		}
         return instance;
 	}	
