@@ -6,12 +6,6 @@ import java.util.List;
 
 import utils.RecordComparator;
 
-/**
- * BPlusTree Class Assumptions: 1. No duplicate keys inserted 2. Order D:
- * D<=number of keys in a node <=2*D 3. All keys are non-negative
- * @param <K>
- * @param <T>
- */
 public class BPlusTree {
 
 	public Node root;
@@ -27,17 +21,9 @@ public class BPlusTree {
 	}
 
 	/**
-	 * TODO Search the value for a specific key
-	 * 
-	 * @param key
-	 * @return value
-	 */
-	public List<Record> search(Integer key) {
-		return null;
-	}
-
-	/**
 	 * Controller method for creating the B plus tree for the attribute in question
+	 * @return
+	 * 		The root node of the newly creared B+ tree
 	 */
 	public Node bulkInsert() {
 		
@@ -81,6 +67,13 @@ public class BPlusTree {
 		return root;
 	}
 	
+	/**
+	 * Creates the index recursively for the given nodes until we have one
+	 * index node
+	 * @param nodes
+	 * @return
+	 * 		Root node of the B plus tree
+	 */
 	public Node createIndexNodes(List<Node> nodes){
 		
 		if(nodes.size() == 1)
@@ -95,6 +88,7 @@ public class BPlusTree {
 			}
 		}
 		
+		checkForLastIndexUnderflow(indexes);
 		return createIndexNodes(indexes);
 	}
 	
@@ -159,6 +153,9 @@ public class BPlusTree {
 	 */
 	public void checkForLastLeafUnderflow(List<Node> leaves) {
 		
+		//TODO: Add check for this being the only node in which case we do not need 
+		//to do anything
+		
 		LeafNode lastLeaf = (LeafNode) leaves.get(leaves.size()-1);
 		
 		if (lastLeaf.size() < order){
@@ -188,6 +185,46 @@ public class BPlusTree {
 			
 			secondLastLeafNode.setDataEntries(secondLastDataEntries);
 			lastLeaf.setDataEntries(lastDataEntries);
+		}
+	}
+	
+	public void checkForLastIndexUnderflow(List<Node> indexes){
+		
+		//Root node does not have to be considered for underflow
+		if(indexes.size() == 1)
+			return;
+		
+		IndexNode lastIndex = (IndexNode)indexes.get(indexes.size()-1);
+		
+		//If the last index is underflowing, we need to redistribute with the second last node
+		if(lastIndex.keys.size() < order){
+			
+			IndexNode secondLastIndex = (IndexNode)indexes.get(indexes.size()-2);
+			
+			//Collecting all the keys and children together so as to redistribute
+			List<Integer> keys = new ArrayList<Integer>();
+			keys.addAll(secondLastIndex.keys);
+			keys.addAll(lastIndex.keys);
+			
+			List<Node> children = new ArrayList<Node>();
+			children.addAll(secondLastIndex.children);
+			children.addAll(lastIndex.children);
+			
+			secondLastIndex.keys.clear();
+			secondLastIndex.children.clear();
+			lastIndex.keys.clear();
+			lastIndex.children.clear();
+
+			//Second to last index node gets m/2 keys and m/2 + 1 children
+			for(int i=0; i<keys.size()/2; i++){
+				secondLastIndex.keys.add(keys.remove(i));
+				secondLastIndex.children.add(children.remove(i));
+			}
+			secondLastIndex.children.add(children.remove(0));
+			
+			//Last index gets the remaining keys and children
+			lastIndex.keys.addAll(keys);
+			lastIndex.children.addAll(children);
 		}
 	}
 }

@@ -26,7 +26,6 @@ public class BuildIndex {
 		try {
 			BinaryFileReader bfr = new BinaryFileReader(index.getTableName());
 			List<Record> allRecords = bfr.getAllRecords();
-			int order = index.getOrder();
 			
 			// Flag 0 for unclustered and 1 for clustered
 			if (index.getFlag() == 0) {
