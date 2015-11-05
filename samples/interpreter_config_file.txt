@@ -1,5 +1,5 @@
-/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/input
-/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/output
-/Users/gaurav/Documents/Eclipse/SQL-Interpretersamples/temp
+/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input
+/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/output
+/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/temp
 1
-1
+0

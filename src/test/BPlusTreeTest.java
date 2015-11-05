@@ -11,8 +11,8 @@ public class BPlusTreeTest {
 	private Integer cols;
 	private String tableName;
 	private String tablePath;
-	//private String inputSrc = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input";
-	private String inputSrc = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/input";
+	private String inputSrc = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input";
+//	private String inputSrc = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/input";
 	
 	public BPlusTreeTest(String file, Integer rows, Integer cols) {
 		this.tableName = file;
@@ -27,24 +27,24 @@ public class BPlusTreeTest {
 		Random randomGenerator;
 		BinaryFileWriter writer;
 		
-		//int[] numbers = new int[]{1, 2, 4, 5, 7, 8, 11, 12, 13, 14};
-		int[] numbers = new int[]{3,
-				4,
-				6,
-				9,
-				10,
-				11,
-				12,
-				13,
-				20,
-				22,
-				23,
-				31,
-				35,
-				36,
-				38,
-				41,
-				44};
+		int[] numbers = new int[]{1, 2, 4, 5, 7, 8, 11, 12, 13, 14};
+//		int[] numbers = new int[]{3,
+//				4,
+//				6,
+//				9,
+//				10,
+//				11,
+//				12,
+//				13,
+//				20,
+//				22,
+//				23,
+//				31,
+//				35,
+//				36,
+//				38,
+//				41,
+//				44};
 		
 		try {
 			 writer = new BinaryFileWriter(this.tablePath);
@@ -64,7 +64,7 @@ public class BPlusTreeTest {
 	}
 	
 	public static void main(String args[]){
-		BPlusTreeTest boats = new BPlusTreeTest("Boats", 17, 3);
+		BPlusTreeTest boats = new BPlusTreeTest("Boats", 10, 3);
 		boats.generateLargeRelation();
 	}
 	

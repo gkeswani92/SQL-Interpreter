@@ -61,8 +61,11 @@ public class BPlusTree {
 				}
 			} 
 		}
+		
 		checkForLastLeafUnderflow(leaves);
+		IndexSerializer.serializeLeaves(leaves, index);
 		Node root = createIndexNodes(leaves);
+		IndexSerializer.serializeHeader(root, leaves.size(), order);
 
 	}
 	
@@ -88,6 +91,7 @@ public class BPlusTree {
 		}
 		
 		checkForLastIndexUnderflow(indexes);
+		IndexSerializer.serializeIndexNodes(indexes);
 		return createIndexNodes(indexes);
 	}
 	
@@ -176,7 +180,7 @@ public class BPlusTree {
 				Integer key = (Integer)allDataEntries.keySet().toArray()[i];
 				secondLastDataEntries.put(key, allDataEntries.get(key));
 			}
-			
+						
 			//Adds the remaining records to the last leaf node
 			for(int i = numKeys/2; i < numKeys - (numKeys/2); i++){
 				Integer key = (Integer)allDataEntries.keySet().toArray()[i];
