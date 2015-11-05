@@ -3,9 +3,8 @@ package indexing;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-public class LeafNode {
+public class LeafNode extends Node {
 	
 	private LinkedHashMap<Integer, List<Record>> leafDataEntries;
 	
@@ -43,5 +42,9 @@ public class LeafNode {
 	
 	public Integer size(){
 		return leafDataEntries.size();
+	}
+	
+	public Integer getFirstKey() {
+		return (Integer)leafDataEntries.keySet().toArray()[0];
 	}
 }

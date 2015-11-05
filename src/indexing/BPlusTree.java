@@ -77,6 +77,56 @@ public class BPlusTree {
 			} 
 		}
 		checkForLastLeafUnderflow(leaves);
+		List<IndexNode> indexes = createIndexFromLeaves(leaves);
+		Node root = createIndexesFromIndexes(indexes);
+	}
+	
+	
+	public List<IndexNode> createIndexFromLeaves(List<LeafNode> nodes) {
+		
+		List<IndexNode> indexes = new ArrayList<>();
+		LeafNode firstLeaf = nodes.remove(0);
+		indexes.add(new IndexNode(firstLeaf));
+		
+		for (LeafNode node: nodes) {
+			IndexNode lastIndex = indexes.get(indexes.size()-1);
+			
+			// The last index node has space for more keys
+			// Always allow 1 extra key because it will be pulled up for the next level of indexes
+			if (lastIndex.getKeys().size() < 2*order) {
+				lastIndex.addKey(node.getFirstKey());
+				lastIndex.addChild(node);
+			} else {
+				indexes.add(new IndexNode(node.getFirstKey(), node));
+			}
+		}
+		
+		return indexes;
+	}
+	
+	public Node createIndexesFromIndexes(List<IndexNode> nodes) {
+		
+		if (nodes.size() == 1) {
+			return nodes.get(0);
+		}
+		
+		List<IndexNode> indexes = new ArrayList<>();
+		IndexNode firstIndex = nodes.remove(0);
+		indexes.add(new IndexNode(firstIndex));
+		
+		for(IndexNode node: nodes){
+			IndexNode lastIndex = indexes.get(indexes.size()-1);
+			
+			//The last index node has space for more keys
+			if (lastIndex.getKeys().size() < 2*order) {
+				lastIndex.addKey(node.getKeys().remove(0));
+				lastIndex.addChild(node);
+			} else {
+				indexes.add(new IndexNode(node.getKeys().remove(0), node));
+			}
+		}
+		createIndexesFromIndexes(indexes);
+		return null;
 	}
 	
 	/**
