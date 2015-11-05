@@ -12,6 +12,7 @@ public class IndexNode extends Node {
 		keys = new ArrayList<Integer>();
 		children = new ArrayList<Node>();
 		children.add(child);
+		isLeafNode = false;
 	}
 
 	public IndexNode(Integer key, Node child) {

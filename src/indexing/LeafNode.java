@@ -13,6 +13,7 @@ public class LeafNode extends Node {
 		List<Record> records = new ArrayList<Record>();
 		records.add(rec);
 		leafDataEntries.put(key, records);
+		isLeafNode = true;
 	}
 	
 	public LinkedHashMap<Integer, List<Record>> getDataEntries(){

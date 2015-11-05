@@ -37,16 +37,16 @@ public class BPlusTree {
 	}
 
 	/**
-	 * 
+	 * Controller method for creating the B plus tree for the attribute in question
 	 */
-	public void bulkInsert() {
+	public Node bulkInsert() {
 		
 		records.sort(new RecordComparator(index.getAttribute()));
-		List<LeafNode> leaves = new ArrayList<LeafNode>();
+		List<Node> leaves = new ArrayList<Node>();
 		
 		for (Record record: records) {
 			Integer key = record.getTuple().getValueForAttr(index.getAttribute());
-			LeafNode leaf = getLeafNodeWithKey(leaves, key);
+			LeafNode leaf = (LeafNode)getLeafNodeWithKey(leaves, key);
 			
 			//If this is the first ever key being inserted into the index
 			if(leaves.isEmpty()){
@@ -62,7 +62,7 @@ public class BPlusTree {
 			
 			//If this is the first time we are seeing a new key
 			else {
-				leaf = leaves.get(leaves.size()-1);
+				leaf = (LeafNode) leaves.get(leaves.size()-1);
 				
 				//If this leaf is full
 				if (leaf.size() >= 2*order) {
@@ -77,57 +77,65 @@ public class BPlusTree {
 			} 
 		}
 		checkForLastLeafUnderflow(leaves);
-		List<IndexNode> indexes = createIndexFromLeaves(leaves);
-		Node root = createIndexesFromIndexes(indexes);
+		Node root = createIndexNodes(leaves);
+		return root;
 	}
 	
+	public Node createIndexNodes(List<Node> nodes){
+		
+		if(nodes.size() == 1)
+			return nodes.get(0);
+		
+		//Attaching all child nodes to a upper level index nodes
+		List<Node> indexes = addChildrenToIndexNodes(nodes);
+		
+		for(Node index: indexes){
+			for(int i=0; i<((IndexNode)index).children.size()-1; i++){
+				((IndexNode)index).keys.add(getSmallestKeyFromSubtree(((IndexNode)index).children.get(i+1)));
+			}
+		}
+		
+		return createIndexNodes(indexes);
+	}
 	
-	public List<IndexNode> createIndexFromLeaves(List<LeafNode> nodes) {
+	/**
+	 * Makes all the current layers nodes children of the upper layer
+	 * @param children
+	 * @return
+	 */
+	public List<Node> addChildrenToIndexNodes(List<Node> children) {
 		
-		List<IndexNode> indexes = new ArrayList<>();
-		LeafNode firstLeaf = nodes.remove(0);
-		indexes.add(new IndexNode(firstLeaf));
+		List<Node> indexes = new ArrayList<Node>();
+		indexes.add(new IndexNode(children.remove(0)));
 		
-		for (LeafNode node: nodes) {
-			IndexNode lastIndex = indexes.get(indexes.size()-1);
+		for (Node node: children) {
+			IndexNode lastIndex = (IndexNode)indexes.get(indexes.size()-1);
 			
-			// The last index node has space for more keys
-			// Always allow 1 extra key because it will be pulled up for the next level of indexes
-			if (lastIndex.getKeys().size() < 2*order) {
-				lastIndex.addKey(node.getFirstKey());
-				lastIndex.addChild(node);
+			if (lastIndex.children.size() == (2*order + 1)) {
+				IndexNode newIndexNode = new IndexNode(node);
+				indexes.add(newIndexNode);
+				
 			} else {
-				indexes.add(new IndexNode(node.getFirstKey(), node));
+				lastIndex.children.add(node);
 			}
 		}
 		
 		return indexes;
 	}
 	
-	public Node createIndexesFromIndexes(List<IndexNode> nodes) {
+	/**
+	 * Returns the smallest key of the subtree that is passed in
+	 * @param root
+	 * @return
+	 */
+	public Integer getSmallestKeyFromSubtree(Node root) {
 		
-		if (nodes.size() == 1) {
-			return nodes.get(0);
-		}
+		if (root.isLeafNode)
+			return ((LeafNode)root).getFirstKey();
 		
-		List<IndexNode> indexes = new ArrayList<>();
-		IndexNode firstIndex = nodes.remove(0);
-		indexes.add(new IndexNode(firstIndex));
-		
-		for(IndexNode node: nodes){
-			IndexNode lastIndex = indexes.get(indexes.size()-1);
-			
-			//The last index node has space for more keys
-			if (lastIndex.getKeys().size() < 2*order) {
-				lastIndex.addKey(node.getKeys().remove(0));
-				lastIndex.addChild(node);
-			} else {
-				indexes.add(new IndexNode(node.getKeys().remove(0), node));
-			}
-		}
-		createIndexesFromIndexes(indexes);
-		return null;
+		return getSmallestKeyFromSubtree(((IndexNode)root).children.get(0));
 	}
+	
 	
 	/**
 	 * Returns the leaf that has the key we are looking for
@@ -135,10 +143,11 @@ public class BPlusTree {
 	 * @param key
 	 * @return
 	 */
-	public LeafNode getLeafNodeWithKey(List<LeafNode> leaves, int key){
-		for(LeafNode leaf: leaves){
-			if(leaf.hasKey(key))
-				return leaf;
+	public LeafNode getLeafNodeWithKey(List<Node> leaves, int key){
+		for(Node leaf: leaves) {
+			LeafNode currLeaf = (LeafNode)leaf;
+			if(currLeaf.hasKey(key))
+				return currLeaf;
 		}
 		return null;
 	}
@@ -148,9 +157,9 @@ public class BPlusTree {
 	 * between the last 2 to prevent that from happening
 	 * @param leaves
 	 */
-	public void checkForLastLeafUnderflow(List<LeafNode> leaves) {
+	public void checkForLastLeafUnderflow(List<Node> leaves) {
 		
-		LeafNode lastLeaf = leaves.get(leaves.size()-1);
+		LeafNode lastLeaf = (LeafNode) leaves.get(leaves.size()-1);
 		
 		if (lastLeaf.size() < order){
 
@@ -159,7 +168,7 @@ public class BPlusTree {
 			LinkedHashMap<Integer, List<Record>> allDataEntries = new LinkedHashMap<Integer, List<Record>>();
 			
 			//Getting the second last leaf node and finding the distribution factor for the nodes
-			LeafNode secondLastLeafNode = leaves.get(leaves.size()-2);
+			LeafNode secondLastLeafNode = (LeafNode) leaves.get(leaves.size()-2);
 			int numKeys = lastLeaf.size() + secondLastLeafNode.size();
 			
 			allDataEntries.putAll(secondLastLeafNode.getDataEntries());
