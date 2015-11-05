@@ -17,15 +17,14 @@ public class BPlusTree {
 		this.index = index;
 		this.records = allRecords;
 		this.order = index.getOrder();
-		bulkInsert();
 	}
 
 	/**
 	 * Controller method for creating the B plus tree for the attribute in question
 	 * @return
-	 * 		The root node of the newly creared B+ tree
+	 * 		The root node of the newly created B+ tree
 	 */
-	public Node bulkInsert() {
+	public void bulkInsert() {
 		
 		records.sort(new RecordComparator(index.getAttribute()));
 		List<Node> leaves = new ArrayList<Node>();
@@ -64,7 +63,7 @@ public class BPlusTree {
 		}
 		checkForLastLeafUnderflow(leaves);
 		Node root = createIndexNodes(leaves);
-		return root;
+
 	}
 	
 	/**
@@ -153,8 +152,9 @@ public class BPlusTree {
 	 */
 	public void checkForLastLeafUnderflow(List<Node> leaves) {
 		
-		//TODO: Add check for this being the only node in which case we do not need 
-		//to do anything
+		//Root node does not have to be considered for underflow
+		if(leaves.size() == 1)
+			return;
 		
 		LeafNode lastLeaf = (LeafNode) leaves.get(leaves.size()-1);
 		
@@ -188,6 +188,12 @@ public class BPlusTree {
 		}
 	}
 	
+	/**
+	 * Checks if last index node has an underflow
+	 * If yes, redistributes the keys and children for second last and last index nodes
+	 * Second last index node gets m/2 - 1 keys and remainder go to last node
+	 * @param indexes
+	 */
 	public void checkForLastIndexUnderflow(List<Node> indexes){
 		
 		//Root node does not have to be considered for underflow
