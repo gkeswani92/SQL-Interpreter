@@ -3,12 +3,11 @@ package indexing;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import utils.DatabaseCatalog;
 import utils.IndexBinaryFileWriter;
 
 public class IndexSerializer {
 
-	//private static final String INDEXES_DIR = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/indexes/";
-	private static final String INDEXES_DIR = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/indexes/";
 	private static int pageCount;
 	private static IndexBinaryFileWriter ibfw;
 
@@ -24,7 +23,7 @@ public class IndexSerializer {
 		ibfw = null;
 		
 		try {
-			ibfw = new IndexBinaryFileWriter(INDEXES_DIR + index.getTableName() + "." + index.getAttribute());
+			ibfw = new IndexBinaryFileWriter(DatabaseCatalog.getInstance().getInputDir() + "/db/indexes/" + index.getTableName() + "." + index.getAttribute());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

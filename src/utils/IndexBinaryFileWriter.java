@@ -103,7 +103,6 @@ public class IndexBinaryFileWriter {
 	public void flushBuffer(){
 		try {
 			buffer.position(0);
-			System.out.println(channel.position());
 			channel.write(buffer);
 		} catch (IOException e) {
 			e.printStackTrace();

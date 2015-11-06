@@ -22,6 +22,7 @@ public class DatabaseCatalog {
 	private Map<String, String[]> tableSchemaCatalag = new HashMap<String, String[]>();
 	private final String ATTR_DELIM = " ";
 	private static DatabaseCatalog instance;
+	private String inputsrcDir;
 
 	private DatabaseCatalog() {
 		//Default constructor
@@ -68,7 +69,7 @@ public class DatabaseCatalog {
 		// Calling the databaseCatalog to read the schema.txt for furture access
 		FileReader schemaFileReaderobj;
 		BufferedReader file;
-		
+		this.inputsrcDir = inputsrcDir;
 		try {
 			schemaFileReaderobj = new FileReader(inputsrcDir + "/db/schema.txt");
 			file = new BufferedReader(schemaFileReaderobj);
@@ -109,5 +110,8 @@ public class DatabaseCatalog {
 		dataFilePath[0] = getBinaryDataFilePath(baseTable);
 		tableFileCatalag.put(alias, dataFilePath);
 	}
-
+	
+	public String getInputDir() {
+		return inputsrcDir;
+	}
 }

@@ -1,6 +1,7 @@
 package logical_operators;
 
 import net.sf.jsqlparser.statement.select.PlainSelect;
+import operators.IndexScanOperator;
 import operators.Operator;
 import operators.ScanOperator;
 import utils.DatabaseCatalog;
