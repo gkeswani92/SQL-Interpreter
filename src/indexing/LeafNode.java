@@ -3,6 +3,7 @@ package indexing;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 public class LeafNode extends Node {
 	
@@ -47,5 +48,21 @@ public class LeafNode extends Node {
 	
 	public Integer getFirstKey() {
 		return (Integer)leafDataEntries.keySet().toArray()[0];
+	}
+	
+	public String toString() {
+		Set<Integer> keys = leafDataEntries.keySet();
+		String result= "";
+		for (Integer key: keys) {
+			result = result + "[" + key + ":";
+			List<Record> records = leafDataEntries.get(key);
+			
+			for (Record r: records) {
+				result = result + "(" + r.getPageId() + ", " + r.getTupleId() + ")" + ",";
+			}
+			result = result + "]";
+		}
+		return result;
+		
 	}
 }

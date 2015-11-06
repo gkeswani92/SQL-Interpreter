@@ -7,10 +7,15 @@ public class Record {
 	private Integer pageId, tupleId;
 	private Tuple tuple;
 
-	public Record (Integer pageId, Integer tupleId, Tuple tuple) {
+	public Record(Integer pageId, Integer tupleId, Tuple tuple) {
 		this.pageId = pageId;
 		this.tupleId = tupleId;
 		this.tuple = tuple;
+	}
+	
+	public Record(Integer pageId, Integer tupleId){
+		this.pageId = pageId;
+		this.tupleId = tupleId;
 	}
 	
 	public Integer getPageId() {
