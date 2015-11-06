@@ -15,14 +15,13 @@ import indexing.Record;
 
 public class IndexBinaryFileWriter {
 
-	private String filePath;
 	private ByteBuffer buffer;
 	private FileOutputStream fos;
 	private FileChannel channel;
 	private File outputFile;
 	
 	public IndexBinaryFileWriter(String filePath) throws FileNotFoundException {		
-		this.filePath = filePath;
+
 		outputFile = new File(filePath);
 		if(!outputFile.exists()) {
 			try {
@@ -34,7 +33,8 @@ public class IndexBinaryFileWriter {
 			}
 		}
 		fos = new FileOutputStream(filePath);
-	    // allocate a channel to write that file
+	    
+		// allocate a channel to write that file
 	    channel = fos.getChannel();
 	    skipHeaderPage();
 	}
@@ -42,12 +42,7 @@ public class IndexBinaryFileWriter {
 	public void skipHeaderPage() {
 		
 		buffer = ByteBuffer.allocate(1024 * 4);	
-		try {
-			channel.write(buffer);
-			buffer.clear();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		flushBuffer();
 	}
 	
 	/**
@@ -107,6 +102,8 @@ public class IndexBinaryFileWriter {
 	 */
 	public void flushBuffer(){
 		try {
+			buffer.position(0);
+			System.out.println(channel.position());
 			channel.write(buffer);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -123,13 +120,12 @@ public class IndexBinaryFileWriter {
 	 */
 	public void serializeHeader(Node root, Integer numLeaves, Integer order){
 		try{
-//			channel.position(0);
-//			buffer = ByteBuffer.allocate(1024 * 4);
-//			buffer.putInt(root.getAddress());
-//			buffer.putInt(numLeaves);
-//			buffer.putInt(order);
-//			flushBuffer();
-			
+			channel.position(0);
+			buffer = ByteBuffer.allocate(1024 * 4);
+			buffer.putInt(root.getAddress());
+			buffer.putInt(numLeaves);
+			buffer.putInt(order);
+			flushBuffer();
 			
 			channel.close();
 			fos.close();
