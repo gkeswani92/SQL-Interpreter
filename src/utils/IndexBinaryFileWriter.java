@@ -123,12 +123,12 @@ public class IndexBinaryFileWriter {
 	 */
 	public void serializeHeader(Node root, Integer numLeaves, Integer order){
 		try{
-			channel.position(0);
-			buffer = ByteBuffer.allocate(1024 * 4);
-			buffer.putInt(root.getAddress());
-			buffer.putInt(numLeaves);
-			buffer.putInt(order);
-			flushBuffer();
+//			channel.position(0);
+//			buffer = ByteBuffer.allocate(1024 * 4);
+//			buffer.putInt(root.getAddress());
+//			buffer.putInt(numLeaves);
+//			buffer.putInt(order);
+//			flushBuffer();
 			
 			
 			channel.close();

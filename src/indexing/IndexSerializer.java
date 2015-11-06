@@ -7,7 +7,8 @@ import utils.IndexBinaryFileWriter;
 
 public class IndexSerializer {
 
-	private static final String INDEXES_DIR = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/indexes/";
+	//private static final String INDEXES_DIR = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/indexes/";
+	private static final String INDEXES_DIR = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/indexes/";
 	private static int pageCount;
 	private static IndexBinaryFileWriter ibfw;
 
