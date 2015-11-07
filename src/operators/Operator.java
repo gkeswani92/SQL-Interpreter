@@ -11,6 +11,7 @@ import utils.Tuple;
  */
 public abstract class Operator {
 
+	int count = 0;
 	/**
 	 * Gets the next tuple from the table
 	 * @return next tuple that satifies operator's conditions
@@ -34,9 +35,9 @@ public abstract class Operator {
 		Tuple currentTuple = getNextTuple();
 		String tableDump = null;
 		if (currentTuple != null)
-			tableDump = new String(currentTuple.toStringAttributes()+"\n");
+			tableDump = new String(count++ + " " + currentTuple.toStringAttributes()+"\n");
 		while(currentTuple != null) {
-			tableDump = tableDump + currentTuple.toStringValues() +  "\n";
+			tableDump = tableDump + count++ + " "+ currentTuple.toStringValues() +  "\n";
 			currentTuple = getNextTuple();
 		}
 		System.out.println(tableDump);
