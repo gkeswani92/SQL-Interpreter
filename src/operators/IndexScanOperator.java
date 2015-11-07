@@ -19,10 +19,12 @@ public class IndexScanOperator extends Operator {
 	private BinaryFileReader bfr;
 	private int currKeyIndex, numKeysInCurrLeaf, currRecordIndex;
 	private LeafNode currLeafNode;
+	private Index index;
 	
 	public IndexScanOperator(Integer lowKey, 
 				Integer highKey, Index index) {
 		
+		this.index = index;
 		this.tableName = index.getTableName();
 		this.lowKey = lowKey;
 		this.highKey = highKey;
@@ -124,10 +126,22 @@ public class IndexScanOperator extends Operator {
 		return null;
 	}
 
+	public String getTableName() {
+		return tableName;
+	}
+	
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
-
+		currKeyIndex = -1;
+		currRecordIndex = -1;
+		
+		try {
+			this.bfr = new BinaryFileReader(this.tableName);
+			this.ibfr = new IndexBinaryFileReader(index);
+			ibfr.navigateToLeafNode(lowKey);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
