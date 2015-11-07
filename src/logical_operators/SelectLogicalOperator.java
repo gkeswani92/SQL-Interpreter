@@ -1,6 +1,5 @@
 package logical_operators;
 
-import indexing.Index;
 import net.sf.jsqlparser.expression.Expression;
 import operators.IndexScanOperator;
 import operators.Operator;
@@ -24,6 +23,6 @@ public class SelectLogicalOperator extends LogicalOperator {
 	@Override
 	public Operator getNextPhysicalOperator() {
 //		return new SelectOperator(child.getNextPhysicalOperator(), this.whereClause);
-		return new IndexScanOperator("Boats", null, 8, IndexConfigFileReader.getInstance().getAllIndexes().get("Boats"));
+		return new IndexScanOperator("Boats", 8, 12, IndexConfigFileReader.getInstance().getAllIndexes().get("Boats"));
 	}    
 }

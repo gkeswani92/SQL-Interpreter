@@ -92,7 +92,7 @@ public class IndexScanOperator extends Operator {
 				
 				//If the current key is in the range we are looking for, we return 
 				//the next record
-				if (keys[i] >= lowKey && (highKey == null || keys[i] <= highKey)) {
+				if ((lowKey == null || keys[i] >= lowKey) && (highKey == null || keys[i] <= highKey)) {
 					while (currRecordIndex < dataEntries.get(keys[currKeyIndex]).size()) {
 						return dataEntries.get(keys[currKeyIndex]).get(currRecordIndex++);
 					}
@@ -102,7 +102,7 @@ public class IndexScanOperator extends Operator {
 				
 				//In case the key is less than the low key, we skip the current loop
 				//and process the next key
-				else if (keys[i] < lowKey){
+				else if (lowKey != null && keys[i] < lowKey){
 					currKeyIndex++;
 					continue;
 				}

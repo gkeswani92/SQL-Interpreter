@@ -41,6 +41,9 @@ public class IndexBinaryFileReader {
 		//which is the first page after the header
 		if (lowKey == null) {
 			setChannelPosition(4096);
+			readPageIntoBuffer();
+			int[] contentsOfPage = new int[1024];
+			bb.asIntBuffer().get(contentsOfPage,0,contentsOfPage.length);
 		} 
 		
 		else {
