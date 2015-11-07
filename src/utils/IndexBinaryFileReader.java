@@ -148,7 +148,7 @@ public class IndexBinaryFileReader {
 			Integer numRecords = contentsOfPage[i++];
 			int j;
 			
-			for(j = i; j < (i + numRecords); j++){
+			for(j = i; j < (i + 2 * numRecords); j = j + 2){
 				Record currentRecord = new Record(contentsOfPage[j],  contentsOfPage[j+1]);	
 				if(currentLeaf == null)
 					currentLeaf = new LeafNode(key, currentRecord);
@@ -156,7 +156,7 @@ public class IndexBinaryFileReader {
 					currentLeaf.addRecord(key, currentRecord);
 			}
 			countDataEntriesProcessed++;
-			i = j+1;
+			i = j;
 		}
 		
 		readPageIntoBuffer();

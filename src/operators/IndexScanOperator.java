@@ -65,6 +65,10 @@ public class IndexScanOperator extends Operator {
 			}
 			
 			Tuple t = bfr.getNextTuple();
+			if (t == null) {
+				return null;
+			}
+			
 			Integer attrToCheck = t.getValueForAttr(index.getAttribute());
 			
 			//If the tuple satisfies the condition, we return it. Else, this is 
