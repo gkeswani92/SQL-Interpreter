@@ -56,6 +56,8 @@ public class IndexScanOperator extends Operator {
 		if (r == null)
 			return null;
 
+		//Sets the channels position to the beginning of the page the current
+		//record is on and iterates over tuples to get the tuple we need
 		bfr.setChannelToPage(r.getPageId());
 		for(int i=0; i<r.getTupleId(); i++)
 			bfr.getNextTuple();
@@ -87,21 +89,38 @@ public class IndexScanOperator extends Operator {
 			numKeysInCurrLeaf = keys.length;
 			
 			for (int i = currKeyIndex; i< numKeysInCurrLeaf; i++) {
-				if (keys[i] >= lowKey && keys[i] <= highKey) {
-					currKeyIndex = i;
+				
+				//If the current key is in the range we are looking for, we return 
+				//the next record
+				if (keys[i] >= lowKey && (highKey == null || keys[i] <= highKey)) {
 					while (currRecordIndex < dataEntries.get(keys[currKeyIndex]).size()) {
 						return dataEntries.get(keys[currKeyIndex]).get(currRecordIndex++);
 					}
 					currKeyIndex++;
 					currRecordIndex = 0;
-				} else {
+				} 
+				
+				//In case the key is less than the low key, we skip the current loop
+				//and process the next key
+				else if (keys[i] < lowKey){
+					currKeyIndex++;
+					continue;
+				}
+				
+				//This is called either when our key goes over the high key and is the
+				//base case for this method
+				else{
 					return null;
 				}
 			}
+			
+			//Current leaf node has been processed. Read next page and create a new leaf node
 			currLeafNode = ibfr.getNextLeafNode();
 			currKeyIndex = 0;
 			currRecordIndex = 0;
 		}
+		
+		//We reach here only if we run out of leaves to process
 		return null;
 	}
 

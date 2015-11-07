@@ -24,6 +24,6 @@ public class SelectLogicalOperator extends LogicalOperator {
 	@Override
 	public Operator getNextPhysicalOperator() {
 //		return new SelectOperator(child.getNextPhysicalOperator(), this.whereClause);
-		return new IndexScanOperator("Boats", 7, 10, IndexConfigFileReader.getInstance().getAllIndexes().get("Boats"));
+		return new IndexScanOperator("Boats", null, 8, IndexConfigFileReader.getInstance().getAllIndexes().get("Boats"));
 	}    
 }
