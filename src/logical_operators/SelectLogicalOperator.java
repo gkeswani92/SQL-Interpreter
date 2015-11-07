@@ -53,7 +53,6 @@ public class SelectLogicalOperator extends LogicalOperator {
 				} else {
 					return new IndexScanOperator(ieb.getLowKey(), ieb.getHighKey(), index);
 				}
-
 			}
 		}
 		
@@ -61,13 +60,17 @@ public class SelectLogicalOperator extends LogicalOperator {
 		return new SelectOperator(child.getNextPhysicalOperator(), whereClause);
 	}
 	
+	/**
+	 * Creates a single select condition by aggregating a list of conditions using AND expression
+	 * @param selectConditions
+	 * @return
+	 */
 	public Expression createSelectCondition(List<Expression> selectConditions) {
 		Expression returnExp = selectConditions.remove(0);
 		
 		for (Expression ex: selectConditions) {
 			returnExp = new AndExpression(returnExp, ex);
 		}
-		
 		return returnExp;
 	}
 }

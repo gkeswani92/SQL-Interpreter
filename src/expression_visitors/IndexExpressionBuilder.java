@@ -71,6 +71,11 @@ public class IndexExpressionBuilder implements ExpressionVisitor {
 		return highKey;
 	}
 	
+	/**
+	 * Checks if column(attribute) has an index
+	 * @param exp
+	 * @return true if has index, false otherwise
+	 */
 	public boolean hasIndex(BinaryExpression exp) {
 		if (exp.getLeftExpression() instanceof Column && 
 				index.getAttribute().equals(((Column)exp.getLeftExpression()).getColumnName().toString())) {
@@ -78,9 +83,10 @@ public class IndexExpressionBuilder implements ExpressionVisitor {
 		}
 		return false;
 	}
+	
 	@Override
 	public void visit(EqualsTo arg0) {
-		if (hasIndex(arg0)) {
+		if (arg0.getRightExpression() instanceof LongValue && hasIndex(arg0)) {
 			lowKey = Integer.parseInt(arg0.getRightExpression().toString());
 			highKey = Integer.parseInt(arg0.getRightExpression().toString());
 		} else {
@@ -90,8 +96,9 @@ public class IndexExpressionBuilder implements ExpressionVisitor {
 
 	@Override
 	public void visit(GreaterThan arg0) {
-		if (hasIndex(arg0)) {
+		if (arg0.getRightExpression() instanceof LongValue && hasIndex(arg0)) {
 			Integer currLowKey = Integer.parseInt(arg0.getRightExpression().toString());
+			// Set lowKey as curr+1 because the index scan operator does an inclusive comparison 
 			if (lowKey == null) {
 				lowKey = currLowKey + 1;
 			} else if (lowKey != null && currLowKey.compareTo(lowKey) > 0) {
@@ -105,7 +112,7 @@ public class IndexExpressionBuilder implements ExpressionVisitor {
 
 	@Override
 	public void visit(GreaterThanEquals arg0) {
-		if (hasIndex(arg0)) {
+		if (arg0.getRightExpression() instanceof LongValue && hasIndex(arg0)) {
 			Integer currLowKey = Integer.parseInt(arg0.getRightExpression().toString());
 			if (lowKey == null) {
 				lowKey = currLowKey;
@@ -119,8 +126,9 @@ public class IndexExpressionBuilder implements ExpressionVisitor {
 	
 	@Override
 	public void visit(MinorThan arg0) {
-		if (hasIndex(arg0)) {
+		if (arg0.getRightExpression() instanceof LongValue && hasIndex(arg0)) {
 			Integer currHighKey = Integer.parseInt(arg0.getRightExpression().toString());
+			// Set lowKey as curr-1 because the index scan operator does an inclusive comparison 
 			if (highKey == null) {
 				highKey = currHighKey - 1;
 			} else if (highKey != null && currHighKey.compareTo(highKey) < 0) {
@@ -134,7 +142,7 @@ public class IndexExpressionBuilder implements ExpressionVisitor {
 
 	@Override
 	public void visit(MinorThanEquals arg0) {	
-		if (hasIndex(arg0)) {
+		if (arg0.getRightExpression() instanceof LongValue && hasIndex(arg0)) {
 			Integer currHighKey = Integer.parseInt(arg0.getRightExpression().toString());
 			if (highKey == null) {
 				highKey = currHighKey;
