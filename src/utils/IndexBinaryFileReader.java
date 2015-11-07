@@ -12,7 +12,6 @@ import indexing.Record;
 
 public class IndexBinaryFileReader {
 
-	private Integer lowKey;
 	private FileInputStream fis;
 	private FileChannel channel;
 	private ByteBuffer bb; 
@@ -36,7 +35,6 @@ public class IndexBinaryFileReader {
 	 */
 	public void navigateToLeafNode(Integer lowKey) {
 		
-		this.lowKey= lowKey;
 		//If lower end is null, we need to start scanning from the leftmost leaf
 		//which is the first page after the header
 		if (lowKey == null) {

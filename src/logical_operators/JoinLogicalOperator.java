@@ -3,6 +3,7 @@ package logical_operators;
 import java.util.ArrayList;
 import java.util.List;
 
+import expression_visitors.SMJSortConditionsBuilder;
 import net.sf.jsqlparser.expression.Expression;
 import operators.BNLJOperator;
 import operators.ExternalSortOperator;
@@ -10,7 +11,6 @@ import operators.InMemorySortOperator;
 import operators.Operator;
 import operators.SMJOperator;
 import operators.TNLJOperator;
-import parser.SMJSortConditionsBuilder;
 import utils.PlanBuilderConfigFileReader;
 
 public class JoinLogicalOperator extends LogicalOperator {

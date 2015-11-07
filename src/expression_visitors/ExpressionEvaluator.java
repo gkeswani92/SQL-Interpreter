@@ -1,4 +1,4 @@
-package parser;
+package expression_visitors;
 
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;

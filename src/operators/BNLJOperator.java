@@ -1,8 +1,9 @@
 package operators;
 
 import java.util.ArrayList;
+
+import expression_visitors.ExpressionEvaluator;
 import net.sf.jsqlparser.expression.Expression;
-import parser.ExpressionEvaluator;
 import utils.Tuple;
 
 public class BNLJOperator extends JoinOperator {

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import expression_visitors.WhereBuilder;
 import indexing.BuildIndex;
 import logical_operators.DuplicateEliminationLogicalOperator;
 import logical_operators.JoinLogicalOperator;
