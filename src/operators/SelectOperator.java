@@ -29,13 +29,13 @@ public class SelectOperator extends Operator {
     public Tuple getNextTuple() {
         Tuple currentTuple = child.getNextTuple();
         
-        // Update tuple with tableName if child is an indexScanOperator
-        if (child instanceof IndexScanOperator) {
-        	IndexScanOperator isc = (IndexScanOperator)child;
-        	currentTuple.updateTuple(isc.getTableName());
-        }
-        
     	while (currentTuple != null) {
+            // Update tuple with tableName if child is an indexScanOperator
+            if (child instanceof IndexScanOperator) {
+            	IndexScanOperator isc = (IndexScanOperator)child;
+            	currentTuple.updateTuple(isc.getTableName());
+            }
+            
 	        ExpressionEvaluator ob = new ExpressionEvaluator(currentTuple);
 	        whereClause.accept(ob);
 	        // Check if tuple satisfies the select condition

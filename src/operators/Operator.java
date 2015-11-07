@@ -39,13 +39,14 @@ public abstract class Operator {
 			tableDump = tableDump + currentTuple.toStringValues() +  "\n";
 			currentTuple = getNextTuple();
 		}
-		PrintWriter out = null;
-		try {
-			out = new PrintWriter("hello.txt");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		out.write(tableDump);
-		out.close();
+		System.out.println(tableDump);
+//		PrintWriter out = null;
+//		try {
+//			out = new PrintWriter("hello.txt");
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//		out.write(tableDump);
+//		out.close();
     }
 }
