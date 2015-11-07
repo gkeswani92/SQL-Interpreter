@@ -20,10 +20,10 @@ public class IndexScanOperator extends Operator {
 	private int currKeyIndex, numKeysInCurrLeaf, currRecordIndex;
 	private LeafNode currLeafNode;
 	
-	public IndexScanOperator(String tableName, Integer lowKey, 
+	public IndexScanOperator(Integer lowKey, 
 				Integer highKey, Index index) {
 		
-		this.tableName = tableName;
+		this.tableName = index.getTableName();
 		this.lowKey = lowKey;
 		this.highKey = highKey;
 		currKeyIndex = -1;

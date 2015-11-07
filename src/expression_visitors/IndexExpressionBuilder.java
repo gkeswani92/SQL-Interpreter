@@ -1,10 +1,15 @@
 package expression_visitors;
 
+import java.util.List;
+
+import indexing.Index;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
+import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
 import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.DoubleValue;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.InverseExpression;
@@ -47,43 +52,111 @@ import net.sf.jsqlparser.statement.select.SubSelect;
  */
 public class IndexExpressionBuilder implements ExpressionVisitor {
 	
-	public IndexExpressionBuilder() {
+	Integer lowKey, highKey;
+	Index index;
+	List<Expression> selectConditions;
+	
+	public IndexExpressionBuilder(Index index, List<Expression> selectConditions) {
+		this.lowKey = null;
+		this.highKey = null;
+		this.index = index;
+		this.selectConditions = selectConditions;
 	}
 	
+	public Integer getLowKey() {
+		return lowKey;
+	}
+	
+	public Integer getHighKey() {
+		return highKey;
+	}
+	
+	public boolean hasIndex(BinaryExpression exp) {
+		if (exp.getLeftExpression() instanceof Column && 
+				index.getAttribute().equals(((Column)exp.getLeftExpression()).getColumnName().toString())) {
+			return true;
+		}
+		return false;
+	}
 	@Override
 	public void visit(EqualsTo arg0) {
+		if (hasIndex(arg0)) {
+			lowKey = Integer.parseInt(arg0.getRightExpression().toString());
+			highKey = Integer.parseInt(arg0.getRightExpression().toString());
+		} else {
+			selectConditions.add(arg0);
+		}
 	}
 
 	@Override
 	public void visit(GreaterThan arg0) {
+		if (hasIndex(arg0)) {
+			Integer currLowKey = Integer.parseInt(arg0.getRightExpression().toString());
+			if (lowKey == null) {
+				lowKey = currLowKey + 1;
+			} else if (lowKey != null && currLowKey.compareTo(lowKey) > 0) {
+				lowKey = currLowKey + 1;
+			}
+
+		} else {
+			selectConditions.add(arg0);
+		}
 	}
 
 	@Override
 	public void visit(GreaterThanEquals arg0) {
+		if (hasIndex(arg0)) {
+			Integer currLowKey = Integer.parseInt(arg0.getRightExpression().toString());
+			if (lowKey == null) {
+				lowKey = currLowKey;
+			} else if (lowKey != null && currLowKey.compareTo(lowKey) > 0) {
+				lowKey = currLowKey;
+			}
+		} else {
+			selectConditions.add(arg0);
+		}
 	}
 	
 	@Override
 	public void visit(MinorThan arg0) {
+		if (hasIndex(arg0)) {
+			Integer currHighKey = Integer.parseInt(arg0.getRightExpression().toString());
+			if (highKey == null) {
+				highKey = currHighKey - 1;
+			} else if (highKey != null && currHighKey.compareTo(highKey) < 0) {
+				highKey = currHighKey - 1;
+			}
+
+		} else {
+			selectConditions.add(arg0);
+		}
 	}
 
 	@Override
 	public void visit(MinorThanEquals arg0) {	
+		if (hasIndex(arg0)) {
+			Integer currHighKey = Integer.parseInt(arg0.getRightExpression().toString());
+			if (highKey == null) {
+				highKey = currHighKey;
+			} else if (highKey != null && currHighKey.compareTo(highKey) < 0) {
+				highKey = currHighKey;
+			}
+		} else {
+			selectConditions.add(arg0);
+		}
 	}
 
 	@Override
 	public void visit(NotEqualsTo arg0) {
+		selectConditions.add(arg0);
 	}
 	
 	@Override
-	public void visit(LongValue arg0) {
-		// TODO Auto-generated method stub
-		
+	public void visit(LongValue arg0) {		
 	}
 	
 	@Override
-	public void visit(Column arg0) {
-		// TODO Auto-generated method stub
-		
+	public void visit(Column arg0) {		
 	}
 
 	@Override

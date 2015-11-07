@@ -1,7 +1,6 @@
 package logical_operators;
 
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import operators.IndexScanOperator;
 import operators.Operator;
 import operators.ScanOperator;
 import utils.DatabaseCatalog;
@@ -37,5 +36,9 @@ public class ScanLogicalOperator extends LogicalOperator {
 	@Override
 	public Operator getNextPhysicalOperator() {
 		return new ScanOperator(this.tableName, this.alias);
+	}
+	
+	public String getTableName() {
+		return tableName;
 	}
 }
