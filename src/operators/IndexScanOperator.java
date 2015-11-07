@@ -48,6 +48,11 @@ public class IndexScanOperator extends Operator {
 		if(index.getFlag() == 0){
 			Record r = getNextRecord();
 			Tuple t = getTupleForRecord(r);
+			
+			if(t != null && t.getValueForAttr("A") == 80 && t.getValueForAttr("B")==33){
+				int test = 0;
+				test = test;
+			}
 			return t;
 		} else {
 			

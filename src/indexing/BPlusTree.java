@@ -182,7 +182,7 @@ public class BPlusTree {
 			}
 						
 			//Adds the remaining records to the last leaf node
-			for(int i = numKeys/2; i < numKeys - (numKeys/2); i++){
+			for(int i = numKeys/2; i < numKeys; i++){
 				Integer key = (Integer)allDataEntries.keySet().toArray()[i];
 				lastDataEntries.put(key, allDataEntries.get(key));
 			}

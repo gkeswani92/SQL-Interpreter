@@ -34,8 +34,10 @@ public abstract class Operator {
     public void dump() {
 		Tuple currentTuple = getNextTuple();
 		String tableDump = null;
-		if (currentTuple != null)
+		if (currentTuple != null){
 			tableDump = new String(count++ + " " + currentTuple.toStringAttributes()+"\n");
+		}
+			
 		while(currentTuple != null) {
 			tableDump = tableDump + count++ + " "+ currentTuple.toStringValues() +  "\n";
 			currentTuple = getNextTuple();
