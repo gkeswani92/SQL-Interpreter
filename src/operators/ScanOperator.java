@@ -49,6 +49,7 @@ public class ScanOperator extends Operator{
 		tuple = bfr.getNextTuple();
 		
 		if(tuple == null){
+			bfr.closeStuff();
 			return tuple;
 		}
 		

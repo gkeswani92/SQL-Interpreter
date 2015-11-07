@@ -27,7 +27,9 @@ public class BPlusTreeTest {
 		Random randomGenerator;
 		BinaryFileWriter writer;
 		
-		int[] numbers = new int[]{1, 2, 4, 5, 7, 8, 11, 12, 13, 14};
+		int[] numbers = new int[]
+		{5, 1, 7, 12, 11, 2, 8, 14, 13, 4};
+//		{1, 2, 4, 5, 7, 8, 11, 12, 13, 14};
 //		int[] numbers = new int[]{3,
 //				4,
 //				6,

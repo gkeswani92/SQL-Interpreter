@@ -65,9 +65,6 @@ public class IndexScanOperator extends Operator {
 			bfr.getNextTuple();
 
 		Tuple t = bfr.getNextTuple();
-//		if (t != null) {
-//			System.out.println(t.toStringValues());
-//		}
 		return t;
 	}
 	
