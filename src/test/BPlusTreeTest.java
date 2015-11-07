@@ -11,8 +11,8 @@ public class BPlusTreeTest {
 	private Integer cols;
 	private String tableName;
 	private String tablePath;
-	private String inputSrc = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input";
-//	private String inputSrc = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/input";
+	//private String inputSrc = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input";
+	private String inputSrc = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/input";
 	
 	public BPlusTreeTest(String file, Integer rows, Integer cols) {
 		this.tableName = file;

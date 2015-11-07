@@ -38,7 +38,6 @@ public class BuildIndex {
 			
 			BinaryFileReader bfr = new BinaryFileReader(index.getTableName());
 			List<Record> allRecords = bfr.getAllRecords();
-
 			bulkLoad(index, allRecords);
 
 		} catch (FileNotFoundException e) {
@@ -55,20 +54,22 @@ public class BuildIndex {
 		List<String> sortConditions = new ArrayList<String>();
 		BinaryFileWriter bfw = null;
 		
-		try {
-			bfw = new BinaryFileWriter(DatabaseCatalog.getInstance().getInputDir() + "/db/" + index.getTableName());
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
 		sortConditions.add(index.getTableName() + "." + index.getAttribute());
 		InMemorySortOperator op = new InMemorySortOperator(sortConditions, new ScanOperator(index.getTableName()));
 		Tuple currTuple = op.getNextTuple();
+		List<Tuple> tuples = new ArrayList<Tuple>();
 		while(currTuple != null) {
-			bfw.writeNextTuple(currTuple);
+			tuples.add(currTuple);
+			//bfw.writeNextTuple(currTuple);
 			currTuple = op.getNextTuple();
 		}
 		
-		bfw.writeNextTuple(null);
+		try {
+			bfw = new BinaryFileWriter(DatabaseCatalog.getInstance().getInputDir() + "/db/data/" + index.getTableName());
+			bfw.writeTupleCollection(tuples);
+			bfw.writeNextTuple(null);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -42,9 +42,39 @@ public class IndexScanOperator extends Operator {
 	
 	@Override
 	public Tuple getNextTuple() {
-		Record r = getNextRecord();
-		Tuple t = getTupleForRecord(r);
-		return t;
+		
+		//Gets the record and the tuple corresponding to that tuple if we are using an
+		//unclustered index
+		if(index.getFlag() == 0){
+			Record r = getNextRecord();
+			Tuple t = getTupleForRecord(r);
+			return t;
+		} else {
+			
+			//Gets the record only in the first call for clustered index
+			if (currKeyIndex == -1){
+				Record r = getNextRecord();
+				if (r == null)
+					return null;
+				
+				//Setting the channel at a position such that the next tuple will
+				//be the corresponding to our record
+				bfr.setChannelToPage(r.getPageId());
+				for(int i=0; i<r.getTupleId();i++)
+					bfr.getNextTuple();
+			}
+			
+			Tuple t = bfr.getNextTuple();
+			Integer attrToCheck = t.getValueForAttr(index.getAttribute());
+			
+			//If the tuple satisfies the condition, we return it. Else, this is 
+			//the end
+			if ((lowKey == null || attrToCheck.compareTo(lowKey) >= 0) && 
+					(highKey == null || attrToCheck.compareTo(highKey) <=0)){
+				return t;
+			}
+		}
+		return null;
 	}
 	
 	/**
