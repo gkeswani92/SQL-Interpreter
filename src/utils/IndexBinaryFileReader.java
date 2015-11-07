@@ -139,6 +139,11 @@ public class IndexBinaryFileReader {
 		LeafNode currentLeaf = null;
 		int[] contentsOfPage = new int[1024];
 		bb.asIntBuffer().get(contentsOfPage,0,contentsOfPage.length);
+		
+		if (contentsOfPage[0] == 1) {
+			return null;
+		}
+		
 		int numDataEntries = contentsOfPage[1];
 		int countDataEntriesProcessed = 0;
 		int i = 2;
