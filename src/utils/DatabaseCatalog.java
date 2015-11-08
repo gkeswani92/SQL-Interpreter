@@ -23,7 +23,6 @@ public class DatabaseCatalog {
 	private final String ATTR_DELIM = " ";
 	private static DatabaseCatalog instance;
 	private String inputsrcDir;
-	private Integer buildIndexFlag;
 
 	private DatabaseCatalog() {
 		//Default constructor
@@ -59,7 +58,6 @@ public class DatabaseCatalog {
 				configParameters.add(currentLine);
 				currentLine = file.readLine();
 			}
-			buildIndexFlag = Integer.parseInt(configParameters.get(3));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -115,9 +113,5 @@ public class DatabaseCatalog {
 	
 	public String getInputDir() {
 		return inputsrcDir;
-	}
-	
-	public Integer getBuildIndexFlag() {
-		return buildIndexFlag;
 	}
 }

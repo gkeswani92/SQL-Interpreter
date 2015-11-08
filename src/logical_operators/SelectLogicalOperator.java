@@ -10,7 +10,6 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import operators.IndexScanOperator;
 import operators.Operator;
 import operators.SelectOperator;
-import utils.DatabaseCatalog;
 import utils.IndexConfigFileReader;
 
 public class SelectLogicalOperator extends LogicalOperator {
@@ -30,7 +29,7 @@ public class SelectLogicalOperator extends LogicalOperator {
 	@Override
 	public Operator getNextPhysicalOperator() {
 		// If child is a scan, then can possibly use index
-		if (child instanceof ScanLogicalOperator && DatabaseCatalog.getInstance().getBuildIndexFlag().compareTo(1) == 0) {
+		if (child instanceof ScanLogicalOperator) {
 			
 			// Create an expression visitor to get the lowKey, highKey and select conditions for attributes without index
 			String tableName = ((ScanLogicalOperator)child).getTableName();
@@ -56,7 +55,7 @@ public class SelectLogicalOperator extends LogicalOperator {
 				}
 			}
 		}
-
+		
 		// Create selectOperator for non index usable. Will only come here if no index usable expressions exist.
 		return new SelectOperator(child.getNextPhysicalOperator(), whereClause);
 	}
