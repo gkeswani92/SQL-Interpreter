@@ -20,6 +20,8 @@ import java.util.Map;
 public class DatabaseCatalog {
 	private Map<String, String[]> tableFileCatalag = new HashMap<String, String[]>();
 	private Map<String, String[]> tableSchemaCatalag = new HashMap<String, String[]>();
+	private Map<String, String> aliasToTableNameMap = new HashMap<String, String>();
+	
 	private final String ATTR_DELIM = " ";
 	private static DatabaseCatalog instance;
 	private String inputsrcDir;
@@ -109,9 +111,14 @@ public class DatabaseCatalog {
 		String[] dataFilePath = new String[1];
 		dataFilePath[0] = getBinaryDataFilePath(baseTable);
 		tableFileCatalag.put(alias, dataFilePath);
+		aliasToTableNameMap.put(alias, baseTable);
 	}
 	
 	public String getInputDir() {
 		return inputsrcDir;
+	}
+	
+	public String getTableForAlias(String alias) {
+		return aliasToTableNameMap.get(alias);
 	}
 }

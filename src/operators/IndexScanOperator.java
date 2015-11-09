@@ -13,7 +13,7 @@ import utils.Tuple;
 
 public class IndexScanOperator extends Operator {
 
-	private String tableName;
+	private String tableName, alias;
 	private Integer lowKey, highKey;
 	private IndexBinaryFileReader ibfr;
 	private BinaryFileReader bfr;
@@ -22,12 +22,13 @@ public class IndexScanOperator extends Operator {
 	private Index index;
 	
 	public IndexScanOperator(Integer lowKey, 
-				Integer highKey, Index index) {
+				Integer highKey, Index index, String alias) {
 		
 		this.index = index;
 		this.tableName = index.getTableName();
 		this.lowKey = lowKey;
 		this.highKey = highKey;
+		this.alias = alias;
 		currKeyIndex = -1;
 		currRecordIndex = -1;
 		
@@ -48,11 +49,7 @@ public class IndexScanOperator extends Operator {
 		if(index.getFlag() == 0){
 			Record r = getNextRecord();
 			Tuple t = getTupleForRecord(r);
-			
-			if(t != null && t.getValueForAttr("A") == 80 && t.getValueForAttr("B")==33){
-				int test = 0;
-				test = test;
-			}
+			t.updateTuple(alias);
 			return t;
 		} else {
 			
@@ -70,11 +67,13 @@ public class IndexScanOperator extends Operator {
 			}
 			
 			Tuple t = bfr.getNextTuple();
+
 			if (t == null) {
 				return null;
 			}
 			
-			Integer attrToCheck = t.getValueForAttr(index.getAttribute());
+			t.updateTuple(alias);
+			Integer attrToCheck = t.getValueForAttr(alias + "." + index.getAttribute());
 			
 			//If the tuple satisfies the condition, we return it. Else, this is 
 			//the end
