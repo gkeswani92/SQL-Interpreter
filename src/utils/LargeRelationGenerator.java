@@ -46,7 +46,7 @@ public class LargeRelationGenerator {
 	
 	public static void main(String args[]){
 		LargeRelationGenerator sailors = new LargeRelationGenerator("Sailors", 5000, 3);
-		LargeRelationGenerator boats = new LargeRelationGenerator("Boats", 5000, 3);
+		LargeRelationGenerator boats = new LargeRelationGenerator("Boats", 15000, 3);
 		LargeRelationGenerator reserves = new LargeRelationGenerator("Reserves", 5000, 2);
 		sailors.generateLargeRelation();
 		boats.generateLargeRelation();

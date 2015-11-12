@@ -49,7 +49,10 @@ public class IndexScanOperator extends Operator {
 		if(index.getFlag() == 0){
 			Record r = getNextRecord();
 			Tuple t = getTupleForRecord(r);
-			t.updateTuple(alias);
+			
+			if(t != null) {
+				t.updateTuple(alias);
+			}
 			return t;
 		} else {
 			

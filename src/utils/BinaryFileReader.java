@@ -64,7 +64,10 @@ public class BinaryFileReader implements TupleReader {
 			tupleIndex++;
 		}
 		
-		
+		if (tuple[0] == 29 && tuple[1] == 0) {
+			int test = 0;
+			test = test;
+		}
 		numTuples--;
 		return new Tuple(tuple, attributes, tableName);
 	}

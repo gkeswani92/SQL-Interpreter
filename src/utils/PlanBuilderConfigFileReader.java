@@ -90,4 +90,8 @@ public class PlanBuilderConfigFileReader {
 	public String getTempDir(){
 		return tempDir;
 	}
+	
+	public Integer getUseIndexFlag(){
+		return isUseIndex;
+	}
 }
