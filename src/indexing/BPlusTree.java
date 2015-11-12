@@ -64,7 +64,16 @@ public class BPlusTree {
 		
 		checkForLastLeafUnderflow(leaves);
 		IndexSerializer.serializeLeaves(leaves, index);
-		Node root = createIndexNodes(leaves);
+		Node root = null;
+		
+		if (leaves.size() == 1) {
+			root = new IndexNode(leaves.get(0));
+			List<Node> nodes = new ArrayList<Node>();
+			nodes.add(root);
+			IndexSerializer.serializeIndexNodes(nodes);
+		} else {
+			root = createIndexNodes(leaves);
+		}
 		IndexSerializer.serializeHeader(root, leaves.size(), order);
 
 	}
