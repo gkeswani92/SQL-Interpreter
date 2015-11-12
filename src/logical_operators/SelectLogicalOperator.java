@@ -12,6 +12,7 @@ import operators.Operator;
 import operators.SelectOperator;
 import utils.DatabaseCatalog;
 import utils.IndexConfigFileReader;
+import utils.PlanBuilderConfigFileReader;
 
 public class SelectLogicalOperator extends LogicalOperator {
 
@@ -29,8 +30,9 @@ public class SelectLogicalOperator extends LogicalOperator {
 
 	@Override
 	public Operator getNextPhysicalOperator() {
+		
 		// If child is a scan, then can possibly use index
-		if (child instanceof ScanLogicalOperator) {
+		if (PlanBuilderConfigFileReader.getInstance().getUseIndexFlag() == 1 && child instanceof ScanLogicalOperator) {
 			
 			// Create an expression visitor to get the lowKey, highKey and select conditions for attributes without index
 			String tableName = ((ScanLogicalOperator)child).getTableName();
