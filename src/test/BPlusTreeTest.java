@@ -1,14 +1,12 @@
 package test;
 
 import java.io.FileNotFoundException;
-import java.util.Random;
 import utils.BinaryFileWriter;
 import utils.DatabaseCatalog;
 import utils.Tuple;
 
 public class BPlusTreeTest {
 	private Integer rows;
-	private Integer cols;
 	private String tableName;
 	private String tablePath;
 	private String inputSrc = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input";
@@ -17,40 +15,20 @@ public class BPlusTreeTest {
 	public BPlusTreeTest(String file, Integer rows, Integer cols) {
 		this.tableName = file;
 		this.tablePath = inputSrc + "/db/data/" + file;
-		this.rows = rows;
-		this.cols = cols;		
+		this.rows = rows;		
 		DatabaseCatalog.getInstance().buildDbCatalog(inputSrc);
 	}
 
 	public void generateLargeRelation(){
 		
-		Random randomGenerator;
 		BinaryFileWriter writer;
 		
-		int[] numbers = new int[]
-		{5, 1, 7, 12, 11, 2, 8, 14, 13, 4};
-//		{1, 2, 4, 5, 7, 8, 11, 12, 13, 14};
-//		int[] numbers = new int[]{3,
-//				4,
-//				6,
-//				9,
-//				10,
-//				11,
-//				12,
-//				13,
-//				20,
-//				22,
-//				23,
-//				31,
-//				35,
-//				36,
-//				38,
-//				41,
-//				44};
+		int[] numbers = {5, 1, 7, 12, 11, 2, 8, 14, 13, 4};
+
 		
 		try {
 			 writer = new BinaryFileWriter(this.tablePath);
-			 randomGenerator = new Random();
+			 //Random randomGenerator = new Random();
 		
 			for(int i=0; i< this.rows; i++){
 				String tupleStr = numbers[i]+","+numbers[i]+","+numbers[i];

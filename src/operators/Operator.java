@@ -1,6 +1,5 @@
 package operators;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 
 import utils.Tuple;
 
