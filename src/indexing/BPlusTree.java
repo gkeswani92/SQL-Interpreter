@@ -241,8 +241,8 @@ public class BPlusTree {
 
 			//Second to last index node gets m/2 keys and m/2 + 1 children
 			for(int i=0; i<keys.size()/2; i++){
-				secondLastIndex.keys.add(keys.remove(i));
-				secondLastIndex.children.add(children.remove(i));
+				secondLastIndex.keys.add(keys.remove(0));
+				secondLastIndex.children.add(children.remove(0));
 			}
 			secondLastIndex.children.add(children.remove(0));
 			
