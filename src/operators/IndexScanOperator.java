@@ -52,6 +52,9 @@ public class IndexScanOperator extends Operator {
 			
 			if(t != null) {
 				t.updateTuple(alias);
+			} else {
+				ibfr.closeStuff();
+				bfr.closeStuff();
 			}
 			return t;
 		} else {
@@ -59,8 +62,11 @@ public class IndexScanOperator extends Operator {
 			//Gets the record only in the first call for clustered index
 			if (currKeyIndex == -1){
 				Record r = getNextRecord();
-				if (r == null)
+				if (r == null) {
+					ibfr.closeStuff();
+					bfr.closeStuff();
 					return null;
+				}
 				
 				//Setting the channel at a position such that the next tuple will
 				//be the corresponding to our record
@@ -72,6 +78,8 @@ public class IndexScanOperator extends Operator {
 			Tuple t = bfr.getNextTuple();
 
 			if (t == null) {
+				ibfr.closeStuff();
+				bfr.closeStuff();
 				return null;
 			}
 			
@@ -85,6 +93,8 @@ public class IndexScanOperator extends Operator {
 				return t;
 			}
 		}
+		ibfr.closeStuff();
+		bfr.closeStuff();
 		return null;
 	}
 	
@@ -174,6 +184,8 @@ public class IndexScanOperator extends Operator {
 		currRecordIndex = -1;
 		
 		try {
+			ibfr.closeStuff();
+			bfr.closeStuff();
 			this.bfr = new BinaryFileReader(this.tableName);
 			this.ibfr = new IndexBinaryFileReader(index);
 			ibfr.navigateToLeafNode(lowKey);

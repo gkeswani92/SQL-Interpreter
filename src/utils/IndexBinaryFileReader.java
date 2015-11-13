@@ -167,4 +167,13 @@ public class IndexBinaryFileReader {
 		readPageIntoBuffer();
 		return currentLeaf;
 	}
+	
+	public void closeStuff() {
+		try {
+			channel.close();
+			fis.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
