@@ -1,6 +1,6 @@
 package operators;
 import java.io.FileNotFoundException;
-
+import java.io.PrintWriter;
 import utils.Tuple;
 
 /**
@@ -42,13 +42,13 @@ public abstract class Operator {
 			currentTuple = getNextTuple();
 		}
 		System.out.println(tableDump);
-//		PrintWriter out = null;
-//		try {
-//			out = new PrintWriter("hello.txt");
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		}
-//		out.write(tableDump);
-//		out.close();
+		PrintWriter out = null;
+		try {
+			out = new PrintWriter("hello.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		out.write(tableDump);
+		out.close();
     }
 }
