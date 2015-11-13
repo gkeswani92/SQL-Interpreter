@@ -1,1 +1,1 @@
-SELECT * FROM Boats WHERE Boats.E > 100 AND Boats.E < 500 AND Boats.E < 300;
+SELECT * FROM Boats, Sailors WHERE Boats.E = 199 AND Sailors.A = 1204;
