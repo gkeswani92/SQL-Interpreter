@@ -14,6 +14,11 @@ import utils.DatabaseCatalog;
 import utils.IndexConfigFileReader;
 import utils.Tuple;
 
+/**
+ * Class to build clustered and unclustered indexes
+ * @author tanvimehta
+ *
+ */
 public class BuildIndex {
 
 	public static void buildIndexes() {
@@ -28,6 +33,10 @@ public class BuildIndex {
 		}
 	}
 	
+	/**
+	 * Checks the flag and builds either a clustered or unclustered index
+	 * @param index
+	 */
 	public static void buildIndex(Index index) {
 		try {
 
@@ -45,11 +54,20 @@ public class BuildIndex {
 		}
 	}
 	
+	/**
+	 * Calls the BPlusTree bulk insert method to build a BPlusTree and serialize it
+	 * @param index
+	 * @param allRecords
+	 */
 	public static void bulkLoad(Index index, List<Record> allRecords) {
 		BPlusTree tree = new BPlusTree(index, allRecords);
 		tree.bulkInsert();
 	}
 	
+	/**
+	 * Sorts the relation on the attribute from the index passed in
+	 * @param index
+	 */
 	public static void sortRelation (Index index) {
 		List<String> sortConditions = new ArrayList<String>();
 		BinaryFileWriter bfw = null;

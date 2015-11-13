@@ -5,6 +5,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Class to keep track of LeafNode object
+ * Consists of a map of key to list of records(containing pageId and tupleId)
+ * @author tanvimehta
+ *
+ */
 public class LeafNode extends Node {
 	
 	private LinkedHashMap<Integer, List<Record>> leafDataEntries;

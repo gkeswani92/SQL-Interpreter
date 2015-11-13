@@ -2,6 +2,12 @@ package indexing;
 
 import utils.Tuple;
 
+/**
+ * Record object that contains information about the pageId and tupleId.
+ * These are stored in the leaves of the BPlusTree structure depending on the key values.
+ * @author tanvimehta
+ *
+ */
 public class Record {
 
 	private Integer pageId, tupleId;

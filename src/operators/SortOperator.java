@@ -23,7 +23,7 @@ public abstract class SortOperator extends Operator {
 		this.child = child;
 		this.sortConditions = new ArrayList<String>();
 		if (sortConditions != null) {
-			this.sortConditions = sortConditions;
+			this.sortConditions.addAll(sortConditions);
 		}
 		this.tuples = tuples;
 		this.currIndex = currIndex;

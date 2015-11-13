@@ -3,6 +3,12 @@ package indexing;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to keep track of indexNode objects
+ * Consist of keys and children(either IndexNode or LeafNode type)
+ * @author tanvimehta
+ *
+ */
 public class IndexNode extends Node {
 	
 	List<Integer> keys;

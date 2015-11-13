@@ -1,5 +1,10 @@
 package indexing;
 
+/**
+ * Class to keep track of index objects
+ * @author tanvimehta
+ *
+ */
 public class Index {
 	
 	String tableName, attribute;

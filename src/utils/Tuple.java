@@ -20,19 +20,12 @@ public class Tuple {
 	
 	public Tuple (int[] values, String[] attributes,String tableName) {
 		
-		try{
-			for (int i = 0; i < attributes.length; i++) {
-				attributeValues.put(attributes[i], values[i]);
-			}
-	
-			this.tableName = tableName;
-			this.isUpdated = false;
+		for (int i = 0; i < attributes.length; i++) {
+			attributeValues.put(attributes[i], values[i]);
 		}
-		catch(Exception e){
-			int test = 0;
-			test = test;
-					
-		}
+
+		this.tableName = tableName;
+		this.isUpdated = false;
 	}
 	
 	public Tuple(String line, String tableName){

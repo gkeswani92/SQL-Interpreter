@@ -6,6 +6,11 @@ import java.util.List;
 
 import utils.RecordComparator;
 
+/**
+ * Class for BPlus tree bulk insertion and serialization
+ * @author tanvimehta
+ *
+ */
 public class BPlusTree {
 
 	public Node root;

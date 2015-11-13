@@ -1,5 +1,10 @@
 package indexing;
 
+/**
+ * Parent class for nodes of BPlusTree structure. Can be either LeafNode or IndexNode
+ * @author tanvimehta
+ *
+ */
 public class Node {
 	protected boolean isLeafNode;
 	protected Integer address;
