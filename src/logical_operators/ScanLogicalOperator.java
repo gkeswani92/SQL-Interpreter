@@ -17,8 +17,8 @@ public class ScanLogicalOperator extends LogicalOperator {
 	public ScanLogicalOperator(PlainSelect body) {
 		this.tableName = body.getFromItem().toString();
 		if(body.getFromItem().getAlias()!=null) {
-			this.tableName = updateCatalogForAlias(this.tableName,body.getFromItem().getAlias());
-			this.alias = body.getFromItem().getAlias();
+			updateCatalogForAlias(this.tableName,body.getFromItem().getAlias());
+			this.tableName = body.getFromItem().getAlias();
 		}
 	}
 	
