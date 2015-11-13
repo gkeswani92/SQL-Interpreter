@@ -122,7 +122,6 @@ public class Interpreter {
 	                	
 	                	//Making join the child of project operation
 		                if (selectAttr.size() != 1 || selectAttr.get(0).toString() != "*") {
-		                	System.out.println("Projection has been called on the join operator");
 		                	root = new ProjectLogicalOperator(body, root);
 		                }
 	                }
@@ -139,7 +138,6 @@ public class Interpreter {
 	                }
 	    			
 	                Operator physicalRoot = constructPhysicalPlan(root);
-
 	                //writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
 	                physicalRoot.dump();
 	    			//writeToFile.writeTestFile(physicalRoot, queryCount, outputFileFormat);

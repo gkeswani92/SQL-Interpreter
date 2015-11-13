@@ -44,6 +44,7 @@ public class IndexScanOperator extends Operator {
 	@Override
 	public Tuple getNextTuple() {
 		
+		//UNCLUSTERED
 		//Gets the record and the tuple corresponding to that tuple if we are using an
 		//unclustered index
 		if(index.getFlag() == 0){
@@ -57,7 +58,10 @@ public class IndexScanOperator extends Operator {
 				bfr.closeStuff();
 			}
 			return t;
-		} else {
+		} 
+		
+		// CLUSTERED
+		else {
 			
 			//Gets the record only in the first call for clustered index
 			if (currKeyIndex == -1){

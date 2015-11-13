@@ -39,17 +39,17 @@ public abstract class Operator {
 		}
 			
 		while(currentTuple != null) {
-			tableDump = tableDump + count++ + " "+ currentTuple.toStringValues() +  "\n";
+			tableDump = tableDump + count++ + " " + currentTuple.toStringValues() +  "\n";
 			currentTuple = getNextTuple();
 		}
 		System.out.println(tableDump);
-//		PrintWriter out = null;
-//		try {
-//			out = new PrintWriter("hello.txt");
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		}
-//		out.write(tableDump);
-//		out.close();
+		PrintWriter out = null;
+		try {
+			out = new PrintWriter("hello.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		out.write(tableDump);
+		out.close();
     }
 }
