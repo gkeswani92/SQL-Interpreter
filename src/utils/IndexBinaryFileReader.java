@@ -79,7 +79,13 @@ public class IndexBinaryFileReader {
 		Integer numKeys = contentsOfPage[1];
 		for(int i=2; i<numKeys+2; i++){
 			if (lowKey < contentsOfPage[i]){
-				traverseDownTheIndex(lowKey, contentsOfPage[i+numKeys-1]);
+				// If it is the leftmost key then don't do a -1 to 
+				// avoid going into the last key rather than the 1st child
+				if (i == 2) {
+					traverseDownTheIndex(lowKey, contentsOfPage[i+numKeys]);
+				} else {
+					traverseDownTheIndex(lowKey, contentsOfPage[i+numKeys-1]);
+				}
 				return;
 			}
 		}
