@@ -81,11 +81,7 @@ public class IndexBinaryFileReader {
 			if (lowKey < contentsOfPage[i]){
 				// If it is the leftmost key then don't do a -1 to 
 				// avoid going into the last key rather than the 1st child
-				if (i == 2) {
-					traverseDownTheIndex(lowKey, contentsOfPage[i+numKeys]);
-				} else {
-					traverseDownTheIndex(lowKey, contentsOfPage[i+numKeys-1]);
-				}
+				traverseDownTheIndex(lowKey, contentsOfPage[i+numKeys]);
 				return;
 			}
 		}
