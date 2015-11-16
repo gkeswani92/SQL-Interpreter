@@ -117,7 +117,7 @@ public class BPlusTree {
 	public List<Node> addChildrenToIndexNodes(List<Node> children) {
 		
 		List<Node> indexes = new ArrayList<Node>();
-		indexes.add(new IndexNode(children.remove(0)));
+		indexes.add(new IndexNode(children.get(0)));
 		
 		for (Node node: children) {
 			IndexNode lastIndex = (IndexNode)indexes.get(indexes.size()-1);
