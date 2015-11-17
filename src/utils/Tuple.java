@@ -18,6 +18,12 @@ public class Tuple {
 	private static final String TUPLE_DELIM = ",";
 	private boolean isUpdated;
 	
+	/**
+	 * Create a tuple given the attributes, their values and the table name
+	 * @param values
+	 * @param attributes
+	 * @param tableName
+	 */
 	public Tuple (int[] values, String[] attributes,String tableName) {
 
 		for (int i = 0; i < attributes.length; i++) {
@@ -27,6 +33,11 @@ public class Tuple {
 		this.isUpdated = false;
 	}
 	
+	/**
+	 * Create a tuple from a string of attributes and table name
+	 * @param line
+	 * @param tableName
+	 */
 	public Tuple(String line, String tableName){
 		this.tableName = tableName;
 		this.createTuple(line);
@@ -34,16 +45,31 @@ public class Tuple {
 		this.isUpdated = false;
 	}
 	
+	/**
+	 * Create a tuple by joining two tuples
+	 * @param leftTuple
+	 * @param rightTuple
+	 */
 	public Tuple (Tuple leftTuple, Tuple rightTuple){
 		this.attributeValues.putAll(leftTuple.getAttributeValues());
 		this.attributeValues.putAll(rightTuple.getAttributeValues());	
 		this.isUpdated = false;
 	}
 	
+	/**
+	 * Returns the attributes of the table
+	 * @param tableName
+	 * @return
+	 */
 	public String[] getTableAttributes(String tableName) {
 		return DatabaseCatalog.getInstance().getTableAttributes(tableName);
 	}
 	
+	/**
+	 * Creates a tuple by splitting the String of values passed in
+	 * @param line
+	 * @return
+	 */
 	public Tuple createTuple(String line) {
 		String[] valueList = line.split(TUPLE_DELIM);
 		String[] attributeList = getTableAttributes(tableName);
@@ -56,16 +82,22 @@ public class Tuple {
 		return this;
 	}
 	
+	/**
+	 * Convert tuple to string for printing to screen
+	 * @return
+	 */
 	public String toStringValues() {
 		String values = "";
 		for(String key : attributeValues.keySet()) {
 			values = values + attributeValues.get(key) + ",";
 		}
-		// Remove trailing ,
-		// TODO: REMOVE THIS ITS TOO PYTHONY
 		return values.substring(0, values.length()-1);
 	}
 	
+	/**
+	 * Returns the string representation of the relations attributes
+	 * @return
+	 */
 	public String toStringAttributes(){
 		String attr = "";
 		for(String key : attributeValues.keySet()) {
@@ -75,14 +107,28 @@ public class Tuple {
 		return attr;
 	}
 	
+	/**
+	 * Returns the value corresponding to the attribute that has been passed in
+	 * @param colName
+	 * @return
+	 */
 	public Integer getValueForAttr (String colName) {
 		return attributeValues.get(colName);
 	}
 	
+	/**
+	 * Drops the attribute that is passed in as a string
+	 * @param key
+	 */
 	public void dropAttribute(String key) {
 		attributeValues.remove(key);
 	}
 	
+	/**
+	 * Removes all attributes except the ones specificied in the list that is passed in
+	 * @param colNames
+	 * @return
+	 */
 	public Tuple retainAttributes(List<String> colNames) {
 		attributeValues.keySet().retainAll(colNames);
 		Map<String, Integer> orderedAttributeValues = new LinkedHashMap<String, Integer>();
@@ -119,6 +165,10 @@ public class Tuple {
 		attributeValues = orderedAttributeValues;
 	}
 	
+	/**
+	 *
+	 * @param tableName
+	 */
 	public void updateTuple (String tableName) {
 		if (!isUpdated) {
 			this.tableName = tableName;
@@ -135,15 +185,31 @@ public class Tuple {
 		}
 	}
 	
+	/**
+	 * Returns the table name to which this tuple belongs
+	 * @return
+	 */
 	public String getTableName() {
 		return tableName;
 	}
 	
+	/**
+	 * Sets the table name for the tuple
+	 * @param tableName
+	 */
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
 	
+	/**
+	 * Gets the number of attributes in this tuple
+	 * @return
+	 */
 	public Integer getNumAttributes() {
 		return attributeValues.size();
+	}
+	
+	public List<Integer> getListAttributeValues() {
+		return (List<Integer>) attributeValues.values();
 	}
 }
