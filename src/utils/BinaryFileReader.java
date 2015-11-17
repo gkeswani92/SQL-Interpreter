@@ -67,6 +67,25 @@ public class BinaryFileReader implements TupleReader {
 		return new Tuple(tuple, attributes, tableName);
 	}
 	
+	public int[] getNextTupleValues() {
+		if(numTuples != null){
+			if(numTuples == 0) {
+				if (updateBufferWithNextPage() == 1) {
+					return null;
+				}
+			}
+		}
+		
+		int[] tuple = new int [numAttr];
+		
+ 		for (int i = 0; i < numAttr; i++) {
+			tuple[i] = tupleArr[tupleIndex];
+			tupleIndex++;
+		}
+		numTuples--;
+		return tuple;
+	}
+	
 	private Integer updateBufferWithNextPage() {
 		
 		try {	

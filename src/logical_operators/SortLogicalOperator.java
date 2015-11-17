@@ -40,6 +40,9 @@ public class SortLogicalOperator extends LogicalOperator {
 			return new InMemorySortOperator(this.child.getNextPhysicalOperator(), this.sortConditions,
 					this.tuples, this.currIndex);
 		} else {
+			if (child instanceof ProjectLogicalOperator){
+				return new ExternalSortOperator(this.sortConditions, this.child.getNextPhysicalOperator(), config.getSortBuffer(), ((ProjectLogicalOperator)child).getRequiredColumns());
+			}
 			return new ExternalSortOperator(this.sortConditions, this.child.getNextPhysicalOperator(), config.getSortBuffer());
 		}
 

@@ -19,11 +19,10 @@ public class Tuple {
 	private boolean isUpdated;
 	
 	public Tuple (int[] values, String[] attributes,String tableName) {
-		
+
 		for (int i = 0; i < attributes.length; i++) {
 			attributeValues.put(attributes[i], values[i]);
 		}
-
 		this.tableName = tableName;
 		this.isUpdated = false;
 	}

@@ -23,7 +23,28 @@ public class ExternalSortOperator extends SortOperator {
 	private String tableName, sortedFile;
 	private String[] attributes;
 	private BinaryFileReader sortedFileReader;
+	private List<String> projectedColumns;
 
+	public ExternalSortOperator(List<String> sortConditions, Operator child, Integer numBufferPages,
+			List<String> projectedColumns) {
+		super(sortConditions, child);
+		this.numBufferPages = numBufferPages;
+		this.sortConditions = new ArrayList<String>();
+		this.sortConditions.addAll(sortConditions);
+		this.projectedColumns	= new ArrayList<String>();
+		this.projectedColumns.addAll(projectedColumns);
+		
+		buffer 				= new ArrayList<Tuple>();
+		inputFilePaths 		= new ArrayList<String>(); //Keeps track of the files created in pass 0
+		outputFilePaths 	= new ArrayList<String>();
+		fanInBuffers 		= new ArrayList<BinaryFileReader>();
+		pass0RunCount 		= 0;
+		passCount			= 1;
+		pass0Done 			= false;
+		sortedFile 			= null;
+		sortedFileReader    = null;
+	}
+	
 	public ExternalSortOperator(List<String> sortConditions, Operator child, Integer numBufferPages) {
 		super(sortConditions, child);
 		this.numBufferPages = numBufferPages;
@@ -158,7 +179,8 @@ public class ExternalSortOperator extends SortOperator {
 			//Gets one tuple each from all of the file readers and maintain a list of
 			//indexes to be dropped if file reader hits null (no more tuples)
 			for(int i=0; i<fanInBuffers.size(); i++){
-				Tuple currentTuple = fanInBuffers.get(i).getNextTuple();
+				
+				Tuple currentTuple = getTupleForExternalSort(fanInBuffers.get(i));
 				
 				if(currentTuple == null) {
 					indexToBeDropped.add(i);
@@ -202,7 +224,7 @@ public class ExternalSortOperator extends SortOperator {
 				
 				//Gets the next tuple for the appropriate BFR. If next tuple is null,
 				//removes that entry from BFR and Merge Tuple List
-				Tuple newTuple = fanInBuffers.get(minTupleIndex).getNextTuple();
+				Tuple newTuple = getTupleForExternalSort(fanInBuffers.get(minTupleIndex));
 				
 				if(newTuple == null){
 					fanInBuffers.remove(minTupleIndex.intValue());
@@ -233,6 +255,31 @@ public class ExternalSortOperator extends SortOperator {
 		passCount++;
 		sortAndMerge();
 	}
+
+	/**
+	 * If the child is a projection, we just get the values from the file and create the 
+	 * tuple ourselves because the attribute list in the catalog wont match the current
+	 * attribute values
+	 * @param bfr
+	 * @return
+	 */
+	private Tuple getTupleForExternalSort(BinaryFileReader bfr) {
+		
+		Tuple currentTuple = null;
+		
+		if(projectedColumns == null) {
+			currentTuple = bfr.getNextTuple();
+		} else {
+			int[] tupleValues = bfr.getNextTupleValues();
+			
+			if(tupleValues != null) {
+				String[] columns = projectedColumns.toArray(new String[projectedColumns.size()]);
+				currentTuple = new Tuple(tupleValues, columns, tableName);
+			}
+		}
+		return currentTuple;
+	}
+	
 	
 	public void addToOutputBuffer(List<Tuple> outputBuffer, Tuple t, Integer fanInCount, 
 			BinaryFileWriter bfw){
@@ -304,7 +351,10 @@ public class ExternalSortOperator extends SortOperator {
 			sortedFileReader = getSortedFileReader(sortedFile);
 		}
 		
-		Tuple tableLessTuple = sortedFileReader.getNextTuple();
+		//If the child is a projection, we just get the values from the file and create the 
+		//tuple ourselves because the attribute list in the catalog wont match the current
+		//attribute values
+		Tuple tableLessTuple = getTupleForExternalSort(sortedFileReader);
 		
 		if (tableLessTuple != null) {
 			tableLessTuple.setTableName(tableName);

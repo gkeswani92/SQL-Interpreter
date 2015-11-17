@@ -13,6 +13,10 @@ public class ProjectLogicalOperator extends LogicalOperator {
 	private LogicalOperator child;
 	private List<String> requiredColumns; 
 	
+	public List<String> getRequiredColumns() {
+		return requiredColumns;
+	}
+
 	public ProjectLogicalOperator(PlainSelect body, LogicalOperator child) {
 		this.child = child;
 		this.requiredColumns = new ArrayList<String>();

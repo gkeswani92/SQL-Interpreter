@@ -20,17 +20,6 @@ public class ProjectOperator extends Operator {
 		this.requiredColumns = requiredColumns;
 	}
 	
-//	public ProjectOperator(PlainSelect body, Operator child) {
-//		this.child = child;
-//		this.requiredColumns = new ArrayList<String>();
-//		@SuppressWarnings("unchecked")
-//		List<SelectExpressionItem> selectColumns = body.getSelectItems();
-//		
-//		//Converting each select item to string
-//		for(Object c: selectColumns) 
-//			requiredColumns.add(c.toString());
-//	}
-	
 	/**
 	 * Gets the next tuple using the scan operator and keeps only the columns
 	 * that were present in the query
