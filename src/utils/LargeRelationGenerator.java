@@ -41,12 +41,17 @@ public class LargeRelationGenerator {
 			for (int j=0; j<this.cols; j++) {
 				tupleStr = tupleStr + highs[j] + ",";
 			}
+			Tuple maxTup = new Tuple(tupleStr, this.tableName);
+			writer.writeNextTuple(maxTup);
 			
 			// Tuple with all minimums to ensure at least 1 tuple has the maximum
 			tupleStr = "";
 			for (int j=0; j<this.cols; j++) {
 				tupleStr = tupleStr + lows[j] + ",";
 			}
+			
+			Tuple minTup = new Tuple(tupleStr, this.tableName);
+			writer.writeNextTuple(minTup);
 			
 			for(int i=0; i<this.rows-2; i++){
 				tupleStr = "";
