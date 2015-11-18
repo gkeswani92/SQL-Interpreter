@@ -49,9 +49,10 @@ public class LargeRelationGenerator {
 			Tuple minTup = new Tuple(tupleStr, this.tableName);
 			writer.writeNextTuple(minTup);
 			
-			for(int i=0; i<this.rows-2; i++){
+			// Use max and min of each attribute in table and generate (rows-2) rows of random tuples.
+			for (int i=0; i<this.rows-2; i++){
 				tupleStr = "";
-				for(int j=0; j<this.cols; j++){
+				for (int j=0; j<this.cols; j++){
 					tupleStr = tupleStr  + (randomGenerator.nextInt((highs[j]+1)- lows[j]) + lows[j]) + ",";
 				}
 				Tuple tuple = new Tuple(tupleStr, this.tableName);
@@ -78,6 +79,7 @@ public class LargeRelationGenerator {
 			int index = 0;
 			int[] highs = new int[parts.length-2], lows = new int[parts.length-2];
 			
+			// Maintain the max and min values for each attribute in the table
 			for (int i = 2; i < parts.length; i++) {
 				String[] attrParts = parts[i].split(",");
 				lows[index] = Integer.parseInt(attrParts[1]);
