@@ -161,6 +161,22 @@ public class Tuple {
 		return attributeValues;
 	}
 	
+	/**
+	 * Returns an array of the values of the tuple
+	 * @return
+	 */
+	public Integer[] getArrayAttributeValues() {
+		
+		Integer[] values = new Integer[attributeValues.size()];
+		Integer index = 0;
+		
+		for(String attr: attributeValues.keySet()) {
+			values[index++] = attributeValues.get(attr);
+		}
+		
+		return values;
+	}
+	
 	public void setAttributeValues(Map<String, Integer> orderedAttributeValues) {
 		attributeValues = orderedAttributeValues;
 	}
@@ -207,9 +223,5 @@ public class Tuple {
 	 */
 	public Integer getNumAttributes() {
 		return attributeValues.size();
-	}
-	
-	public List<Integer> getListAttributeValues() {
-		return (List<Integer>) attributeValues.values();
 	}
 }

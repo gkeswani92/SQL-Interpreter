@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
+import statistics.TableStatistics;
 
 /**
  * Singleton class to initialize the table details for access by all instances
@@ -21,6 +24,7 @@ public class DatabaseCatalog {
 	private Map<String, String[]> tableFileCatalag = new HashMap<String, String[]>();
 	private Map<String, String[]> tableSchemaCatalag = new HashMap<String, String[]>();
 	private Map<String, String> aliasToTableNameMap = new HashMap<String, String>();
+	private Map<String, TableStatistics> stats = new HashMap<String, TableStatistics>();
 	
 	private final String ATTR_DELIM = " ";
 	private static DatabaseCatalog instance;
@@ -120,5 +124,13 @@ public class DatabaseCatalog {
 	
 	public String getTableForAlias(String alias) {
 		return aliasToTableNameMap.get(alias);
+	}
+	
+	public Set<String> getTableNames(){
+		return tableSchemaCatalag.keySet();
+	}
+	
+	public void setStatistics(Map<String, TableStatistics> stats) {
+		this.stats = stats;
 	}
 }

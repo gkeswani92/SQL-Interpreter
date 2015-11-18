@@ -23,8 +23,7 @@ public class BinaryFileReader implements TupleReader {
 	private int tupleIndex;
 	private String[] attributes;
 	private String tableName;
-	
-	private Integer tupleId, pageId;
+	private Integer tupleId, pageId, totalTuples;
 	
 	public BinaryFileReader(String tableName) throws FileNotFoundException {
 		attributes = DatabaseCatalog.getInstance().getTableAttributes(tableName);
@@ -36,6 +35,7 @@ public class BinaryFileReader implements TupleReader {
 		this.tableName = tableName;
 		this.pageId = 0;
 		this.tupleId = 0;
+		totalTuples = 0;
 	}
 	
 	public BinaryFileReader(String fileName, String tableName) throws FileNotFoundException {	
@@ -174,10 +174,15 @@ public class BinaryFileReader implements TupleReader {
 		Tuple t = getNextTuple();
 		
 		while (t != null) {
+			totalTuples++;
 			allTuples.add(t);
 			t = getNextTuple();
 		}
 		
 		return allTuples;
+	}
+	
+	public Integer getNumberOfTuples(){
+		return totalTuples;
 	}
 }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import expression_visitors.WhereBuilder;
 import indexing.BuildIndex;
@@ -16,17 +17,21 @@ import logical_operators.ProjectLogicalOperator;
 import logical_operators.ScanLogicalOperator;
 import logical_operators.SelectLogicalOperator;
 import logical_operators.SortLogicalOperator;
-import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.*;
+import net.sf.jsqlparser.statement.select.Join;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import operators.Operator;
-import utils.PlanBuilderConfigFileReader;
+import statistics.GatherStatistics;
 import utils.DatabaseCatalog;
 import utils.DirectoryCleanUp;
 import utils.DumpRelations;
 import utils.IndexConfigFileReader;
+import utils.PlanBuilderConfigFileReader;
 
 /**
  * Class for getting started with JSQLParser. Reads SQL statements from
@@ -65,6 +70,10 @@ public class Interpreter {
 			PlanBuilderConfigFileReader.getInstance().setTempDir(tempMergeOutput);
 			IndexConfigFileReader.getInstance().readConfigFile(inputSrcDir);
 			writeToFile = new DumpRelations(outputScrDir);
+			
+			//Gathering statistics about the given relations
+			Set<String> tableNames = DatabaseCatalog.getInstance().getTableNames();
+			GatherStatistics.gatherStatistics(tableNames);
 		}
 		
 		if(buildIndex == 1)
