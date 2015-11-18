@@ -1,23 +1,28 @@
 package utils;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Random;
 
 public class LargeRelationGenerator {
-	private Integer rows;
-	private Integer cols;
+	private Integer rows, cols;
 	private String tableName;
 	private String tablePath;
-	private String inputSrc = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/input";
-
-	public LargeRelationGenerator(String file, Integer rows, Integer cols) {
+	private String inputSrc = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input";
+	private static String statsFile = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input/db/stats.txt";
+	private int[] highs, lows;
+	
+	public LargeRelationGenerator(String file, Integer rows, Integer cols, int[] highs, int[] lows) {
 		this.tableName = file;
 		this.tablePath = inputSrc + "/db/data/" + file;
 		this.rows = rows;
-		this.cols = cols;		
+		this.cols = cols;	
+		this.highs = highs;
+		this.lows = lows;
 		DatabaseCatalog.getInstance().buildDbCatalog(inputSrc);
 	}
-
+	
 	public void generateLargeRelation(){
 		
 		Random randomGenerator;
@@ -30,7 +35,7 @@ public class LargeRelationGenerator {
 			for(int i=0; i<this.rows; i++){
 				String tupleStr = "";
 				for(int j=0; j<this.cols; j++){
-					tupleStr = tupleStr  + randomGenerator.nextInt(1000)+",";
+					tupleStr = tupleStr  + (randomGenerator.nextInt((highs[j]+1)- lows[j]) + lows[j]) + ",";
 				}
 				Tuple tuple = new Tuple(tupleStr, this.tableName);
 				writer.writeNextTuple(tuple);
@@ -44,13 +49,29 @@ public class LargeRelationGenerator {
 		
 	}
 	
-	public static void main(String args[]){
-		LargeRelationGenerator sailors = new LargeRelationGenerator("Sailors", 5000, 3);
-		LargeRelationGenerator boats = new LargeRelationGenerator("Boats", 15000, 3);
-		LargeRelationGenerator reserves = new LargeRelationGenerator("Reserves", 5000, 2);
-		sailors.generateLargeRelation();
-		boats.generateLargeRelation();
-		reserves.generateLargeRelation();
+	public static void main(String args[]) throws Exception{
+		
+		FileReader reader = new FileReader(statsFile);
+		BufferedReader file = new BufferedReader(reader);
+		
+		// Read each line of the file and translate into indexes
+		String line = file.readLine();
+		while (line != null && !line.isEmpty()) {
+			String[] parts = line.split(" ");
+			int index = 0;
+			int[] highs = new int[parts.length-2], lows = new int[parts.length-2];
+			
+			for (int i = 2; i < parts.length; i++) {
+				String[] attrParts = parts[i].split(",");
+				lows[index] = Integer.parseInt(attrParts[1]);
+				highs[index] = Integer.parseInt(attrParts[2]);
+				index++;
+			}
+			
+			LargeRelationGenerator relation = new LargeRelationGenerator(parts[0], Integer.parseInt(parts[1]), (parts.length-2), highs, lows);
+			relation.generateLargeRelation();
+			line = file.readLine();
+		}
 	}
 	
 }
