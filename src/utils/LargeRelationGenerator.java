@@ -33,11 +33,23 @@ public class LargeRelationGenerator {
 		BinaryFileWriter writer;
 		
 		try {
-			 writer = new BinaryFileWriter(this.tablePath);
-			 randomGenerator = new Random();
-		
-			for(int i=0; i<this.rows; i++){
-				String tupleStr = "";
+			writer = new BinaryFileWriter(this.tablePath);
+			randomGenerator = new Random();
+			
+			// Tuple with all maximums to ensure at least 1 tuple has the maximum
+			String tupleStr = "";
+			for (int j=0; j<this.cols; j++) {
+				tupleStr = tupleStr + highs[j] + ",";
+			}
+			
+			// Tuple with all minimums to ensure at least 1 tuple has the maximum
+			tupleStr = "";
+			for (int j=0; j<this.cols; j++) {
+				tupleStr = tupleStr + lows[j] + ",";
+			}
+			
+			for(int i=0; i<this.rows-2; i++){
+				tupleStr = "";
 				for(int j=0; j<this.cols; j++){
 					tupleStr = tupleStr  + (randomGenerator.nextInt((highs[j]+1)- lows[j]) + lows[j]) + ",";
 				}
