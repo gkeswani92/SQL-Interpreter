@@ -3,7 +3,9 @@ package utils;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import indexing.Index;
 
@@ -15,11 +17,11 @@ public class IndexConfigFileReader {
 	
 	private FileReader configFileReaderObj;
 	private BufferedReader file;
-	private LinkedHashMap<String, Index> indexes;
+	private LinkedHashMap<String, List<Index>> indexes;
 	private static IndexConfigFileReader instance;
 	
 	public IndexConfigFileReader() {
-		indexes = new LinkedHashMap<String, Index>();
+		indexes = new LinkedHashMap<String, List<Index>>();
 	}
 	
 	public static synchronized IndexConfigFileReader getInstance() {
@@ -38,7 +40,13 @@ public class IndexConfigFileReader {
 			String line = file.readLine();
 			while (line != null && !line.isEmpty()) {
 				String[] parts = line.split(" ");	
-				indexes.put(parts[0], new Index(parts[0], parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3])));
+				if (indexes.containsKey(parts[0])) {
+					indexes.get(parts[0]).add(new Index(parts[0], parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3])));
+				} else {
+					List<Index> indxs = new ArrayList<Index>();
+					indxs.add(new Index(parts[0], parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3])));
+					indexes.put(parts[0], indxs);
+				}
 				line = file.readLine();
 			}
 
@@ -48,11 +56,7 @@ public class IndexConfigFileReader {
 
 	}
 	
-	public Index getIndexByTableName(String tableName) {
+	public List<Index> getIndexesByTableName(String tableName) {
 		return indexes.get(tableName);
-	}
-	
-	public LinkedHashMap<String, Index> getAllIndexes() {
-		return indexes;
 	}
 }
