@@ -35,7 +35,7 @@ public class UnionFindElement {
 	 * @param attr
 	 * @return
 	 */
-	public boolean attributeInElement(String attr){
+	public boolean attributeInElement(Column attr){
 		return attributes.contains(attr);
 	}
 	
@@ -48,6 +48,7 @@ public class UnionFindElement {
 	public List<Column> findAllAttributesForRelation(String relation){
 		
 		List<Column> matchingAttributes = new ArrayList<Column>();
+		
 		for(Column attribute: attributes){
 			if(attribute.getTable().toString().equals(relation)){
 				matchingAttributes.add(attribute);

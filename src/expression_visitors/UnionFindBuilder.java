@@ -63,7 +63,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 		
 		//If the left half of the expression is a column
 		if(arg0.getLeftExpression() instanceof Column){
-			String left = ((Column) arg0.getLeftExpression()).getTable().toString() + "." + ((Column) arg0.getLeftExpression()).getColumnName();
+			Column left = (Column) arg0.getLeftExpression();
 			UnionFindElement leftElement = unionFind.find(left);
 			
 			//If a union find element does not exist, create one for the left column
@@ -71,7 +71,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 				leftElement = unionFind.create(left);
 			
 			if(arg0.getRightExpression() instanceof Column){
-				String right = ((Column) arg0.getRightExpression()).getTable().toString() + "." + ((Column) arg0.getRightExpression()).getColumnName();
+				Column right = ((Column) arg0.getRightExpression());
 				UnionFindElement rightElement = unionFind.find(right);
 				
 				//If right element does not exist, add it to the left element
@@ -89,7 +89,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 		
 		else {
 			Long value = ((LongValue)arg0.getLeftExpression()).toLong();
-			String right = ((Column) arg0.getRightExpression()).getTable().toString() + "." + ((Column) arg0.getRightExpression()).getColumnName();
+			Column right = ((Column) arg0.getRightExpression());
 			UnionFindElement rightElement = unionFind.find(right);
 			
 			//If a union find element does not exist, create one for the right column
@@ -104,7 +104,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 	public void visit(GreaterThan arg0) {
 		//If the left half of the expression is a column
 		if(arg0.getLeftExpression() instanceof Column){
-			String left = ((Column) arg0.getLeftExpression()).getTable().toString() + "." + ((Column) arg0.getLeftExpression()).getColumnName();
+			Column left = (Column) arg0.getLeftExpression();
 			UnionFindElement leftElement = unionFind.find(left);
 			
 			//If a union find element does not exist, create one for the left column
@@ -121,7 +121,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 		
 		else {
 			Long value = ((LongValue)arg0.getLeftExpression()).toLong();
-			String right = ((Column) arg0.getRightExpression()).getTable().toString() + "." + ((Column) arg0.getRightExpression()).getColumnName();
+			Column right = ((Column) arg0.getRightExpression());
 			UnionFindElement rightElement = unionFind.find(right);
 			
 			//If a union find element does not exist, create one for the right column
@@ -136,7 +136,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 	public void visit(GreaterThanEquals arg0) {
 		//If the left half of the expression is a column
 		if(arg0.getLeftExpression() instanceof Column){
-			String left = ((Column) arg0.getLeftExpression()).getTable().toString() + "." + ((Column) arg0.getLeftExpression()).getColumnName();
+			Column left = (Column) arg0.getLeftExpression();
 			UnionFindElement leftElement = unionFind.find(left);
 			
 			//If a union find element does not exist, create one for the left column
@@ -153,7 +153,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 		
 		else {
 			Long value = ((LongValue)arg0.getLeftExpression()).toLong();
-			String right = ((Column) arg0.getRightExpression()).getTable().toString() + "." + ((Column) arg0.getRightExpression()).getColumnName();
+			Column right = ((Column) arg0.getRightExpression());
 			UnionFindElement rightElement = unionFind.find(right);
 			
 			//If a union find element does not exist, create one for the right column
@@ -168,7 +168,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 	public void visit(MinorThan arg0) {
 		//If the left half of the expression is a column
 		if(arg0.getLeftExpression() instanceof Column){
-			String left = ((Column) arg0.getLeftExpression()).getTable().toString() + "." + ((Column) arg0.getLeftExpression()).getColumnName();
+			Column left = (Column) arg0.getLeftExpression();
 			UnionFindElement leftElement = unionFind.find(left);
 			
 			//If a union find element does not exist, create one for the left column
@@ -185,7 +185,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 		
 		else {
 			Long value = ((LongValue)arg0.getLeftExpression()).toLong();
-			String right = ((Column) arg0.getRightExpression()).getTable().toString() + "." + ((Column) arg0.getRightExpression()).getColumnName();
+			Column right = ((Column) arg0.getRightExpression());
 			UnionFindElement rightElement = unionFind.find(right);
 			
 			//If a union find element does not exist, create one for the right column
@@ -200,7 +200,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 	public void visit(MinorThanEquals arg0) {
 		//If the left half of the expression is a column
 		if(arg0.getLeftExpression() instanceof Column){
-			String left = ((Column) arg0.getLeftExpression()).getTable().toString() + "." + ((Column) arg0.getLeftExpression()).getColumnName();
+			Column left = (Column) arg0.getLeftExpression();
 			UnionFindElement leftElement = unionFind.find(left);
 			
 			//If a union find element does not exist, create one for the left column
@@ -217,7 +217,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 		
 		else {
 			Long value = ((LongValue)arg0.getLeftExpression()).toLong();
-			String right = ((Column) arg0.getRightExpression()).getTable().toString() + "." + ((Column) arg0.getRightExpression()).getColumnName();
+			Column right = ((Column) arg0.getRightExpression());
 			UnionFindElement rightElement = unionFind.find(right);
 			
 			//If a union find element does not exist, create one for the right column

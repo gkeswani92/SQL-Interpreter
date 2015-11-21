@@ -37,7 +37,7 @@ public class UnionFind {
 	 * @param attr
 	 * @return
 	 */
-	public UnionFindElement find(String attr){
+	public UnionFindElement find(Column attr){
 		for(UnionFindElement element: elements){
 			if(element.attributeInElement(attr)){
 				return element;
@@ -50,7 +50,7 @@ public class UnionFind {
 	 * Creates a new union find element
 	 * @param attr
 	 */
-	public UnionFindElement create(String attr){
+	public UnionFindElement create(Column attr){
 		UnionFindElement newElement = new UnionFindElement(attr);
 		elements.add(newElement);
 		return newElement;
@@ -122,7 +122,7 @@ public class UnionFind {
 	}
 	
 	private Expression getExpressionForUnionFindElement(UnionFindElement ufe, String tableName) {
-		List<String> attributes = ufe.findAllAttributesForRelation(tableName);
+		List<Column> attributes = ufe.findAllAttributesForRelation(tableName);
 		Expression finalExp = null;
 		if (ufe.getEqualityConstraint() != null) {
 			finalExp = new EqualsTo(new Column(), new LongValue(getEqualityConstraint()));
