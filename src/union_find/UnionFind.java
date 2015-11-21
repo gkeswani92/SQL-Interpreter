@@ -5,7 +5,10 @@ import java.util.List;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.schema.Column;
 
 public class UnionFind {
@@ -121,17 +124,98 @@ public class UnionFind {
 		}
 	}
 	
+	/**
+	 * Returns a conjugated expression(AND expression) for all attributes from a single table (with name tableName)
+	 * @param ufe
+	 * @param tableName
+	 * @return
+	 */
 	private Expression getExpressionForUnionFindElement(UnionFindElement ufe, String tableName) {
 		List<Column> attributes = ufe.findAllAttributesForRelation(tableName);
 		Expression finalExp = null;
-		if (ufe.getEqualityConstraint() != null) {
-			finalExp = new EqualsTo(new Column(), new LongValue(getEqualityConstraint()));
+
+		// If all bounds are null, the create equalsTo expressions for all pairs of attributes from the same table
+		if (ufe.getEqualityConstraint() == null && ufe.getLowerBound() == null && ufe.getUpperBound() == null) {
+			Column left = attributes.get(0);
+			finalExp = new EqualsTo(left, attributes.get(1));
+			if (attributes.size() == 2) {
+				return finalExp;
+			}
+			
+			for (int i = 2; i < attributes.size(); i++) {
+				finalExp = new AndExpression(finalExp, new EqualsTo(left, attributes.get(i)));
+			}
+			
+			return finalExp;
 		}
+		
+		// Comes here only if atleast 1 bound is non-null
+		if (ufe.getEqualityConstraint() != null) {
+			finalExp = new EqualsTo(attributes.get(0), new LongValue(ufe.getEqualityConstraint()));
+			if (attributes.size() == 1) {
+				return finalExp;
+			} else {
+				// If multiple attributes of same relation in the union find.
+				// Use AND to conjugate all the equals to expressions
+				for (int i = 1; i < attributes.size(); i++) {
+					finalExp = new AndExpression(finalExp, new EqualsTo(attributes.get(i), new LongValue(ufe.getEqualityConstraint())));
+				}
+			}
+		} else {
+			// If union find has a lower bound
+			if (ufe.getLowerBound() != null) {
+				finalExp = new GreaterThanEquals(attributes.get(0), new LongValue(ufe.getLowerBound()));
+				
+				if (attributes.size() > 1) {
+					for(int i = 1; i < attributes.size(); i++) {
+						finalExp = new AndExpression(finalExp, new GreaterThanEquals(attributes.get(i), new LongValue(ufe.getLowerBound())));
+					}
+				}
+			}
+			
+			// If union find has an upper bound
+			if (ufe.getUpperBound() != null) {
+				// Only comes here if union find had neither a lower bound or an equality constraint
+				if (finalExp == null) {
+					finalExp = new MinorThanEquals(attributes.get(0), new LongValue(ufe.getUpperBound()));
+				} else {
+					// If union find had a lower bound, add upper bound expression of 1st attribute in the list to the existing lower bound expressions 
+					// using an AND expression.
+					finalExp = new AndExpression(finalExp, new MinorThanEquals(attributes.get(0), new LongValue(ufe.getUpperBound())));
+				}
+				
+				if (attributes.size() == 1) {
+					return finalExp;
+				}
+				
+				// Add remaining attributes to the expression
+				for (int i = 1; i < attributes.size(); i++) {
+					finalExp = new AndExpression(finalExp, new MinorThanEquals(attributes.get(i), new LongValue(ufe.getUpperBound())));
+				}	
+			}
+		}	
+
+		return finalExp;
 	}
 	
+	/**
+	 * Get conjugated expression (AND expression) for all union finds that have attributes from tableName passed as argument
+	 * @param ufes union finds with attributes from tableName
+	 * @param tableName
+	 * @return
+	 */
 	private Expression getExpressionForUnionFindElements(List<UnionFindElement> ufes, String tableName) {
 		
-		for ()
-		return null;
+		Expression exp = getExpressionForUnionFindElement(ufes.get(0), tableName);
+		
+		if (ufes.size() == 1) {
+			return exp;
+		}
+		
+		for (int i = 1; i < ufes.size(); i++) {
+			exp = new AndExpression(exp, getExpressionForUnionFindElement(ufes.get(i), tableName));
+		}
+		
+		return exp;
 	}
 }
