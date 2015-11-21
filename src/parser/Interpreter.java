@@ -248,26 +248,40 @@ public class Interpreter {
 		
 		for(String tableName: allChildren){
 			List<UnionFindElement> union_find = unionFind.findElementsForRelation(tableName);
+			Expression unsuableExp = getUnusableConditionsForRelation(tableName, unusableSelectConditions);
 			
 		}
 		return null;
 	}
 	
-	private Expression getUnusableConditionsForRelation(String tableName, List<Expression> unusableConditions) {
+	private static Expression getUnusableConditionsForRelation(String tableName, List<Expression> unusableSelectConditions) {
 		
 		List<Expression> conditions = new ArrayList<Expression>();
-		for(Expression currentExp: unusableConditions){
+		
+		for(Expression currentExp: unusableSelectConditions){
 			BinaryExpression currentExpression = ((BinaryExpression)currentExp);
 			
-			//Left is a column and right is not 
+			//Left is a column
 			if(currentExpression.getLeftExpression() instanceof Column){
-				if(!(currentExpression.getRightExpression() instanceof Column)){
-					if(currentExpression.getLeftExpression())
-			}
-				
+				if(currentExpression.getLeftExpression().toString().split(".")[0].equals(tableName)){
+					conditions.add(currentExp);
+				}
+			} else {
+				if(currentExpression.getRightExpression().toString().split(".")[0].equals(tableName)){
+					conditions.add(currentExp);
+				}
 			}
 		}
-		return null;
+		
+		//Creating a conjunction of all the unusable conditions
+		if(conditions.size() == 1)
+			return conditions.get(0);
+		
+		Expression finalExpression = conditions.get(0);
+		for(int i=1; i<conditions.size(); i++){
+			finalExpression = new AndExpression(finalExpression, conditions.get(i));
+		}
+		return finalExpression;
 	}
 	
 	private static void getChildrenFromQuery(PlainSelect body, List<String> allChildren) {

@@ -3,6 +3,11 @@ package union_find;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.schema.Column;
+
 public class UnionFind {
 	
 	private List<UnionFindElement> elements;
@@ -114,5 +119,19 @@ public class UnionFind {
 		} else {
 			mergedElement.setEqualityConstraint(element1.getEqualityConstraint());
 		}
+	}
+	
+	private Expression getExpressionForUnionFindElement(UnionFindElement ufe, String tableName) {
+		List<String> attributes = ufe.findAllAttributesForRelation(tableName);
+		Expression finalExp = null;
+		if (ufe.getEqualityConstraint() != null) {
+			finalExp = new EqualsTo(new Column(), new LongValue(getEqualityConstraint()));
+		}
+	}
+	
+	private Expression getExpressionForUnionFindElements(List<UnionFindElement> ufes, String tableName) {
+		
+		for ()
+		return null;
 	}
 }
