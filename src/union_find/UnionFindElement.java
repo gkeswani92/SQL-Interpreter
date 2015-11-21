@@ -36,7 +36,14 @@ public class UnionFindElement {
 	 * @return
 	 */
 	public boolean attributeInElement(Column attr){
-		return attributes.contains(attr);
+		for(Column attribute: attributes){
+			String attrTable = attr.getTable().toString() + "." + attr.getColumnName().toString();
+			String currentAttributeTable = attribute.getTable().toString() + "." + attribute.getColumnName().toString();
+			if(attrTable.equals(currentAttributeTable)){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**

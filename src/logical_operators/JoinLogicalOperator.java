@@ -20,7 +20,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 		this.joinConditions = new ArrayList<Expression>();
 		this.joinConditions.addAll(joinConditions);
 	}
-
+	
 	@Override
 	public Operator getNextPhysicalOperator() {
 		return null;

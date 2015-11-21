@@ -1,8 +1,6 @@
 package expression_visitors;
 
 import java.util.List;
-import java.util.Map;
-
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
@@ -238,6 +236,12 @@ public class UnionFindBuilder implements ExpressionVisitor {
 	}
 	
 	@Override
+	public void visit(AndExpression arg0) {
+		arg0.getLeftExpression().accept(this);
+		arg0.getRightExpression().accept(this);
+	}
+	
+	@Override
 	public void visit(LongValue arg0) {
 	}
 	
@@ -249,11 +253,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 	}
 
 	
-	@Override
-	public void visit(AndExpression arg0) {
-		arg0.getLeftExpression().accept(this);
-		arg0.getRightExpression().accept(this);
-	}
+
 	
 	@Override
 	public void visit(NullValue arg0) {

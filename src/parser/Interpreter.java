@@ -2,7 +2,7 @@ package parser;
 
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,6 +11,7 @@ import java.util.Set;
 import expression_visitors.UnionFindBuilder;
 import indexing.BuildIndex;
 import logical_operators.DuplicateEliminationLogicalOperator;
+import logical_operators.JoinLogicalOperator;
 import logical_operators.LogicalOperator;
 import logical_operators.ProjectLogicalOperator;
 import logical_operators.ScanLogicalOperator;
@@ -27,6 +28,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import operators.Operator;
+import operators.ScanOperator;
 import statistics.GatherStatistics;
 import union_find.UnionFind;
 import union_find.UnionFindElement;
@@ -246,12 +248,35 @@ public class Interpreter {
 			body.getWhere().accept(ufb);
 		}
 		
+		Map<String, LogicalOperator> children = new LinkedHashMap<String, LogicalOperator>();
+		
 		for(String tableName: allChildren){
-			List<UnionFindElement> union_find = unionFind.findElementsForRelation(tableName);
-			Expression unsuableExp = getUnusableConditionsForRelation(tableName, unusableSelectConditions);
+			List<UnionFindElement> unionFindElements = unionFind.findElementsForRelation(tableName);
+			Expression unsuableSelectionConditions = getUnusableConditionsForRelation(tableName, unusableSelectConditions);
+			Expression unionFindConditions= unionFind.getExpressionForUnionFindElements(unionFindElements, tableName);
+			Expression finalExpressionRelation = null;
+			
+			if(unionFindConditions != null) {
+				if(unsuableSelectionConditions != null) {
+					finalExpressionRelation = new AndExpression(unionFindConditions, unsuableSelectionConditions);
+				} else {
+					finalExpressionRelation = unionFindConditions;
+				}
+			} else {
+				if(unsuableSelectionConditions != null) {
+					finalExpressionRelation = unsuableSelectionConditions;
+				}
+			}
+			
+			
+			if(finalExpressionRelation == null){
+				children.put(tableName, new ScanLogicalOperator(tableName));
+			} else {
+				children.put(tableName, new SelectLogicalOperator(finalExpressionRelation, new ScanLogicalOperator(tableName)));
+			}
 			
 		}
-		return null;
+		return new JoinLogicalOperator(unusableJoinConditions, children);
 	}
 	
 	private static Expression getUnusableConditionsForRelation(String tableName, List<Expression> unusableSelectConditions) {
@@ -263,19 +288,22 @@ public class Interpreter {
 			
 			//Left is a column
 			if(currentExpression.getLeftExpression() instanceof Column){
-				if(currentExpression.getLeftExpression().toString().split(".")[0].equals(tableName)){
+				if(((Column)currentExpression.getLeftExpression()).getTable().toString().equals(tableName)){
 					conditions.add(currentExp);
 				}
 			} else {
-				if(currentExpression.getRightExpression().toString().split(".")[0].equals(tableName)){
+				if(((Column)currentExpression.getRightExpression()).getTable().toString().equals(tableName)){
 					conditions.add(currentExp);
 				}
 			}
 		}
 		
 		//Creating a conjunction of all the unusable conditions
-		if(conditions.size() == 1)
+		if (conditions.size() == 0){
+			return null;
+		} else if (conditions.size() == 1) {
 			return conditions.get(0);
+		}
 		
 		Expression finalExpression = conditions.get(0);
 		for(int i=1; i<conditions.size(); i++){

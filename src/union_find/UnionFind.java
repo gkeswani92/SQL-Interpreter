@@ -28,7 +28,7 @@ public class UnionFind {
 	public List<UnionFindElement> findElementsForRelation(String tableName) {
 		List<UnionFindElement> returnList = new ArrayList<UnionFindElement>();
 		for(UnionFindElement el: elements) {
-			if (el.findAllAttributesForRelation(tableName) != null) {
+			if (el.findAllAttributesForRelation(tableName) != null && el.findAllAttributesForRelation(tableName).size() > 0) {
 				returnList.add(el);
 			}
 		}
@@ -136,14 +136,16 @@ public class UnionFind {
 
 		// If all bounds are null, the create equalsTo expressions for all pairs of attributes from the same table
 		if (ufe.getEqualityConstraint() == null && ufe.getLowerBound() == null && ufe.getUpperBound() == null) {
-			Column left = attributes.get(0);
-			finalExp = new EqualsTo(left, attributes.get(1));
-			if (attributes.size() == 2) {
-				return finalExp;
-			}
-			
-			for (int i = 2; i < attributes.size(); i++) {
-				finalExp = new AndExpression(finalExp, new EqualsTo(left, attributes.get(i)));
+			if (attributes.size() > 1) {
+				Column left = attributes.get(0);
+				finalExp = new EqualsTo(left, attributes.get(1));
+				if (attributes.size() == 2) {
+					return finalExp;
+				}
+				
+				for (int i = 2; i < attributes.size(); i++) {
+					finalExp = new AndExpression(finalExp, new EqualsTo(left, attributes.get(i)));
+				}
 			}
 			
 			return finalExp;
@@ -204,7 +206,11 @@ public class UnionFind {
 	 * @param tableName
 	 * @return
 	 */
-	private Expression getExpressionForUnionFindElements(List<UnionFindElement> ufes, String tableName) {
+	public Expression getExpressionForUnionFindElements(List<UnionFindElement> ufes, String tableName) {
+		
+		if (ufes.size() == 0){
+			return null;
+		}
 		
 		Expression exp = getExpressionForUnionFindElement(ufes.get(0), tableName);
 		
@@ -213,7 +219,10 @@ public class UnionFind {
 		}
 		
 		for (int i = 1; i < ufes.size(); i++) {
-			exp = new AndExpression(exp, getExpressionForUnionFindElement(ufes.get(i), tableName));
+			Expression rightExpression = getExpressionForUnionFindElement(ufes.get(i), tableName);
+			if (rightExpression != null) {
+				exp = new AndExpression(exp, rightExpression);
+			}
 		}
 		
 		return exp;
