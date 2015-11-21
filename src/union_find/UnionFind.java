@@ -12,6 +12,22 @@ public class UnionFind {
 	}
 	
 	/**
+	 * Returns the list of union find elements that contain an attribute of
+	 * the passed in relation
+	 * @param tableName
+	 * @return
+	 */
+	public List<UnionFindElement> findElementsForRelation(String tableName) {
+		List<UnionFindElement> returnList = new ArrayList<UnionFindElement>();
+		for(UnionFindElement el: elements) {
+			if (el.findAllAttributesForRelation(tableName) != null) {
+				returnList.add(el);
+			}
+		}
+		return returnList;
+	}
+	
+	/**
 	 * Finds the union find element that the passed in attribute belongs to
 	 * @param attr
 	 * @return

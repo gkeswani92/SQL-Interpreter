@@ -1,6 +1,7 @@
 package expression_visitors;
 
 import java.util.List;
+import java.util.Map;
 
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
@@ -49,11 +50,12 @@ import union_find.UnionFindElement;
 public class UnionFindBuilder implements ExpressionVisitor {
 
 	UnionFind unionFind;
-	List<Expression> unusableConditions;
+	List<Expression> unusableJoinConditions, unusableSelectConditions;
 	
-	public UnionFindBuilder(UnionFind unionFind, List<Expression> unusable){
+	public UnionFindBuilder(UnionFind unionFind, List<Expression> unusableJoin, List<Expression> unusableSelect) {
 		this.unionFind = unionFind;
-		this.unusableConditions = unusable;
+		this.unusableJoinConditions = unusableJoin;
+		this.unusableSelectConditions = unusableSelect;
 	}
 	
 	@Override	
@@ -110,7 +112,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 				leftElement = unionFind.create(left);
 			
 			if(arg0.getRightExpression() instanceof Column){
-				unusableConditions.add(arg0);
+				unusableJoinConditions.add(arg0);
 			} else {
 				Long value = ((LongValue)arg0.getRightExpression()).toLong();
 				leftElement.setLowerBound(value -1);
@@ -142,7 +144,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 				leftElement = unionFind.create(left);
 			
 			if(arg0.getRightExpression() instanceof Column){
-				unusableConditions.add(arg0);
+				unusableJoinConditions.add(arg0);
 			} else {
 				Long value = ((LongValue)arg0.getRightExpression()).toLong();
 				leftElement.setLowerBound(value);
@@ -174,7 +176,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 				leftElement = unionFind.create(left);
 			
 			if(arg0.getRightExpression() instanceof Column){
-				unusableConditions.add(arg0);
+				unusableJoinConditions.add(arg0);
 			} else {
 				Long value = ((LongValue)arg0.getRightExpression()).toLong();
 				leftElement.setUpperBound(value-1);
@@ -206,7 +208,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 				leftElement = unionFind.create(left);
 			
 			if(arg0.getRightExpression() instanceof Column){
-				unusableConditions.add(arg0);
+				unusableJoinConditions.add(arg0);
 			} else {
 				Long value = ((LongValue)arg0.getRightExpression()).toLong();
 				leftElement.setUpperBound(value);
@@ -228,7 +230,11 @@ public class UnionFindBuilder implements ExpressionVisitor {
 
 	@Override
 	public void visit(NotEqualsTo arg0) {
-		unusableConditions.add(arg0);
+		if (!(arg0.getLeftExpression() instanceof Column) || !(arg0.getRightExpression() instanceof Column)) {
+			unusableSelectConditions.add(arg0);
+		} else {
+			unusableJoinConditions.add(arg0);
+		}
 	}
 	
 	@Override

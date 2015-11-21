@@ -2,6 +2,7 @@ package parser;
 
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,9 +16,11 @@ import logical_operators.ProjectLogicalOperator;
 import logical_operators.ScanLogicalOperator;
 import logical_operators.SelectLogicalOperator;
 import logical_operators.SortLogicalOperator;
+import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParser;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
@@ -26,6 +29,7 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 import operators.Operator;
 import statistics.GatherStatistics;
 import union_find.UnionFind;
+import union_find.UnionFindElement;
 import utils.DatabaseCatalog;
 import utils.DirectoryCleanUp;
 import utils.DumpRelations;
@@ -233,17 +237,39 @@ public class Interpreter {
 		getChildrenFromQuery(body, allChildren);
 		
 		UnionFind unionFind = new UnionFind();
-		List<Expression> unusableConditions = new ArrayList<Expression>();
+		List<Expression> unusableJoinConditions = new ArrayList<Expression>();
+		List<Expression> unusableSelectConditions = new ArrayList<Expression>();
 		
 		// If where clause exists, call visitor class to get map of basic operators and list of join conditions
 		if (body.getWhere() != null) {
-			UnionFindBuilder ufb = new UnionFindBuilder(unionFind, unusableConditions);
+			UnionFindBuilder ufb = new UnionFindBuilder(unionFind, unusableJoinConditions, unusableSelectConditions);
 			body.getWhere().accept(ufb);
 		}
+		
+		for(String tableName: allChildren){
+			List<UnionFindElement> union_find = unionFind.findElementsForRelation(tableName);
 			
+		}
 		return null;
 	}
-
+	
+	private Expression getUnusableConditionsForRelation(String tableName, List<Expression> unusableConditions) {
+		
+		List<Expression> conditions = new ArrayList<Expression>();
+		for(Expression currentExp: unusableConditions){
+			BinaryExpression currentExpression = ((BinaryExpression)currentExp);
+			
+			//Left is a column and right is not 
+			if(currentExpression.getLeftExpression() instanceof Column){
+				if(!(currentExpression.getRightExpression() instanceof Column)){
+					if(currentExpression.getLeftExpression())
+			}
+				
+			}
+		}
+		return null;
+	}
+	
 	private static void getChildrenFromQuery(PlainSelect body, List<String> allChildren) {
 		if (body.getFromItem().getAlias() == null) {
 			allChildren.add(body.getFromItem().toString());
