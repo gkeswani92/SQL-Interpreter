@@ -2,16 +2,14 @@ package parser;
 
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import expression_visitors.WhereBuilder;
+import expression_visitors.UnionFindBuilder;
 import indexing.BuildIndex;
 import logical_operators.DuplicateEliminationLogicalOperator;
-import logical_operators.JoinLogicalOperator;
 import logical_operators.LogicalOperator;
 import logical_operators.ProjectLogicalOperator;
 import logical_operators.ScanLogicalOperator;
@@ -27,6 +25,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import operators.Operator;
 import statistics.GatherStatistics;
+import union_find.UnionFind;
 import utils.DatabaseCatalog;
 import utils.DirectoryCleanUp;
 import utils.DumpRelations;
@@ -229,70 +228,38 @@ public class Interpreter {
 	 * @param body select body
 	 */
 	public static LogicalOperator handleJoin(PlainSelect body) {
-		Map<String, List<LogicalOperator>> tableOperators = new HashMap<String, List<LogicalOperator>>();
-		List<Entry<List<String>,Expression>> joins = new ArrayList<>();
+		
+		List<String> allChildren = new ArrayList<String>();
+		getChildrenFromQuery(body, allChildren);
+		
+		UnionFind unionFind = new UnionFind();
+		List<Expression> unusableConditions = new ArrayList<Expression>();
 		
 		// If where clause exists, call visitor class to get map of basic operators and list of join conditions
 		if (body.getWhere() != null) {
-			WhereBuilder where = new WhereBuilder(tableOperators, joins);
-			body.getWhere().accept(where);
+			UnionFindBuilder ufb = new UnionFindBuilder(unionFind, unusableConditions);
+			body.getWhere().accept(ufb);
 		}
-		
-		List<String> currentLeftJoinTables = new ArrayList<>();		
-		
-		// First left table comes from the FromItem
-		if(body.getFromItem().getAlias()!=null){
-			currentLeftJoinTables.add(body.getFromItem().getAlias());			
+			
+		return null;
+	}
+
+	private static void getChildrenFromQuery(PlainSelect body, List<String> allChildren) {
+		if (body.getFromItem().getAlias() == null) {
+			allChildren.add(body.getFromItem().toString());
 		} else {
-			currentLeftJoinTables.add(body.getFromItem().toString());
+			allChildren.add(body.getFromItem().getAlias());
 		}
 		
-		String currentRightJoinTable;
-		
-		LogicalOperator temp, root = null;
-		
-		for (Object exp: body.getJoins()) {
-			
-			if(((Join)exp).getRightItem().getAlias()!=null){
-				currentRightJoinTable = ((Join)exp).getRightItem().getAlias();			
-			} else{
-				currentRightJoinTable = ((Join)exp).getRightItem().toString();
-			}
-			Expression finalJoinCondition = null;
-			
-			// If the root is null and there is just 1 table in the left list of tables, create
-			// join operator tree with left and right table basic operators as left and right children
-			if (root == null && currentLeftJoinTables.size() == 1) {
-				finalJoinCondition = getJoinCondition(joins, currentLeftJoinTables.get(0), currentRightJoinTable);
-				temp = new JoinLogicalOperator(finalJoinCondition, 
-						getBasicOperator(tableOperators, currentLeftJoinTables.get(0)), 
-						getBasicOperator(tableOperators, currentRightJoinTable),
-						currentRightJoinTable);
-				root = temp;
-			} 
-			// Add 1 table from join(joins from select body) into the left current join list
-			// Check if any of the tables in the left list have a join condition with the right table
-			// If they do, conjunct all the join conditions and create a join operator with the conjunct join condition
-			// Use old root as the left child and right table as right child
-			else {
-				for (String leftTable : currentLeftJoinTables) {
-					Expression currentTableJoin = getJoinCondition(joins, leftTable, currentRightJoinTable);
-					if (finalJoinCondition == null) {
-						finalJoinCondition = currentTableJoin;
-					} else {
-						//Check for null condition before appending an AND
-						if(currentTableJoin != null)
-							finalJoinCondition = new AndExpression(finalJoinCondition, currentTableJoin);
-					}
-				}
-				temp = new JoinLogicalOperator(finalJoinCondition, root, getBasicOperator(tableOperators, currentRightJoinTable), currentRightJoinTable);
-				root = temp;
-			}
-			
-			// Add the current right table into the list of left tables for next iteration
-			currentLeftJoinTables.add(currentRightJoinTable);
-		}
-		return root;
+		if (body.getJoins()!=null) {
+            for (Object exp: body.getJoins()) {
+            	if (exp.toString().contains("AS")) {
+    				allChildren.add(((Join)exp).getRightItem().getAlias());
+            	} else {
+            		allChildren.add(((Join)exp).getRightItem().toString());
+            	}
+            }
+        }
 	}
 	
 	/**
