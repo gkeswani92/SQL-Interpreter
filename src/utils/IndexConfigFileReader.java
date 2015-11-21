@@ -59,4 +59,8 @@ public class IndexConfigFileReader {
 	public List<Index> getIndexesByTableName(String tableName) {
 		return indexes.get(tableName);
 	}
+	
+	public LinkedHashMap<String, List<Index>> getAllIndexes() {
+		return indexes;
+	}
 }
