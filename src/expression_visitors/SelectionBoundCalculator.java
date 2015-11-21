@@ -172,7 +172,7 @@ public class SelectionBoundCalculator implements ExpressionVisitor {
 				if (ass.isEmpty() || !ass.containsKey(leftColName)) {
 					ass.put(leftColName, new AttributeSelectionStatistics(null, upperBound));
 				} else {
-					Long currUpperBound = ass.get(leftColName).getLowerBound();
+					Long currUpperBound = ass.get(leftColName).getUpperBound();
 					if (upperBound.compareTo(currUpperBound) < 0) {
 						ass.get(leftColName).setUpperBound(upperBound);
 					}
@@ -187,7 +187,7 @@ public class SelectionBoundCalculator implements ExpressionVisitor {
 			if (ass.isEmpty() || !ass.containsKey(rightColName)) {
 				ass.put(rightColName, new AttributeSelectionStatistics(lowerBound, null));
 			} else {
-				Long currLowerBound = ass.get(rightColName).getUpperBound();
+				Long currLowerBound = ass.get(rightColName).getLowerBound();
 				if (lowerBound.compareTo(currLowerBound) > 0) {
 					ass.get(rightColName).setUpperBound(lowerBound);
 				}
