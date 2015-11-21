@@ -129,7 +129,7 @@ public class SelectionBoundCalculator implements ExpressionVisitor {
 					ass.put(leftColName, new AttributeSelectionStatistics(lowerBound, null));
 				} else {
 					Long currLowerBound = ass.get(leftColName).getLowerBound();
-					if (lowerBound.compareTo(currLowerBound) > 0) {
+					if (currLowerBound != null && lowerBound.compareTo(currLowerBound) > 0) {
 						ass.get(leftColName).setUpperBound(lowerBound);
 					}
 				}
@@ -144,7 +144,7 @@ public class SelectionBoundCalculator implements ExpressionVisitor {
 				ass.put(rightColName, new AttributeSelectionStatistics(null, upperBound));
 			} else {
 				Long currUpperBound = ass.get(rightColName).getUpperBound();
-				if (upperBound.compareTo(currUpperBound) < 0) {
+				if (currUpperBound != null && upperBound.compareTo(currUpperBound) < 0) {
 					ass.get(rightColName).setUpperBound(upperBound);
 				}
 			}
@@ -173,7 +173,7 @@ public class SelectionBoundCalculator implements ExpressionVisitor {
 					ass.put(leftColName, new AttributeSelectionStatistics(null, upperBound));
 				} else {
 					Long currUpperBound = ass.get(leftColName).getUpperBound();
-					if (upperBound.compareTo(currUpperBound) < 0) {
+					if (currUpperBound != null && upperBound.compareTo(currUpperBound) < 0) {
 						ass.get(leftColName).setUpperBound(upperBound);
 					}
 				}
@@ -188,7 +188,7 @@ public class SelectionBoundCalculator implements ExpressionVisitor {
 				ass.put(rightColName, new AttributeSelectionStatistics(lowerBound, null));
 			} else {
 				Long currLowerBound = ass.get(rightColName).getLowerBound();
-				if (lowerBound.compareTo(currLowerBound) > 0) {
+				if (currLowerBound != null && lowerBound.compareTo(currLowerBound) > 0) {
 					ass.get(rightColName).setUpperBound(lowerBound);
 				}
 			}
