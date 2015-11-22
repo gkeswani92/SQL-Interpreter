@@ -95,6 +95,8 @@ public class IndexExpressionBuilder implements ExpressionVisitor {
 			} else if (arg0.getLeftExpression() instanceof LongValue){
 				lowKey = Integer.parseInt(arg0.getLeftExpression().toString());
 				highKey = Integer.parseInt(arg0.getLeftExpression().toString());
+			} else {
+				selectConditions.add(arg0);
 			}
 		} else {
 			selectConditions.add(arg0);
@@ -121,6 +123,8 @@ public class IndexExpressionBuilder implements ExpressionVisitor {
 				} else if (highKey != null && currHighKey.compareTo(highKey) < 0) {
 					highKey = currHighKey - 1;
 				}
+			} else {
+				selectConditions.add(arg0);
 			}
 
 		} else {
@@ -145,6 +149,8 @@ public class IndexExpressionBuilder implements ExpressionVisitor {
 				} else if (highKey != null && currHighKey.compareTo(highKey) < 0) {
 					highKey = currHighKey;
 				}
+			} else {
+				selectConditions.add(arg0);
 			}
 
 		} else {
@@ -171,6 +177,8 @@ public class IndexExpressionBuilder implements ExpressionVisitor {
 				} else if (lowKey != null && currLowKey.compareTo(lowKey) > 0) {
 					lowKey = currLowKey + 1;
 				}
+			} else {
+				selectConditions.add(arg0);
 			}
 
 
@@ -196,6 +204,8 @@ public class IndexExpressionBuilder implements ExpressionVisitor {
 				} else if (lowKey != null && currLowKey.compareTo(lowKey) > 0) {
 					lowKey = currLowKey;
 				}
+			} else {
+				selectConditions.add(arg0);
 			}
 
 		} else {
