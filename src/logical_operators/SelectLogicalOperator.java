@@ -22,10 +22,12 @@ public class SelectLogicalOperator extends LogicalOperator {
 
 	LogicalOperator child;
 	Expression whereClause;
+	DatabaseCatalog dbCatalog;
 	
 	public SelectLogicalOperator(Expression exp, LogicalOperator child) {
 		this.child = child;
 		whereClause = exp;
+		dbCatalog = DatabaseCatalog.getInstance();
 	}
 	
     public Expression getExpression(){
@@ -44,18 +46,9 @@ public class SelectLogicalOperator extends LogicalOperator {
 			//Attribute statistics for the min, max and reduction factor for the attribute
 			Map<String, AttributeSelectionStatistics> currentAttributeStatistics = getAttributeSelectionStatistics(alias);
 			
-			//IO cost for using each of the given attributes
-			Map<String, Double> ioCost = new HashMap<String, Double>();
+			Map<String, Double> ioCost = getIOCostForIndexes(alias, currentAttributeStatistics);
 			
-			for(String attribute: currentAttributeStatistics.keySet()){
-				AttributeSelectionStatistics attrStatistics = currentAttributeStatistics.get(attribute);
-				Index attrIndex = IndexConfigFileReader.getInstance().getIndexForAttribute(attribute, alias);
-				if(attrIndex != null) {
-					
-				}
-			}
-			
-			
+		
 			List<Expression> selectConditions = new ArrayList<Expression>();
 			List<Index> indexes = IndexConfigFileReader.getInstance().getIndexesByTableName(alias);
 			
@@ -64,6 +57,39 @@ public class SelectLogicalOperator extends LogicalOperator {
 		
 		// Create selectOperator for non index usable. Will only come here if no index usable expressions exist.
 		return new SelectOperator(child.getNextPhysicalOperator(), whereClause);
+	}
+
+	/** 
+	 * Returns a map of the attribute to the IO cost of using an index on that attribute
+	 * @param alias
+	 * @param currentAttributeStatistics
+	 * @return
+	 */
+	private Map<String, Double> getIOCostForIndexes(String alias,
+										Map<String, AttributeSelectionStatistics> currentAttributeStatistics) {
+		
+		//IO cost for using each of the given attributes
+		Map<String, Double> ioCost = new HashMap<String, Double>();
+		
+		for(String attribute: currentAttributeStatistics.keySet()){
+			AttributeSelectionStatistics attrStatistics = currentAttributeStatistics.get(attribute);
+			Index attrIndex = IndexConfigFileReader.getInstance().getIndexForAttribute(attribute, alias);
+			if(attrIndex != null) {
+				Integer numAttributes = dbCatalog.getTableAttributes(alias).length;
+				Integer numTuples = dbCatalog.getStatistics(alias).count;
+				Integer numPages = Math.floorDiv(numTuples, 4088 / (4 * numAttributes));
+				Double ioCostAttr = 0.0;
+				
+				//0 is for unclustered and 1 is for clustered
+				if(attrIndex.getFlag() == 0) {
+					ioCostAttr = 3 + (numTuples * attrStatistics.getReductionFactor()) + (attrIndex.getNumLeaves() * attrStatistics.getReductionFactor());
+				} else {
+					ioCostAttr = 3 + (numPages * attrStatistics.getReductionFactor());
+				}
+				ioCost.put(attribute, ioCostAttr);
+			}
+		}
+		return ioCost;
 	}
 
 	/**
