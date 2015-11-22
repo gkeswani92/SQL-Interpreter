@@ -16,6 +16,7 @@ import statistics.AttributeSelectionStatistics;
 import statistics.AttributeStatistics;
 import statistics.TableStatistics;
 import utils.DatabaseCatalog;
+import utils.IndexBinaryFileReader;
 import utils.IndexConfigFileReader;
 import utils.PlanBuilderConfigFileReader;
 
@@ -111,6 +112,12 @@ public class SelectLogicalOperator extends LogicalOperator {
 		for(String attribute: currentAttributeStatistics.keySet()){
 			AttributeSelectionStatistics attrStatistics = currentAttributeStatistics.get(attribute);
 			Index attrIndex = IndexConfigFileReader.getInstance().getIndexForAttribute(attribute, alias);
+			
+			// Get number of leaves from the index file
+			IndexBinaryFileReader ibfr = new IndexBinaryFileReader(attrIndex);
+			attrIndex.setNumLeaves(ibfr.getNumLeaves());
+			ibfr.closeStuff();
+			
 			if(attrIndex != null) {
 				Integer numAttributes = dbCatalog.getTableAttributes(alias).length;
 				Integer numTuples = dbCatalog.getStatistics(alias).count;

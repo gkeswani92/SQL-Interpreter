@@ -123,6 +123,25 @@ public class IndexBinaryFileReader {
 	}
 	
 	/**
+	 * Gets the number of leaves of the index
+	 * @return
+	 * 		number of leaves
+	 */
+	public Integer getNumLeaves(){
+		Integer numLeaves = -1;
+		try{
+			bb = ByteBuffer.allocate(8);
+			channel.read(bb);
+			bb.position(0);
+			numLeaves= bb.getInt();
+			numLeaves = bb.getInt();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return numLeaves;
+	}
+	
+	/**
 	 * Method to read one complete page into the byte buffer from the 
 	 * current position of the channel
 	 */
