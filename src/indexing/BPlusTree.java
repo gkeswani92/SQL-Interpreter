@@ -80,7 +80,6 @@ public class BPlusTree {
 			root = createIndexNodes(leaves);
 		}
 		IndexSerializer.serializeHeader(root, leaves.size(), order);
-		index.setNumLeaves(leaves.size());
 	}
 	
 	/**
