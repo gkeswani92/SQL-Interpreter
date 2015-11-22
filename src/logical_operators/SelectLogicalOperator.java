@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import expression_visitors.IndexExpressionBuilder;
 import expression_visitors.SelectionBoundCalculator;
 import indexing.Index;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import operators.IndexScanOperator;
 import operators.Operator;
 import operators.SelectOperator;
 import statistics.AttributeSelectionStatistics;
@@ -37,28 +38,64 @@ public class SelectLogicalOperator extends LogicalOperator {
 	@Override
 	public Operator getNextPhysicalOperator() {
 		
+		Index index = null;
+		String alias = getTableName();
+				
 		// If child is a scan, then can possibly use index
 		if (PlanBuilderConfigFileReader.getInstance().getUseIndexFlag() == 1 && child instanceof ScanLogicalOperator) {
 			
-			
-			String alias = getTableName();
-			
-			//Attribute statistics for the min, max and reduction factor for the attribute
+			// Finding the IO cost to use the various available indexes
 			Map<String, AttributeSelectionStatistics> currentAttributeStatistics = getAttributeSelectionStatistics(alias);
-			
 			Map<String, Double> ioCost = getIOCostForIndexes(alias, currentAttributeStatistics);
 			
-		
-			List<Expression> selectConditions = new ArrayList<Expression>();
-			List<Index> indexes = IndexConfigFileReader.getInstance().getIndexesByTableName(alias);
-			
-			
+			//In case of multiple indexes, we need to figure out which index to use
+			String attrIndexToUse = getBestIndexForSelection(ioCost, alias);			
+			index = IndexConfigFileReader.getInstance().getIndexForAttribute(attrIndexToUse, alias);
 		}
 		
+		if (index != null) {
+			List<Expression> selectConditions = new ArrayList<Expression>();
+			IndexExpressionBuilder ieb = new IndexExpressionBuilder(index,selectConditions);
+			whereClause.accept(ieb);
+			
+			// If either lowKey or highKey is a non null value, the where clause has index usable conditions
+			if (!(ieb.getLowKey() == null && ieb.getHighKey() == null)) {
+				
+				// If selectConditions is non empty, the where clause has both index usable and index non-usable conditions.
+				// Create SelectOperator and set child as IndexScanOperator
+				if (!selectConditions.isEmpty()) {
+					Expression select = createSelectCondition(selectConditions);
+					return new SelectOperator(new IndexScanOperator(ieb.getLowKey(), ieb.getHighKey(), index, alias), select);
+				} else {
+					return new IndexScanOperator(ieb.getLowKey(), ieb.getHighKey(), index, alias);
+				}
+			}
+		}
 		// Create selectOperator for non index usable. Will only come here if no index usable expressions exist.
 		return new SelectOperator(child.getNextPhysicalOperator(), whereClause);
 	}
 
+	/**
+	 * Computes the best index to use when compared to other indexes and full scan
+	 * @param ioCost
+	 * @return
+	 */
+	public String getBestIndexForSelection(Map<String, Double> ioCost, String tableName){
+		
+		//Initialising minimum cost to full scan
+		Double minCost = dbCatalog.getStatistics(tableName).count * 1.0;
+		String attrIndexToUse = null;
+		
+		//Checking if there is a better way than a full scan
+		for(String attr: ioCost.keySet()){
+			if(ioCost.get(attr).compareTo(minCost) == -1){
+				minCost = ioCost.get(attr);
+				attrIndexToUse = attr;
+			}
+		}
+		return attrIndexToUse;
+	}
+	
 	/** 
 	 * Returns a map of the attribute to the IO cost of using an index on that attribute
 	 * @param alias

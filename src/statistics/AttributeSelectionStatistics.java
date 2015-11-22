@@ -38,6 +38,12 @@ public class AttributeSelectionStatistics {
 	}
 	
 	public void setReductionFactor(Integer minAttributeValue, Integer maxAttributeValue) {
-		reductionFactor = (upperBound - lowerBound + 1) * 1.0 / (maxAttributeValue - minAttributeValue + 1);
+		if (upperBound != null && lowerBound != null) {
+			reductionFactor = (upperBound - lowerBound + 1) * 1.0 / (maxAttributeValue - minAttributeValue + 1);
+		} else if (upperBound != null) {
+			reductionFactor = (upperBound - minAttributeValue + 1) * 1.0 / (maxAttributeValue - minAttributeValue + 1);
+		} else {
+			reductionFactor = (maxAttributeValue - lowerBound + 1) * 1.0 / (maxAttributeValue - minAttributeValue + 1);
+		}
 	}
 }

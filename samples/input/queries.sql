@@ -1,1 +1,1 @@
-SELECT * FROM Boats, Sailors WHERE Boats.E = 199 AND Sailors.A = 1204;
+SELECT * FROM Sailors, Reserves WHERE Sailors.A = Reserves.G AND Sailors.A > 10 AND Sailors.A < 20 AND Sailors.B > 30;

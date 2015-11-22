@@ -76,7 +76,7 @@ public class IndexConfigFileReader {
 	}
 	
 	public Index getIndexForAttribute(String attrName, String tableName){
-		if(attributeHasIndex(attrName, tableName)) {
+		if(attrName != null && attributeHasIndex(attrName, tableName)) {
 			List<Index> tableIndexes = indexes.get(tableName);
 			for(Index index: tableIndexes) {
 				if(index.getAttribute().equals(attrName) && index.getTableName().equals(tableName))
