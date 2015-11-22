@@ -63,4 +63,26 @@ public class IndexConfigFileReader {
 	public LinkedHashMap<String, List<Index>> getAllIndexes() {
 		return indexes;
 	}
+	
+	public boolean attributeHasIndex(String attrName, String tableName){
+		List<Index> tableIndexes = indexes.get(tableName);
+		if(tableIndexes != null){
+			for(Index index: tableIndexes) {
+				if(index.getAttribute().equals(attrName) && index.getTableName().equals(tableName))
+					return true;
+			}
+		}
+		return false;
+	}
+	
+	public Index getIndexForAttribute(String attrName, String tableName){
+		if(attributeHasIndex(attrName, tableName)) {
+			List<Index> tableIndexes = indexes.get(tableName);
+			for(Index index: tableIndexes) {
+				if(index.getAttribute().equals(attrName) && index.getTableName().equals(tableName))
+					return index;
+			}
+		}
+		return null;
+	}
 }

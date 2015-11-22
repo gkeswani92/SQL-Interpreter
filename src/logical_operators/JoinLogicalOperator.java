@@ -2,11 +2,11 @@ package logical_operators;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.jsqlparser.expression.Expression;
-
 import operators.Operator;
 
 public class JoinLogicalOperator extends LogicalOperator {
@@ -15,7 +15,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 	List<Expression> joinConditions;
 	
 	public JoinLogicalOperator(List<Expression> joinConditions, Map<String, LogicalOperator> children) {
-		this.children = new HashMap<String, LogicalOperator>();
+		this.children = new LinkedHashMap<String, LogicalOperator>();
 		this.children.putAll(children);
 		this.joinConditions = new ArrayList<Expression>();
 		this.joinConditions.addAll(joinConditions);
@@ -23,6 +23,12 @@ public class JoinLogicalOperator extends LogicalOperator {
 	
 	@Override
 	public Operator getNextPhysicalOperator() {
+		
+		Map<String, Operator> physicalChildren = new LinkedHashMap<String, Operator>();
+		for(String tableName: children.keySet()){
+			LogicalOperator currentChild = children.get(tableName);
+			physicalChildren.put(tableName, currentChild.getNextPhysicalOperator());
+		}
 		return null;
 		
 //		PlanBuilderConfigFileReader config = PlanBuilderConfigFileReader.getInstance();

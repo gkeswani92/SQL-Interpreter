@@ -133,4 +133,8 @@ public class DatabaseCatalog {
 	public void setStatistics(Map<String, TableStatistics> stats) {
 		this.stats = stats;
 	}
+	
+	public TableStatistics getStatistics(String tableName) {
+		return stats.get(tableName);
+	}
 }

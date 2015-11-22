@@ -20,6 +20,10 @@ public class TableStatistics {
 		}
 	}
 	
+	public AttributeStatistics getAttributeStatistics(String attr){
+		return tableStatistics.get(attr);
+	}
+	
 	@Override
 	public String toString(){
 		String str = "[Number of Tuples: " + count + ", ";

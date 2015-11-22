@@ -24,12 +24,14 @@ public class BuildIndex {
 	public static void buildIndexes() {
 		
 		System.out.println("Building indexes");
-		LinkedHashMap<String, Index> indexes = IndexConfigFileReader.getInstance().getAllIndexes();
+		LinkedHashMap<String, List<Index>> indexes = IndexConfigFileReader.getInstance().getAllIndexes();
 		
 		Set<String> tableNames = indexes.keySet();
 		for (String tableName: tableNames) {
-			Index currIndex = indexes.get(tableName);
-			buildIndex(currIndex);
+			List<Index> tableIndexes = indexes.get(tableName);
+			for(Index currIndex: tableIndexes){
+				buildIndex(currIndex);
+			}
 		}
 	}
 	

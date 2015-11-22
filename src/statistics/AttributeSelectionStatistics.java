@@ -8,13 +8,13 @@ public class AttributeSelectionStatistics {
 	public AttributeSelectionStatistics() {
 		lowerBound = null;
 		upperBound = null;
-		reductionFactor = null;
+		reductionFactor = 1.0;
 	}
 	
 	public AttributeSelectionStatistics(Long lowerBound, Long upperBound) {
 		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
-		reductionFactor = null;
+		reductionFactor = 1.0;
 	}
 	
 	public Double getReductionFactor() {
@@ -35,5 +35,9 @@ public class AttributeSelectionStatistics {
 	
 	public void setUpperBound(Long upperBound) {
 		this.upperBound = upperBound;
+	}
+	
+	public void setReductionFactor(Integer minAttributeValue, Integer maxAttributeValue) {
+		reductionFactor = (upperBound - lowerBound + 1) * 1.0 / (maxAttributeValue - minAttributeValue + 1);
 	}
 }
