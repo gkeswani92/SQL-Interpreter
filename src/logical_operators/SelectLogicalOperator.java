@@ -122,15 +122,19 @@ public class SelectLogicalOperator extends LogicalOperator {
 				Integer numAttributes = dbCatalog.getTableAttributes(alias).length;
 				Integer numTuples = dbCatalog.getStatistics(alias).count;
 				Integer numPages = Math.floorDiv(numTuples, 4088 / (4 * numAttributes));
+				Double reductionFactor = attrStatistics.getReductionFactor();
 				Double ioCostAttr = 0.0;
 				
 				//0 is for unclustered and 1 is for clustered
-				if(attrIndex.getFlag() == 0) {
-					ioCostAttr = 3 + (numTuples * attrStatistics.getReductionFactor()) + (attrIndex.getNumLeaves() * attrStatistics.getReductionFactor());
-				} else {
-					ioCostAttr = 3 + (numPages * attrStatistics.getReductionFactor());
+				//Reduction factor is -1 only in cases where we cannot use the index
+				if(reductionFactor.compareTo(-1.0) != 0) {
+					if(attrIndex.getFlag() == 0) {
+						ioCostAttr = 3 + (numTuples * attrStatistics.getReductionFactor()) + (attrIndex.getNumLeaves() * attrStatistics.getReductionFactor());
+					} else {
+						ioCostAttr = 3 + (numPages * attrStatistics.getReductionFactor());
+					}
+					ioCost.put(attribute, ioCostAttr);
 				}
-				ioCost.put(attribute, ioCostAttr);
 			}
 		}
 		return ioCost;

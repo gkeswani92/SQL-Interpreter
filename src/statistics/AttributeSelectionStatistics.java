@@ -42,8 +42,10 @@ public class AttributeSelectionStatistics {
 			reductionFactor = (upperBound - lowerBound + 1) * 1.0 / (maxAttributeValue - minAttributeValue + 1);
 		} else if (upperBound != null) {
 			reductionFactor = (upperBound - minAttributeValue + 1) * 1.0 / (maxAttributeValue - minAttributeValue + 1);
-		} else {
+		} else if (lowerBound != null){
 			reductionFactor = (maxAttributeValue - lowerBound + 1) * 1.0 / (maxAttributeValue - minAttributeValue + 1);
+		} else {
+			reductionFactor = -1.0;
 		}
 	}
 }
