@@ -15,12 +15,13 @@ public class RelationSubset implements Iterable<String> {
 		planCost = 0.0;
 	}
 	
-	public RelationSubset(List<String> tableNames){
+	public RelationSubset(List<String> tableNames, String newTableName){
 		relations = new ArrayList<String>();
 		relations.addAll(tableNames);
+		relations.add(newTableName);
 		planCost = 0.0;
 	}
-
+	
 	/**
 	 * Adds the relation to the current relation subset
 	 * @param tableName
@@ -62,5 +63,17 @@ public class RelationSubset implements Iterable<String> {
 			}
 		}
 		return addableRelations;
+	}
+	
+	public boolean exactlyMatches(List<String> parents) {
+		if(relations.size() == parents.size()){
+			for(int i=0; i<relations.size(); i++){
+				if(!relations.get(i).equals(parents.get(i))){
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 }

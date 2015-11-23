@@ -214,7 +214,7 @@ public class UnionFind {
 		
 		Expression exp = getExpressionForUnionFindElement(ufes.get(0), tableName);
 		
-		if (ufes.size() == 1) {
+		if (exp == null || ufes.size() == 1) {
 			return exp;
 		}
 		

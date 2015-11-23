@@ -1,18 +1,20 @@
 package logical_operators;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.jsqlparser.expression.Expression;
 import operators.Operator;
+import utils.RelationSubsetComparator;
 
 public class JoinLogicalOperator extends LogicalOperator {
 	
-	Map<String, LogicalOperator> children;
-	List<Expression> joinConditions;
+	private Map<String, LogicalOperator> children;
+	private List<Expression> joinConditions;
+	private static Map<List<String>, Double> planCosts;
 	
 	public JoinLogicalOperator(List<Expression> joinConditions, Map<String, LogicalOperator> children) {
 		this.children = new LinkedHashMap<String, LogicalOperator>();
@@ -29,8 +31,101 @@ public class JoinLogicalOperator extends LogicalOperator {
 			LogicalOperator currentChild = children.get(tableName);
 			physicalChildren.put(tableName, currentChild.getNextPhysicalOperator());
 		}
-		return null;
 		
+		List<RelationSubset> relationSubsets =  new ArrayList<RelationSubset>();
+		List<String> initialRelations = new ArrayList<String>();
+		
+		//Initialising the map to contain one relation plans
+		for(String tableName: physicalChildren.keySet()) {
+			RelationSubset currentSubset = new RelationSubset(tableName);
+			relationSubsets.add(currentSubset);
+			initialRelations.add(tableName);
+		}
+		
+		findBestJoinPlan(relationSubsets, initialRelations);
+		return null;
+	}
+	
+	public void findBestJoinPlan(List<RelationSubset> relationSubsets, List<String> tableNames) {
+		
+		//Base case: When all plans have the size of the initial number of relations
+		if(tableNames.size() == relationSubsets.get(0).getRelations().size()){
+			System.out.println("We have computed all possible plans. Now checking for the best plan");
+		}
+		
+		List<RelationSubset> subsetsToRemove = new ArrayList<RelationSubset>();
+		List<RelationSubset> subsetsToAdd = new ArrayList<RelationSubset>();
+		
+		for(RelationSubset currentSubset: relationSubsets){
+			System.out.println("Finding the best possible plan for "+currentSubset);		
+			List<String> addableRelations = currentSubset.findAddableRelations(tableNames);
+			List<RelationSubset> addableRelationSubsets = new ArrayList<RelationSubset>();
+			
+			//Find all possible relation subsets that can be created using the current relation subset
+			for(String relation: addableRelations) {
+				RelationSubset currentPossibleSubset = new RelationSubset(currentSubset.getRelations(), relation);
+				computeCostOfPlan(currentPossibleSubset, currentSubset);
+				addableRelationSubsets.add(currentPossibleSubset);
+			}	
+			
+			//Finding the best plans for the current subset and keeping them for the next iteration
+			List<RelationSubset> bestAddableRelationSubsets = findBestAddableRelationSubset(addableRelationSubsets);
+			subsetsToAdd.addAll(bestAddableRelationSubsets);
+			subsetsToRemove.add(currentSubset);	
+		}		
+		
+		relationSubsets.removeAll(subsetsToRemove);
+		relationSubsets.addAll(subsetsToAdd);
+		findBestJoinPlan(relationSubsets, tableNames);
+	}
+	
+	/**
+	 * Finds the minimum cost relation subsets. In case of a tie, all relations subsets with the minimum
+	 * cost are returned
+	 * @param addableRelationSubsets
+	 * @return
+	 */
+	public List<RelationSubset> findBestAddableRelationSubset(List<RelationSubset> addableRelationSubsets) {
+		
+		Integer index = 0;
+		List<RelationSubset> minCostPlans = new ArrayList<RelationSubset>();
+		
+		Collections.sort(addableRelationSubsets, new RelationSubsetComparator());
+		RelationSubset rs = addableRelationSubsets.get(index++);
+		Double minCost = rs.getPlanCost();
+		minCostPlans.add(rs);
+
+		//Finding all relation subsets that have the minimum cost
+		while (index < addableRelationSubsets.size() ){
+			rs = addableRelationSubsets.get(index++);
+			if(rs.getPlanCost().equals(minCost)){
+				minCostPlans.add(rs);
+			} else {
+				break;
+			}
+		}
+		return minCostPlans;
+	}
+	
+	/**
+	 * Computes and sets the cost of the current subset by using the cost of the parent subset
+	 * and the size of the parent relation
+	 * @param currentSubset
+	 * @param parentSubset
+	 */
+	public void computeCostOfPlan(RelationSubset currentSubset, RelationSubset parentSubset){
+		currentSubset.setPlanCost(parentSubset.getPlanCost() + getSizeOfParent(parentSubset));
+	}
+	
+	/**
+	 * Computes the size of the parent subset relation
+	 * @param parentSubset
+	 * @return
+	 */
+	public Double getSizeOfParent(RelationSubset parentSubset) {
+		return 123.0;
+	}
+	
 //		PlanBuilderConfigFileReader config = PlanBuilderConfigFileReader.getInstance();
 //		// Read config file and create appropriate join operator
 //		if (config.getJoinType() == 0) {
@@ -69,7 +164,4 @@ public class JoinLogicalOperator extends LogicalOperator {
 //						leftSortConditions,
 //						rightSortConditions);
 //			}
-//		}
-		
-	}
 }
