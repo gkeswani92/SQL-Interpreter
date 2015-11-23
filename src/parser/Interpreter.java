@@ -28,7 +28,6 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import operators.Operator;
-import operators.ScanOperator;
 import statistics.GatherStatistics;
 import union_find.UnionFind;
 import union_find.UnionFindElement;
@@ -181,6 +180,8 @@ public class Interpreter {
 	}
 	
 	private static Operator constructPhysicalPlan (LogicalOperator root) {
+		String plan = root.getLogicalPlanToString(0);
+		System.out.println(plan);
 		Operator opRoot = root.getNextPhysicalOperator();
 		return opRoot;
 	}

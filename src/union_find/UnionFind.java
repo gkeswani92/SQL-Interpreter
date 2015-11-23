@@ -19,6 +19,10 @@ public class UnionFind {
 		elements = new ArrayList<UnionFindElement>();
 	}
 	
+	public List<UnionFindElement> getElements() {
+		return elements;
+	}
+	
 	/**
 	 * Returns the list of union find elements that contain an attribute of
 	 * the passed in relation
@@ -212,13 +216,19 @@ public class UnionFind {
 			return null;
 		}
 		
-		Expression exp = getExpressionForUnionFindElement(ufes.get(0), tableName);
+		int i = 0;
+		Expression exp = null;
 		
-		if (exp == null || ufes.size() == 1) {
+		while(exp == null && i < ufes.size()) {
+			exp = getExpressionForUnionFindElement(ufes.get(i), tableName);
+			i++;
+		}
+		
+		if (exp == null || i >= ufes.size()) {
 			return exp;
 		}
 		
-		for (int i = 1; i < ufes.size(); i++) {
+		for (; i < ufes.size(); i++) {
 			Expression rightExpression = getExpressionForUnionFindElement(ufes.get(i), tableName);
 			if (rightExpression != null) {
 				exp = new AndExpression(exp, rightExpression);

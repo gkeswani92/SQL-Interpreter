@@ -47,4 +47,24 @@ public class SortLogicalOperator extends LogicalOperator {
 		}
 
 	}
+
+	@Override
+	public String getLogicalPlanToString(Integer level) {
+		String plan = "";
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		plan = plan + "Sort" + "[";
+		for (String cond: sortConditions) {
+			plan = plan + cond + ",";
+		}
+		
+		plan = plan.substring(0, plan.length()-1);
+		plan = plan + "]\n";
+		plan = plan + child.getLogicalPlanToString(level+=1);
+		return plan;
+	}
 }

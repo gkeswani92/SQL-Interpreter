@@ -32,4 +32,27 @@ public class ProjectLogicalOperator extends LogicalOperator {
 	public Operator getNextPhysicalOperator() {
 		return new ProjectOperator(child.getNextPhysicalOperator(), requiredColumns);
 	}
+
+	@Override
+	public String getLogicalPlanToString(Integer level) {
+		String plan = "";
+		
+		// Level
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		plan = plan + "Project" + "[";
+		for (String col: requiredColumns) {
+			plan = plan + col + ",";
+		}
+		plan = plan.substring(0, plan.length()-1);
+		plan = plan + "]\n";
+		
+		plan = plan + child.getLogicalPlanToString(level+=1);
+		
+		return plan;
+	}
 }

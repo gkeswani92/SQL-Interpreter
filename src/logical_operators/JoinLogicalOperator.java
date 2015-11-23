@@ -9,6 +9,7 @@ import java.util.Map;
 import net.sf.jsqlparser.expression.Expression;
 import operators.Operator;
 import union_find.UnionFind;
+import union_find.UnionFindElement;
 import utils.RelationSubsetComparator;
 
 public class JoinLogicalOperator extends LogicalOperator {
@@ -128,6 +129,40 @@ public class JoinLogicalOperator extends LogicalOperator {
 	 */
 	public Double getSizeOfParent(RelationSubset parentSubset) {
 		return 123.0;
+	}
+
+	@Override
+	public String getLogicalPlanToString(Integer level) {
+		String plan = "";
+		
+		// Level
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		// Join with Residual join expressions
+		plan = plan + "Join" + "[";
+		for (Expression exp: joinConditions) {
+			plan = plan + exp.toString() + ",";
+		}
+		plan = plan.substring(0, plan.length()-1);
+		plan = plan + "]" + "\n";
+		
+		// Union find elements
+		for (UnionFindElement ufe: unionFind.getElements()) {
+			plan = plan + ufe.toString();
+		}
+		
+		level = level + 1;
+		for (String key: children.keySet()) {
+			plan = plan + children.get(key).getLogicalPlanToString(level);
+		}
+		
+		plan = plan + "\n";
+		
+		return plan;
 	}
 	
 //		PlanBuilderConfigFileReader config = PlanBuilderConfigFileReader.getInstance();

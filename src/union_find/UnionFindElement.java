@@ -105,4 +105,23 @@ public class UnionFindElement {
 		setLowerBound(equalityConstraint);
 		setUpperBound(equalityConstraint);
 	}
+	
+	public String toString() {
+		String ufe = "";
+		
+		// Attributes in union find
+		ufe = ufe + "[[";
+		for (Column attr: attributes) {
+			ufe = ufe + attr.toString() + ",";
+		}
+		ufe = ufe.substring(0, ufe.length()-1);
+		ufe = ufe + "]" + ",";
+		
+		// Bounds
+		ufe = ufe + " equals " + equalityConstraint + ", ";
+		ufe = ufe + "min " + lowerBound + ", ";
+		ufe = ufe + "max " + upperBound + "]\n";
+		
+		return ufe;
+	}
 }
