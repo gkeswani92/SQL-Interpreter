@@ -8,19 +8,23 @@ import java.util.Map;
 
 import net.sf.jsqlparser.expression.Expression;
 import operators.Operator;
+import union_find.UnionFind;
 import utils.RelationSubsetComparator;
 
 public class JoinLogicalOperator extends LogicalOperator {
 	
 	private Map<String, LogicalOperator> children;
 	private List<Expression> joinConditions;
-	private static Map<List<String>, Double> planCosts;
+	private Map<List<String>, Double> planCosts;
+	private UnionFind unionFind;
 	
-	public JoinLogicalOperator(List<Expression> joinConditions, Map<String, LogicalOperator> children) {
+	public JoinLogicalOperator(List<Expression> joinConditions, Map<String, LogicalOperator> children,
+					UnionFind unionFind) {
 		this.children = new LinkedHashMap<String, LogicalOperator>();
 		this.children.putAll(children);
 		this.joinConditions = new ArrayList<Expression>();
 		this.joinConditions.addAll(joinConditions);
+		this.unionFind = unionFind;
 	}
 	
 	@Override

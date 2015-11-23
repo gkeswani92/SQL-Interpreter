@@ -276,7 +276,7 @@ public class Interpreter {
 			}
 			
 		}
-		return new JoinLogicalOperator(unusableJoinConditions, children);
+		return new JoinLogicalOperator(unusableJoinConditions, children, unionFind);
 	}
 	
 	private static Expression getUnusableConditionsForRelation(String tableName, List<Expression> unusableSelectConditions) {
