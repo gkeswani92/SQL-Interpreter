@@ -148,7 +148,11 @@ public class JoinLogicalOperator extends LogicalOperator {
 			plan = plan + exp.toString() + ",";
 		}
 		plan = plan.substring(0, plan.length()-1);
-		plan = plan + "]" + "\n";
+		if (!joinConditions.isEmpty()) {
+			plan = plan + "]";
+		}
+		
+		plan = plan + "\n";
 		
 		// Union find elements
 		for (UnionFindElement ufe: unionFind.getElements()) {
