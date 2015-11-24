@@ -1,6 +1,8 @@
 package expression_visitors;
 
 import java.util.List;
+import java.util.Map;
+
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
@@ -48,9 +50,10 @@ import union_find.UnionFindElement;
 public class UnionFindBuilder implements ExpressionVisitor {
 
 	UnionFind unionFind;
-	List<Expression> unusableJoinConditions, unusableSelectConditions;
+	Map<List<String>,Expression> unusableJoinConditions;
+	List<Expression> unusableSelectConditions; 
 	
-	public UnionFindBuilder(UnionFind unionFind, List<Expression> unusableJoin, List<Expression> unusableSelect) {
+	public UnionFindBuilder(UnionFind unionFind, Map<List<String>, Expression> unusableJoin, List<Expression> unusableSelect) {
 		this.unionFind = unionFind;
 		this.unusableJoinConditions = unusableJoin;
 		this.unusableSelectConditions = unusableSelect;

@@ -7,7 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import operators.Operator;
 import statistics.AttributeSelectionStatistics;
@@ -132,22 +135,59 @@ public class JoinLogicalOperator extends LogicalOperator {
 		}
 		
 		//Find the best join plan for the given relations
-		findBestJoinPlan(relationSubsets, initialRelations);
-		return null;
+		RelationSubset bestJoinPlanSubset = findBestJoinPlan(relationSubsets, initialRelations);
+		return getLeftDeepTree(bestJoinPlanSubset);
 	}
 	
+	 public Operator getLeftDeepTree(RelationSubset bestJoinPlanSubset) {
+		 
+		 List<String> allRelations = bestJoinPlanSubset.getRelations();
+		 List<String> leftJoinTables = new ArrayList<>();
+		 String rightTable = null;
+		 
+		 // Get the 1st two tables
+		 leftJoinTables.add(allRelations.get(0));
+		 rightTable = allRelations.get(1);
+		 
+		 List<List<Column>> joinAttributes = unionFind.getJoinAttributes(leftJoinTables, rightTable);
+		 Expression unionFindJoinCondition = getExpressionFromColumnList(joinAttributes);
+		 Expression unusableCondition = getUnusableCondition(leftJoinTables, rightTable);
+		 
+		 if (allRelations.size() > 2) {
+			 
+		 }
+		 return null;
+	 }
+	 
+	 public Expression getUnusableCondition(List<String> leftJoinTables, String rightTable) {
+		 for (Expression unusableJoinConditon: joinConditions) {
+			 BinaryExpression be = (BinaryExpression) unusableJoinConditon;
+		 }
+	 }
+	 
+	 public Expression getExpressionFromColumnList(List<List<Column>> attributes) {
+		 Expression exp = new EqualsTo(attributes.get(0).get(0), attributes.get(0).get(1));
+		 
+		 for (int i = 1; i < attributes.size(); i++) {
+			 exp = new AndExpression(exp, new EqualsTo(attributes.get(i).get(0), attributes.get(i).get(1)));
+		 }
+		 
+		 return exp;
+	 }
 	/**
 	 * Finds the best left deep join plan for the children of the logical join
 	 * @param relationSubsets
 	 * @param tableNames
+	 * @return 
 	 */
-	public void findBestJoinPlan(List<RelationSubset> relationSubsets, List<String> tableNames) {
+	public RelationSubset findBestJoinPlan(List<RelationSubset> relationSubsets, List<String> tableNames) {
 		
 		// Base case: When all plans have the size of the initial number of relations
 		// Select the plan with the minimum cost
 		if(tableNames.size() == relationSubsets.get(0).getRelations().size()){
 			System.out.println("We have computed all possible plans. Now checking for the best plan");
-			return;
+			Collections.sort(relationSubsets, new RelationSubsetComparator());
+			return relationSubsets.get(0);
 		}
 		
 		List<RelationSubset> newSubsets = new ArrayList<RelationSubset>();
@@ -174,8 +214,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 			List<RelationSubset> bestAddableRelationSubsets = findBestAddableRelationSubset(relationAdditionSubsets);
 			newSubsets.addAll(bestAddableRelationSubsets);
 		}
-		
-		findBestJoinPlan(newSubsets, tableNames);
+		return findBestJoinPlan(newSubsets, tableNames);
 	}
 	
 	/**
@@ -216,18 +255,17 @@ public class JoinLogicalOperator extends LogicalOperator {
 		Integer numTuplesRight = dbCatalog.getStatistics(rightRelation).count;
 		
 		List<List<Column>> joinConditions = unionFind.getJoinAttributes(leftRelations, rightRelation);
-		currentSubset.setJoinConditions(joinConditions);
+		currentSubset.addJoinConditions(joinConditions);
 		
 		//If the current subset has two tables, the V values of the children needs
 		//to be used directly
 		if(currentSubset.getRelations().size() == 2) {
 			Integer numTuplesLeft = dbCatalog.getStatistics(leftRelations.get(0)).count;
-			
+			Double denominator = 1.0;
 			
 			//If there are no join condition, the size is the cross product
 			if(joinConditions.size() > 0) {
-				Double denominator = 1.0;
-			
+				
 				//For multiple join conditions, the denominator needs to be a product of 
 				//max v values for each join condition
 				for(List<Column> joinCondition: joinConditions){
@@ -235,8 +273,8 @@ public class JoinLogicalOperator extends LogicalOperator {
 					Double vValueRight = v_values.get(joinCondition.get(1).toString());
 					denominator *= Math.max(vValueLeft,vValueRight);
 				}
-				size = (numTuplesLeft * numTuplesRight) / denominator;
 			} 
+			size = (numTuplesLeft * numTuplesRight) / denominator;
 		}
 		
 		//For joins which contains more than 2 tables on the left, we need to

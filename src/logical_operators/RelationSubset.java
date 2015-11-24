@@ -79,6 +79,10 @@ public class RelationSubset implements Iterable<String> {
 		this.joinConditions = joinConditions;
 	}
 	
+	public void addJoinConditions(List<List<Column>> joinConditions) {
+		this.joinConditions.addAll(joinConditions);
+	}
+	
 	public List<String> getRelations() {
 		return relations;
 	}
