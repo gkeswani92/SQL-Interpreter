@@ -216,8 +216,7 @@ public class UnionFind {
 			return null;
 		}
 		
-<<<<<<< Updated upstream
-		int i = 0;
+ 		int i = 0;
 		Expression exp = null;
 		
 		while(exp == null && i < ufes.size()) {
@@ -226,10 +225,6 @@ public class UnionFind {
 		}
 		
 		if (exp == null || i >= ufes.size()) {
-=======
-		Expression exp = getExpressionForUnionFindElement(ufes.get(0), tableName);
-		if (exp == null || ufes.size() == 1) {
->>>>>>> Stashed changes
 			return exp;
 		}
 		
