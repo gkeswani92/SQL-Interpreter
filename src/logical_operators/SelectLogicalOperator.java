@@ -22,14 +22,22 @@ import utils.PlanBuilderConfigFileReader;
 
 public class SelectLogicalOperator extends LogicalOperator {
 
-	LogicalOperator child;
-	Expression whereClause;
-	DatabaseCatalog dbCatalog;
+	private LogicalOperator child;
+	private Expression whereClause;
+	private DatabaseCatalog dbCatalog;
+	private String alias;
+	private Map<String, AttributeSelectionStatistics> currentAttributeStatistics;
 	
 	public SelectLogicalOperator(Expression exp, LogicalOperator child) {
 		this.child = child;
 		whereClause = exp;
 		dbCatalog = DatabaseCatalog.getInstance();
+		alias = getTableName();
+		currentAttributeStatistics = getAttributeSelectionStatistics(getTableName());
+	}
+	
+	public Map<String, AttributeSelectionStatistics> getCurrentAttributeStatistics() {
+		return currentAttributeStatistics;
 	}
 	
     public Expression getExpression(){
@@ -40,13 +48,11 @@ public class SelectLogicalOperator extends LogicalOperator {
 	public Operator getNextPhysicalOperator() {
 		
 		Index index = null;
-		String alias = getTableName();
 				
 		// If child is a scan, then can possibly use index
 		if (PlanBuilderConfigFileReader.getInstance().getUseIndexFlag() == 1 && child instanceof ScanLogicalOperator) {
 			
 			// Finding the IO cost to use the various available indexes
-			Map<String, AttributeSelectionStatistics> currentAttributeStatistics = getAttributeSelectionStatistics(alias);
 			Map<String, Double> ioCost = getIOCostForIndexes(alias, currentAttributeStatistics);
 			
 			//In case of multiple indexes, we need to figure out which index to use

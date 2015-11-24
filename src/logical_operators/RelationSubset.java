@@ -4,15 +4,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.jsqlparser.schema.Column;
+
 public class RelationSubset implements Iterable<String> {
 	
 	private List<String> relations;
-	private Double planCost;
+	private Double planCost, size;
+	private List<List<Column>> joinConditions;
 	
 	public RelationSubset(String tableName){
 		relations = new ArrayList<String>();
 		relations.add(tableName);
 		planCost = 0.0;
+		size = 0.0;
+		joinConditions = new ArrayList<List<Column>>();
 	}
 	
 	public RelationSubset(List<String> tableNames, String newTableName){
@@ -20,14 +25,58 @@ public class RelationSubset implements Iterable<String> {
 		relations.addAll(tableNames);
 		relations.add(newTableName);
 		planCost = 0.0;
+		size = 0.0;
+		joinConditions = new ArrayList<List<Column>>();
 	}
-	
+
 	/**
 	 * Adds the relation to the current relation subset
 	 * @param tableName
 	 */
 	public void addToRelationSubset(String tableName) {
 		relations.add(tableName);
+	}
+	
+	/**
+	 * Returns the list of relations that are passed in but are not presnt in this
+	 * relation 
+	 * @param initialRelations
+	 * @return
+	 */
+	public List<String> findAddableRelations(List<String> initialRelations) {
+		List<String> addableRelations = new ArrayList<String>();
+		for(String relation: initialRelations) {
+			if(!relations.contains(relation)){
+				addableRelations.add(relation);
+			}
+		}
+		return addableRelations;
+	}
+	
+	/**
+	 * Returns true if the passed in relations matches the current subsets in 
+	 * this relations
+	 * @param parents
+	 * @return
+	 */
+	public boolean exactlyMatches(List<String> parents) {
+		if(relations.size() == parents.size()){
+			for(int i=0; i<relations.size(); i++){
+				if(!relations.get(i).equals(parents.get(i))){
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	public List<List<Column>> getJoinConditions() {
+		return joinConditions;
+	}
+
+	public void setJoinConditions(List<List<Column>> joinConditions) {
+		this.joinConditions = joinConditions;
 	}
 	
 	public List<String> getRelations() {
@@ -46,8 +95,16 @@ public class RelationSubset implements Iterable<String> {
 		this.planCost = planCost;
 	}
 	
+	public Double getSize() {
+		return size;
+	}
+
+	public void setSize(Double size) {
+		this.size = size;
+	}
+	
 	public String toString() {
-		return "Subset: " + relations + " Cost: " + planCost;
+		return "Subset: " + relations + " Cost: " + planCost + " Size: " + size;
 	}
 
 	@Override
@@ -55,25 +112,4 @@ public class RelationSubset implements Iterable<String> {
 		return relations.iterator();
 	}
 	
-	public List<String> findAddableRelations(List<String> initialRelations) {
-		List<String> addableRelations = new ArrayList<String>();
-		for(String relation: initialRelations) {
-			if(!relations.contains(relation)){
-				addableRelations.add(relation);
-			}
-		}
-		return addableRelations;
-	}
-	
-	public boolean exactlyMatches(List<String> parents) {
-		if(relations.size() == parents.size()){
-			for(int i=0; i<relations.size(); i++){
-				if(!relations.get(i).equals(parents.get(i))){
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
-	}
 }

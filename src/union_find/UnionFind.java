@@ -216,6 +216,7 @@ public class UnionFind {
 			return null;
 		}
 		
+<<<<<<< Updated upstream
 		int i = 0;
 		Expression exp = null;
 		
@@ -225,6 +226,10 @@ public class UnionFind {
 		}
 		
 		if (exp == null || i >= ufes.size()) {
+=======
+		Expression exp = getExpressionForUnionFindElement(ufes.get(0), tableName);
+		if (exp == null || ufes.size() == 1) {
+>>>>>>> Stashed changes
 			return exp;
 		}
 		
@@ -233,8 +238,39 @@ public class UnionFind {
 			if (rightExpression != null) {
 				exp = new AndExpression(exp, rightExpression);
 			}
-		}
-		
+		}		
 		return exp;
+	}
+	
+	/**
+	 * Gets attributes that left and right relations are being joined on
+	 */
+	public List<List<Column>> getJoinAttributes(List<String> left, String right){
+		
+		List<List<Column>> joinAttributes = new ArrayList<List<Column>>();
+		
+		//For every relation in the left, search for attribute pairs with the right in the same union
+		//find element
+		for(String leftRelation: left){
+			for(UnionFindElement ufe: elements){
+				List<Column> leftAttributes = ufe.findAllAttributesForRelation(leftRelation);
+				List<Column> rightAttributes = ufe.findAllAttributesForRelation(right);
+				
+				//If the current union find element has attributes from the left and right relation,
+				//then make pairs and return
+				if(leftAttributes != null && rightAttributes != null){
+					
+					for(Column leftColumn: leftAttributes){
+						for(Column rightColumn: rightAttributes){
+							List<Column> currentJoinAttribute = new ArrayList<Column>();
+							currentJoinAttribute.add(leftColumn);
+							currentJoinAttribute.add(rightColumn);
+							joinAttributes.add(currentJoinAttribute);
+						}
+					}
+				}
+			}
+		}
+		return joinAttributes;
 	}
 }

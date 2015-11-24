@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import expression_visitors.UnionFindBuilder;
 import indexing.BuildIndex;
 import logical_operators.DuplicateEliminationLogicalOperator;
@@ -268,7 +267,6 @@ public class Interpreter {
 					finalExpressionRelation = unsuableSelectionConditions;
 				}
 			}
-			
 			
 			if(finalExpressionRelation == null){
 				children.put(tableName, new ScanLogicalOperator(tableName));
