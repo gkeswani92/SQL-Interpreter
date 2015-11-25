@@ -95,8 +95,15 @@ public class SMJOperator extends JoinOperator {
 		}
 		
 		// Join with join expressions
-		plan = plan + "SMJ[" + joinCondition.toString()+ "]\n";
+		if (joinCondition != null) {
+			plan = plan + "SMJ[" + joinCondition.toString()+ "]\n";
+		} else {
+			plan = plan + "SMJ\n";
+		}
 		
+		level += 1;
+		plan = plan + leftChild.getPhysicalPlanToString(level);
+		plan = plan + rightChild.getPhysicalPlanToString(level);
 		return plan;
 	}
 }

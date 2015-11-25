@@ -1,5 +1,0 @@
-/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/input
-/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/output
-/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/temp
-1
-1

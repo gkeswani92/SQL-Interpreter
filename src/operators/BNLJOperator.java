@@ -1,11 +1,9 @@
 package operators;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import expression_visitors.ExpressionEvaluator;
 import net.sf.jsqlparser.expression.Expression;
-import union_find.UnionFindElement;
 import utils.Tuple;
 
 public class BNLJOperator extends JoinOperator {
@@ -169,8 +167,15 @@ public class BNLJOperator extends JoinOperator {
 		}
 		
 		// Join with join expressions
-		plan = plan + "BNLJ[" + joinCondition.toString()+ "]\n";
+		if (joinCondition != null) {
+			plan = plan + "BNLJ[" + joinCondition.toString()+ "]\n";
+		} else {
+			plan = plan + "BNLJ\n";
+		}
 		
+		level += 1;
+		plan = plan + leftChild.getPhysicalPlanToString(level);
+		plan = plan + rightChild.getPhysicalPlanToString(level);
 		return plan;
 	}
 }
