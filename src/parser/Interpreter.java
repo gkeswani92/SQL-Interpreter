@@ -183,6 +183,8 @@ public class Interpreter {
 		String plan = root.getLogicalPlanToString(0);
 		System.out.println(plan);
 		Operator opRoot = root.getNextPhysicalOperator();
+		plan = opRoot.getPhysicalPlanToString(0);
+		System.out.println(plan);
 		return opRoot;
 	}
 	

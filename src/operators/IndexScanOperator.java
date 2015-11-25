@@ -198,4 +198,18 @@ public class IndexScanOperator extends Operator {
 		}
 	}
 
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		plan = plan + "IndexScan[";
+		plan = plan + tableName + "," + index.getAttribute() + "," + lowKey + "," + highKey;
+		plan = plan + "]\n";
+		return plan;
+	}
 }

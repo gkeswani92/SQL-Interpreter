@@ -53,4 +53,16 @@ public class DuplicateEliminationOperator extends Operator {
 		child.reset();
 	}
 
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		
+		if (level == 0) {
+			plan = "DupElim" + "\n";
+		}
+		
+		plan = plan + child.getPhysicalPlanToString(level+=1) + "\n";
+		return plan;
+	}
+
 }

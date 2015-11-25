@@ -49,4 +49,20 @@ public class TNLJOperator extends JoinOperator {
 		return null;		
 	}
 
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		
+		// Level
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		// Join with join expressions
+		plan = plan + "TNLJ[" + joinCondition.toString()+ "]\n";
+		
+		return plan;
+	}
 }

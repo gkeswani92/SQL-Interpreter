@@ -61,4 +61,24 @@ public class InMemorySortOperator extends SortOperator {
 	public void reset(int index) {
 		currIndex = index;
 	}
+
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		plan = plan + "InMemorySort" + "[";
+		for (String cond: sortConditions) {
+			plan = plan + cond + ",";
+		}
+		
+		plan = plan.substring(0, plan.length()-1);
+		plan = plan + "]\n";
+		plan = plan + child.getPhysicalPlanToString(level+=1);
+		return plan;
+	}
 }

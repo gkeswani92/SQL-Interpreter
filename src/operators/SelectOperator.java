@@ -55,4 +55,20 @@ public class SelectOperator extends Operator {
     public Expression getExpression(){
     	return whereClause;
     }
+
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		plan = plan + "Select[";
+		plan = plan + whereClause.toString();
+		plan = plan + "]\n";
+		plan = plan + child.getPhysicalPlanToString(level+=1);
+		return plan;
+	}
 }

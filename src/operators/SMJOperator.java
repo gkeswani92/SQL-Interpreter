@@ -82,4 +82,21 @@ public class SMJOperator extends JoinOperator {
 		
 		return returnTuple;
 	}
+	
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		
+		// Level
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		// Join with join expressions
+		plan = plan + "SMJ[" + joinCondition.toString()+ "]\n";
+		
+		return plan;
+	}
 }

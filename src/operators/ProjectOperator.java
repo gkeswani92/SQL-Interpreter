@@ -54,4 +54,27 @@ public class ProjectOperator extends Operator {
     public void setRequiredColumns(List<String> requiredColumns) {
     	this.requiredColumns = requiredColumns;
     }
+
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		
+		// Level
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		plan = plan + "Project" + "[";
+		for (String col: requiredColumns) {
+			plan = plan + col + ",";
+		}
+		plan = plan.substring(0, plan.length()-1);
+		plan = plan + "]\n";
+		
+		plan = plan + child.getPhysicalPlanToString(level+=1);
+		
+		return plan;
+	}
 }

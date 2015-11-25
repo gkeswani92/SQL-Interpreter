@@ -1,1 +1,1 @@
-SELECT * FROM Sailors, Reserves, Boats WHERE Sailors.A = Reserves.G AND Reserves.H = Boats.D AND Sailors.A < 20;
+SELECT DISTINCT Sailors.A, Reserves.G FROM Sailors, Reserves, Boats WHERE Sailors.B = Reserves.G AND Sailors.A = Boats.D AND Reserves.H <> Boats.D AND Reserves.H < 100 ORDER BY Sailors.A;

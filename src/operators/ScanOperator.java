@@ -73,4 +73,19 @@ public class ScanOperator extends Operator{
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		
+		// Level
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		plan = plan + "TableScan[" + tableName + "]\n";
+		return plan;
+	}
 }

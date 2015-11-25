@@ -22,6 +22,8 @@ public abstract class Operator {
 	 */
 	public abstract void reset();
 	
+	public abstract String getPhysicalPlanToString(Integer level);
+	
 	public void reset(int index) {
 		
 	}
