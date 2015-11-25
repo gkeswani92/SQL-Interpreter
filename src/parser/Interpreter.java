@@ -2,6 +2,7 @@ package parser;
 
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -239,7 +240,7 @@ public class Interpreter {
 		getChildrenFromQuery(body, allChildren);
 		
 		UnionFind unionFind = new UnionFind();
-		List<Expression> unusableJoinConditions = new ArrayList<Expression>();
+		Map<List<String>, Expression> unusableJoinConditions = new LinkedHashMap<List<String>, Expression>();
 		List<Expression> unusableSelectConditions = new ArrayList<Expression>();
 		
 		// If where clause exists, call visitor class to get map of basic operators and list of join conditions

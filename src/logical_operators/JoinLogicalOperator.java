@@ -7,35 +7,39 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jsqlparser.expression.BinaryExpression;
+import expression_visitors.SMJSortConditionsBuilder;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.schema.Column;
+import operators.BNLJOperator;
 import operators.Operator;
+import operators.SMJOperator;
 import statistics.AttributeSelectionStatistics;
 import statistics.AttributeStatistics;
 import statistics.TableStatistics;
 import union_find.UnionFind;
 import union_find.UnionFindElement;
 import utils.DatabaseCatalog;
+import utils.PlanBuilderConfigFileReader;
 import utils.RelationSubsetComparator;
 
 public class JoinLogicalOperator extends LogicalOperator {
 	
 	private Map<String, LogicalOperator> children;
 	private List<String> relationsToBeJoined;
-	private List<Expression> joinConditions;
+	private Map<List<String>, Expression> joinConditions;
 	private UnionFind unionFind;
 	private Map<String, Double> v_values;
 	private DatabaseCatalog dbCatalog;
+	private Map<String, Operator> physicalChildren;
 	
-	public JoinLogicalOperator(List<Expression> joinConditions, Map<String, LogicalOperator> children,
+	public JoinLogicalOperator(Map<List<String>, Expression> joinConditions, Map<String, LogicalOperator> children,
 					UnionFind unionFind) {
 		this.children = new LinkedHashMap<String, LogicalOperator>();
 		this.children.putAll(children);
-		this.joinConditions = new ArrayList<Expression>();
-		this.joinConditions.addAll(joinConditions);
+		this.joinConditions = new HashMap<List<String>, Expression>();
+		this.joinConditions.putAll(joinConditions);
 		this.unionFind = unionFind;
 		
 		dbCatalog = DatabaseCatalog.getInstance();
@@ -118,7 +122,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 	public Operator getNextPhysicalOperator() {
 		
 		// Map of relation name to the corresponding physical child operator
-		Map<String, Operator> physicalChildren = new LinkedHashMap<String, Operator>();
+		physicalChildren = new LinkedHashMap<String, Operator>();
 		for(String tableName: children.keySet()){
 			LogicalOperator currentChild = children.get(tableName);
 			physicalChildren.put(tableName, currentChild.getNextPhysicalOperator());
@@ -139,33 +143,103 @@ public class JoinLogicalOperator extends LogicalOperator {
 		return getLeftDeepTree(bestJoinPlanSubset);
 	}
 	
-	 public Operator getLeftDeepTree(RelationSubset bestJoinPlanSubset) {
+	public Operator getJoinOperator(Expression unionFindCondition, Expression unusableCondition, 
+			Operator leftChild, String leftTable, String rightTable) {
+		
+		Expression finalCondition = null;
+		if (leftChild == null) {
+			leftChild = physicalChildren.get(leftTable);
+		}	
+		Operator rightChild = physicalChildren.get(rightTable);
+		
+		// If we have unusable conditions, use BNLJ
+		if (unusableCondition != null) {
+			finalCondition = unusableCondition;
+			if (unionFindCondition != null) {
+				finalCondition = new AndExpression(finalCondition, unionFindCondition);
+			}
+			return new BNLJOperator(finalCondition, leftChild, rightChild, PlanBuilderConfigFileReader.getInstance().getJoinBuffer());
+		} 
+		// If we have ONLY usable conditions, use SMJ
+		else if (unionFindCondition != null) {
+			finalCondition = unionFindCondition;
+			List<String> leftSortConditions = new ArrayList<String>();
+			List<String> rightSortConditions = new ArrayList<String>();
+			
+			// Call ExpressionVisitor to get list of left sort conditions and list of right sort conditions.
+			SMJSortConditionsBuilder conditions = new SMJSortConditionsBuilder(leftSortConditions, rightSortConditions, rightTable);
+			finalCondition.accept(conditions);
+			return new SMJOperator(finalCondition, leftChild, rightChild, leftSortConditions, rightSortConditions);
+		} 
+		// If we have neither, use BNLJ
+		else {
+			return new BNLJOperator(null, leftChild, rightChild, PlanBuilderConfigFileReader.getInstance().getJoinBuffer());
+		}
+	}
+	
+	public Operator getLeftDeepTree(RelationSubset bestJoinPlanSubset) {
 		 
 		 List<String> allRelations = bestJoinPlanSubset.getRelations();
 		 List<String> leftJoinTables = new ArrayList<>();
 		 String rightTable = null;
 		 
 		 // Get the 1st two tables
+		 int rightIndex = 1;
 		 leftJoinTables.add(allRelations.get(0));
-		 rightTable = allRelations.get(1);
+		 rightTable = allRelations.get(rightIndex++);
 		 
-		 List<List<Column>> joinAttributes = unionFind.getJoinAttributes(leftJoinTables, rightTable);
-		 Expression unionFindJoinCondition = getExpressionFromColumnList(joinAttributes);
-		 Expression unusableCondition = getUnusableCondition(leftJoinTables, rightTable);
+		 Operator root = null;
 		 
-		 if (allRelations.size() > 2) {
+		 while (leftJoinTables.size() < allRelations.size()) {
+			 List<List<Column>> joinAttributes = unionFind.getJoinAttributes(leftJoinTables, rightTable);
+			 Expression unionFindJoinCondition = getExpressionFromColumnList(joinAttributes);
+			 Expression unusableCondition = getUnusableCondition(leftJoinTables, rightTable);
 			 
+			 // CREATE NEW JOIN OPERATOR
+			 if (root == null) {
+				 root = getJoinOperator(unionFindJoinCondition, unusableCondition, null, leftJoinTables.get(0), rightTable);
+			 } else {
+				 root = getJoinOperator(unionFindJoinCondition, unusableCondition, root, null, rightTable);
+			 }
+			 
+			 leftJoinTables.add(rightTable);
+			 
+			 if (rightIndex < allRelations.size()) {
+				 rightTable = allRelations.get(rightIndex++);
+			 }
 		 }
-		 return null;
+		 return root;
+	 }
+	 
+	 public boolean checkIfContains(List<String> attributes, List<String> leftTables) {
+		 for (String leftTable: leftTables) {
+			 if (attributes.contains(leftTable)) {
+				 return true;
+			 }
+		 }
+		 return false;
 	 }
 	 
 	 public Expression getUnusableCondition(List<String> leftJoinTables, String rightTable) {
-		 for (Expression unusableJoinConditon: joinConditions) {
-			 BinaryExpression be = (BinaryExpression) unusableJoinConditon;
+		 
+		 Expression exp = null;
+		 for (List<String> attributes: joinConditions.keySet()) {
+			 if(attributes.contains(rightTable) && checkIfContains(attributes, leftJoinTables)) {
+				 if (exp == null) {
+					 exp = joinConditions.get(attributes);
+				 } else {
+					 exp = new AndExpression(exp, joinConditions.get(attributes));
+				 }
+			 }
 		 }
+		 return exp;
 	 }
 	 
 	 public Expression getExpressionFromColumnList(List<List<Column>> attributes) {
+		 if (attributes.size() == 0) {
+			 return null;
+		 }
+		 
 		 Expression exp = new EqualsTo(attributes.get(0).get(0), attributes.get(0).get(1));
 		 
 		 for (int i = 1; i < attributes.size(); i++) {
@@ -367,8 +441,8 @@ public class JoinLogicalOperator extends LogicalOperator {
 		
 		// Join with Residual join expressions
 		plan = plan + "Join" + "[";
-		for (Expression exp: joinConditions) {
-			plan = plan + exp.toString() + ",";
+		for (List<String> key: joinConditions.keySet()) {
+			plan = plan + joinConditions.get(key).toString() + ",";
 		}
 		plan = plan.substring(0, plan.length()-1);
 		if (!joinConditions.isEmpty()) {
