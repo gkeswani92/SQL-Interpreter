@@ -13,6 +13,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import operators.BNLJOperator;
+import operators.ExternalSortOperator;
 import operators.Operator;
 import operators.SMJOperator;
 import statistics.AttributeSelectionStatistics;
@@ -169,7 +170,17 @@ public class JoinLogicalOperator extends LogicalOperator {
 			// Call ExpressionVisitor to get list of left sort conditions and list of right sort conditions.
 			SMJSortConditionsBuilder conditions = new SMJSortConditionsBuilder(leftSortConditions, rightSortConditions, rightTable);
 			finalCondition.accept(conditions);
-			return new SMJOperator(finalCondition, leftChild, rightChild, leftSortConditions, rightSortConditions);
+			
+			return new SMJOperator(finalCondition, 
+					new ExternalSortOperator(leftSortConditions, 
+							leftChild, 
+							PlanBuilderConfigFileReader.getInstance().getSortBuffer()),
+					new ExternalSortOperator(rightSortConditions, 
+							rightChild, 
+							PlanBuilderConfigFileReader.getInstance().getSortBuffer()),
+					leftSortConditions,
+					rightSortConditions);
+			
 		} 
 		// If we have neither, use BNLJ
 		else {

@@ -119,12 +119,13 @@ public class SelectLogicalOperator extends LogicalOperator {
 			AttributeSelectionStatistics attrStatistics = currentAttributeStatistics.get(attribute);
 			Index attrIndex = IndexConfigFileReader.getInstance().getIndexForAttribute(attribute, alias);
 			
-			// Get number of leaves from the index file
-			IndexBinaryFileReader ibfr = new IndexBinaryFileReader(attrIndex);
-			attrIndex.setNumLeaves(ibfr.getNumLeaves());
-			ibfr.closeStuff();
-			
 			if(attrIndex != null) {
+				
+				// Get number of leaves from the index file
+				IndexBinaryFileReader ibfr = new IndexBinaryFileReader(attrIndex);
+				attrIndex.setNumLeaves(ibfr.getNumLeaves());
+				ibfr.closeStuff();
+				
 				Integer numAttributes = dbCatalog.getTableAttributes(alias).length;
 				Integer numTuples = dbCatalog.getStatistics(alias).count;
 				Integer numPages = Math.floorDiv(numTuples, 4088 / (4 * numAttributes));

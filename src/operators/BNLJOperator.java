@@ -140,8 +140,10 @@ public class BNLJOperator extends JoinOperator {
 				break;
 			
 			//If it is a cartesian product, just return the tuple
-			if(joinCondition == null)
+			if(joinCondition == null){
+				outerIndex++;
 				return joinTuple;
+			}
 			
 			//If the joined tuple, satisfies the join condition, return it
 			ExpressionEvaluator ob = new ExpressionEvaluator(joinTuple);

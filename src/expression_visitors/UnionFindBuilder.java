@@ -120,7 +120,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 				attributeNames.add(right.getTable().toString());
 				unusableJoinConditions.put(attributeNames, arg0);			} else {
 				Long value = ((LongValue)arg0.getRightExpression()).toLong();
-				leftElement.setLowerBound(value -1);
+				leftElement.setLowerBound(value + 1);
 			}
 		} 
 		
@@ -133,7 +133,7 @@ public class UnionFindBuilder implements ExpressionVisitor {
 			if(rightElement == null) {
 				rightElement = unionFind.create(right);
 			}
-			rightElement.setUpperBound(value+1);
+			rightElement.setUpperBound(value -1);
 		}
 	}
 
