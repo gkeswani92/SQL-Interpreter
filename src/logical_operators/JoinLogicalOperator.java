@@ -145,6 +145,16 @@ public class JoinLogicalOperator extends LogicalOperator {
 		return getLeftDeepTree(bestJoinPlanSubset);
 	}
 	
+	/**
+	 * Gets the join operator - BNLJ / SMJ with the join conditions depending on 
+	 * the usable and unusable conditions
+	 * @param unionFindCondition
+	 * @param unusableCondition
+	 * @param leftChild
+	 * @param leftTable
+	 * @param rightTable
+	 * @return
+	 */
 	public Operator getJoinOperator(Expression unionFindCondition, Expression unusableCondition, 
 			Operator leftChild, String leftTable, String rightTable) {
 		
@@ -189,6 +199,11 @@ public class JoinLogicalOperator extends LogicalOperator {
 		}
 	}
 	
+	/**
+	 * Given the best plan relation subset, creates the left deep join tree
+	 * @param bestJoinPlanSubset
+	 * @return
+	 */
 	public Operator getLeftDeepTree(RelationSubset bestJoinPlanSubset) {
 		 
 		 List<String> allRelations = bestJoinPlanSubset.getRelations();
@@ -260,6 +275,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 		 
 		 return exp;
 	 }
+	 
 	/**
 	 * Finds the best left deep join plan for the children of the logical join
 	 * @param relationSubsets
@@ -271,14 +287,16 @@ public class JoinLogicalOperator extends LogicalOperator {
 		// Base case: When all plans have the size of the initial number of relations
 		// Select the plan with the minimum cost
 		if(tableNames.size() == relationSubsets.get(0).getRelations().size()){
-			System.out.println("We have computed all possible plans. Now checking for the best plan");
+			System.out.println("\nFinal plans: " + relationSubsets);
 			Collections.sort(relationSubsets, new RelationSubsetComparator());
+			System.out.println("Best plan: " + relationSubsets.get(0));
 			return relationSubsets.get(0);
 		}
 		
 		List<RelationSubset> newSubsets = new ArrayList<RelationSubset>();
 		
 		for(RelationSubset currentSubset: relationSubsets){
+			System.out.println("\nFinding the best next plan for "+currentSubset);
 			List<String> relationAdditions = currentSubset.findAddableRelations(tableNames);
 			List<RelationSubset> relationAdditionSubsets = new ArrayList<RelationSubset>();
 			
@@ -294,11 +312,13 @@ public class JoinLogicalOperator extends LogicalOperator {
 				//Computing the size of the current plan
 				Double size = computeSizeOfPlan(currentPossibleSubset, currentSubset, relation);
 				currentPossibleSubset.setSize(size);
+				System.out.println(currentPossibleSubset);
 			}	
 			
 			//Finding the best plans for the current subset and keeping them for the next iteration
 			List<RelationSubset> bestAddableRelationSubsets = findBestAddableRelationSubset(relationAdditionSubsets);
 			newSubsets.addAll(bestAddableRelationSubsets);
+			System.out.println("Best plans for current subset are "+bestAddableRelationSubsets);
 		}
 		return findBestJoinPlan(newSubsets, tableNames);
 	}
