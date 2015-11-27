@@ -53,7 +53,12 @@ public class ScanLogicalOperator extends LogicalOperator {
 			}
 		}
 		
-		plan = plan + "Leaf[" + tableName + "]\n";
+		String table = tableName;
+		if (DatabaseCatalog.getInstance().getTableForAlias(table) != null) {
+			table = DatabaseCatalog.getInstance().getTableForAlias(table);
+		}
+		
+		plan = plan + "Leaf[" + table + "]\n";
 		return plan;
 	}
 }

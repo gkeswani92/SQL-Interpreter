@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 
 import utils.Tuple;
 import utils.BinaryFileReader;
+import utils.DatabaseCatalog;
 
 /**
  * Extends operator to implement the scan
@@ -85,7 +86,12 @@ public class ScanOperator extends Operator{
 			}
 		}
 		
-		plan = plan + "TableScan[" + tableName + "]\n";
+		String table = tableName;
+		if (DatabaseCatalog.getInstance().getTableForAlias(table) != null) {
+			table = DatabaseCatalog.getInstance().getTableForAlias(table);
+		}
+		
+		plan = plan + "TableScan[" + table + "]\n";
 		return plan;
 	}
 }

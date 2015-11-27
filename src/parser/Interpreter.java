@@ -1,6 +1,8 @@
 package parser;
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -149,8 +151,8 @@ public class Interpreter {
 	                		root = new DuplicateEliminationLogicalOperator(root);
 	                }
 	    			
-	                Operator physicalRoot = constructPhysicalPlan(root);
-	                //writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
+	                Operator physicalRoot = constructPhysicalPlan(root, queryCount, outputScrDir);
+	                writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
 	                physicalRoot.dump();
 	    			//writeToFile.writeTestFile(physicalRoot, queryCount, outputFileFormat);
 	    			
@@ -178,13 +180,41 @@ public class Interpreter {
 		}
 	}
 	
-	private static Operator constructPhysicalPlan (LogicalOperator root) {
+	/**
+	 * Constructs and writes the logical and physical plan to disk
+	 * @param root
+	 * @param queryCount
+	 * @param outputScrDir
+	 * @return
+	 */
+	private static Operator constructPhysicalPlan (LogicalOperator root, Integer queryCount, String outputScrDir) {
 		String plan = root.getLogicalPlanToString(0);
-		System.out.println(plan);
+		writePlanToDisk(plan, "logicalplan", queryCount, outputScrDir);
+		
 		Operator opRoot = root.getNextPhysicalOperator();
 		plan = opRoot.getPhysicalPlanToString(0);
-		System.out.println(plan);
+		writePlanToDisk(plan, "physicalplan", queryCount, outputScrDir);
 		return opRoot;
+	}
+	
+	/**
+	 * Writes the passed in plan to disk
+	 * @param plan
+	 * @param typeOfPlan
+	 * @param queryCount
+	 * @param outputScrDir
+	 */
+	private static void writePlanToDisk(String plan, String typeOfPlan, Integer queryCount, String outputScrDir) {
+		
+		String filePath = outputScrDir + "/query"+ queryCount.toString() + "_" + typeOfPlan;
+		PrintWriter out = null;
+		try {
+			out = new PrintWriter(filePath);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		out.write(plan);
+		out.close();
 	}
 	
 	private static LogicalOperator handleWithoutJoin(PlainSelect body, List<SelectItem> selectAttr) {

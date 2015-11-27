@@ -50,7 +50,7 @@ public class SelectLogicalOperator extends LogicalOperator {
 		Index index = null;
 				
 		// If child is a scan, then can possibly use index
-		if (PlanBuilderConfigFileReader.getInstance().getUseIndexFlag() == 1 && child instanceof ScanLogicalOperator) {
+		if (child instanceof ScanLogicalOperator) {
 			
 			// Finding the IO cost to use the various available indexes
 			Map<String, Double> ioCost = getIOCostForIndexes(alias, currentAttributeStatistics);
