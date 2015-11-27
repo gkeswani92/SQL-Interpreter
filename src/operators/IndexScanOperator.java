@@ -186,6 +186,7 @@ public class IndexScanOperator extends Operator {
 	public void reset() {
 		currKeyIndex = -1;
 		currRecordIndex = -1;
+		currLeafNode = null;
 		
 		try {
 			ibfr.closeStuff();
