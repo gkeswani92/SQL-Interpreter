@@ -152,7 +152,7 @@ public class Interpreter {
 	                }
 	    			
 	                Operator physicalRoot = constructPhysicalPlan(root, queryCount, outputScrDir);
-	                writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
+	                //writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
 	                physicalRoot.dump();
 	    			//writeToFile.writeTestFile(physicalRoot, queryCount, outputFileFormat);
 	    			
