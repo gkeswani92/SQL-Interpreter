@@ -40,8 +40,8 @@ public abstract class Operator {
 		}
 			
 		while(currentTuple != null) {
-			//tableDump = tableDump + count++ + " " + currentTuple.toStringValues() +  "\n";
-			System.out.println(count++ + " " + currentTuple.toStringValues());
+			tableDump = tableDump + count++ + " " + currentTuple.toStringValues() +  "\n";
+			//System.out.println(count++ + " " + currentTuple.toStringValues());
 			currentTuple = getNextTuple();
 		}
 		System.out.println(tableDump);

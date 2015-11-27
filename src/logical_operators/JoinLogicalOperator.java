@@ -60,6 +60,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 			
 			//Getting the child and the statistics for the relation 
 			LogicalOperator child = children.get(relation);
+			
 			TableStatistics tableStats = DatabaseCatalog.getInstance().getStatistics(relation);
 			String[] attributes = dbCatalog.getTableAttributes(relation);
 			

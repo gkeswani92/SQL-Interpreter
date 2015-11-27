@@ -76,6 +76,10 @@ public class IndexConfigFileReader {
 	}
 	
 	public Index getIndexForAttribute(String attrName, String tableName){
+		if (DatabaseCatalog.getInstance().getTableForAlias(tableName) != null) {
+			tableName = DatabaseCatalog.getInstance().getTableForAlias(tableName);
+		}
+		
 		if(attrName != null && attributeHasIndex(attrName, tableName)) {
 			List<Index> tableIndexes = indexes.get(tableName);
 			for(Index index: tableIndexes) {

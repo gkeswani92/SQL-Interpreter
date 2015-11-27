@@ -135,6 +135,9 @@ public class DatabaseCatalog {
 	}
 	
 	public TableStatistics getStatistics(String tableName) {
+		if (getTableForAlias(tableName) != null) {
+			tableName = getTableForAlias(tableName);
+		}
 		return stats.get(tableName);
 	}
 }
