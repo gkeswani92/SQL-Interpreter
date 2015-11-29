@@ -79,7 +79,8 @@ public class BPlusTree {
 		} else {
 			root = createIndexNodes(leaves);
 		}
-		IndexSerializer.serializeHeader(root, leaves.size(), order);
+		IndexSerializer.serializeHeader(root, leaves.size()+1, order);
+
 	}
 	
 	/**
@@ -97,13 +98,14 @@ public class BPlusTree {
 		//Attaching all child nodes to a upper level index nodes
 		List<Node> indexes = addChildrenToIndexNodes(nodes);
 		
+		checkForLastIndexUnderflow(indexes);
+		
 		for(Node index: indexes){
 			for(int i=0; i<((IndexNode)index).children.size()-1; i++){
 				((IndexNode)index).keys.add(getSmallestKeyFromSubtree(((IndexNode)index).children.get(i+1)));
 			}
 		}
 		
-		checkForLastIndexUnderflow(indexes);
 		IndexSerializer.serializeIndexNodes(indexes);
 		return createIndexNodes(indexes);
 	}
@@ -116,7 +118,7 @@ public class BPlusTree {
 	public List<Node> addChildrenToIndexNodes(List<Node> children) {
 		
 		List<Node> indexes = new ArrayList<Node>();
-		indexes.add(new IndexNode(children.get(0)));
+		indexes.add(new IndexNode(children.remove(0)));
 		
 		for (Node node: children) {
 			IndexNode lastIndex = (IndexNode)indexes.get(indexes.size()-1);
@@ -220,33 +222,26 @@ public class BPlusTree {
 		IndexNode lastIndex = (IndexNode)indexes.get(indexes.size()-1);
 		
 		//If the last index is underflowing, we need to redistribute with the second last node
-		if(lastIndex.keys.size() < order){
+		if(lastIndex.children.size() < order + 1){
 			
 			IndexNode secondLastIndex = (IndexNode)indexes.get(indexes.size()-2);
 			
-			//Collecting all the keys and children together so as to redistribute
-			List<Integer> keys = new ArrayList<Integer>();
-			keys.addAll(secondLastIndex.keys);
-			keys.addAll(lastIndex.keys);
-			
+			//Collecting all the children together so as to redistribute
 			List<Node> children = new ArrayList<Node>();
 			children.addAll(secondLastIndex.children);
 			children.addAll(lastIndex.children);
 			
-			secondLastIndex.keys.clear();
 			secondLastIndex.children.clear();
-			lastIndex.keys.clear();
 			lastIndex.children.clear();
 
-			//Second to last index node gets m/2 keys and m/2 + 1 children
-			for(int i=0; i<keys.size()/2; i++){
-				secondLastIndex.keys.add(keys.remove(0));
+			int numChildren = children.size();
+			
+			//Second to last index node gets m/2 children
+			for(int i=0; i<numChildren/2; i++){
 				secondLastIndex.children.add(children.remove(0));
 			}
-			secondLastIndex.children.add(children.remove(0));
 			
-			//Last index gets the remaining keys and children
-			lastIndex.keys.addAll(keys);
+			//Last index gets the remaining children
 			lastIndex.children.addAll(children);
 		}
 	}
