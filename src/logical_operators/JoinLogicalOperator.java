@@ -107,11 +107,18 @@ public class JoinLogicalOperator extends LogicalOperator {
 					if(!selectionAttributes.contains(relation + "." + attribute)){
 						AttributeStatistics currentAttrStats = tableStats.getAttributeStatistics(attribute);
 						Double vValueFromRange = currentAttrStats.maximum - currentAttrStats.minimum + 1.0;
-						Double vValueFromSelectionCondition = v_values.get(selectionAttributes.get(0));
-						if(vValueFromRange < vValueFromSelectionCondition) {
-							v_values.put(relation + "." + attribute, vValueFromRange);
+						
+						//If v values were computed from the selection condition for some attribute, compare
+						//the table stat v values to it. Otherwise, just use the table stats value
+						if(selectionAttributes.size() > 0){
+							Double vValueFromSelectionCondition = v_values.get(selectionAttributes.get(0));
+							if(vValueFromRange < vValueFromSelectionCondition) {
+								v_values.put(relation + "." + attribute, vValueFromRange);
+							} else {
+								v_values.put(relation + "." + attribute, vValueFromSelectionCondition);
+							}
 						} else {
-							v_values.put(relation + "." + attribute, vValueFromSelectionCondition);
+							v_values.put(relation + "." + attribute, vValueFromRange);
 						}
 					}
 				}
