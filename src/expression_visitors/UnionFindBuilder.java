@@ -113,12 +113,26 @@ public class UnionFindBuilder implements ExpressionVisitor {
 			if(leftElement == null)
 				leftElement = unionFind.create(left);
 			
-			if(arg0.getRightExpression() instanceof Column){
+			if (arg0.getRightExpression() instanceof Column) {
 				Column right = (Column)arg0.getRightExpression();
-				List<String> attributeNames = new ArrayList<String>();
-				attributeNames.add(left.getTable().toString());
-				attributeNames.add(right.getTable().toString());
-				unusableJoinConditions.put(attributeNames, arg0);			} else {
+				if (left.getTable().toString().equals(right.getTable().toString())) {
+					unusableSelectConditions.add(arg0);
+				} else {
+					List<String> attributeNames = new ArrayList<String>();
+					attributeNames.add(left.getTable().toString());
+					attributeNames.add(right.getTable().toString());
+					// To make sure order of table names in condition does not matter
+					java.util.Collections.sort(attributeNames);
+					
+					if (unusableJoinConditions.containsKey(attributeNames)){
+						Expression aggregate = new AndExpression(unusableJoinConditions.get(attributeNames), arg0);
+						unusableJoinConditions.put(attributeNames, aggregate);
+					} else {
+						unusableJoinConditions.put(attributeNames, arg0);
+					}
+
+				}
+			} else {
 				Long value = ((LongValue)arg0.getRightExpression()).toLong();
 				leftElement.setLowerBound(value + 1);
 			}
@@ -148,12 +162,24 @@ public class UnionFindBuilder implements ExpressionVisitor {
 			if(leftElement == null)
 				leftElement = unionFind.create(left);
 			
-			if(arg0.getRightExpression() instanceof Column){
+			if(arg0.getRightExpression() instanceof Column) {
 				Column right = (Column)arg0.getRightExpression();
-				List<String> attributeNames = new ArrayList<String>();
-				attributeNames.add(left.getTable().toString());
-				attributeNames.add(right.getTable().toString());
-				unusableJoinConditions.put(attributeNames, arg0);			
+				if (left.getTable().toString().equals(right.getTable().toString())) {
+					unusableSelectConditions.add(arg0);
+				} else {
+					List<String> attributeNames = new ArrayList<String>();
+					attributeNames.add(left.getTable().toString());
+					attributeNames.add(right.getTable().toString());
+					// To make sure order of table names in condition does not matter
+					java.util.Collections.sort(attributeNames);
+					
+					if (unusableJoinConditions.containsKey(attributeNames)){
+						Expression aggregate = new AndExpression(unusableJoinConditions.get(attributeNames), arg0);
+						unusableJoinConditions.put(attributeNames, aggregate);
+					} else {
+						unusableJoinConditions.put(attributeNames, arg0);
+					}
+				}			
 			} else {
 				Long value = ((LongValue)arg0.getRightExpression()).toLong();
 				leftElement.setLowerBound(value);
@@ -186,10 +212,22 @@ public class UnionFindBuilder implements ExpressionVisitor {
 			
 			if(arg0.getRightExpression() instanceof Column){
 				Column right = (Column)arg0.getRightExpression();
-				List<String> attributeNames = new ArrayList<String>();
-				attributeNames.add(left.getTable().toString());
-				attributeNames.add(right.getTable().toString());
-				unusableJoinConditions.put(attributeNames, arg0);
+				if (left.getTable().toString().equals(right.getTable().toString())) {
+					unusableSelectConditions.add(arg0);
+				} else {
+					List<String> attributeNames = new ArrayList<String>();
+					attributeNames.add(left.getTable().toString());
+					attributeNames.add(right.getTable().toString());
+					// To make sure order of table names in condition does not matter
+					java.util.Collections.sort(attributeNames);
+					
+					if (unusableJoinConditions.containsKey(attributeNames)){
+						Expression aggregate = new AndExpression(unusableJoinConditions.get(attributeNames), arg0);
+						unusableJoinConditions.put(attributeNames, aggregate);
+					} else {
+						unusableJoinConditions.put(attributeNames, arg0);
+					}
+				}
 			} else {
 				Long value = ((LongValue)arg0.getRightExpression()).toLong();
 				leftElement.setUpperBound(value-1);
@@ -222,10 +260,22 @@ public class UnionFindBuilder implements ExpressionVisitor {
 			
 			if(arg0.getRightExpression() instanceof Column){
 				Column right = (Column)arg0.getRightExpression();
-				List<String> attributeNames = new ArrayList<String>();
-				attributeNames.add(left.getTable().toString());
-				attributeNames.add(right.getTable().toString());
-				unusableJoinConditions.put(attributeNames, arg0);
+				if (left.getTable().toString().equals(right.getTable().toString())) {
+					unusableSelectConditions.add(arg0);
+				} else {
+					List<String> attributeNames = new ArrayList<String>();
+					attributeNames.add(left.getTable().toString());
+					attributeNames.add(right.getTable().toString());
+					// To make sure order of table names in condition does not matter
+					java.util.Collections.sort(attributeNames);
+					
+					if (unusableJoinConditions.containsKey(attributeNames)){
+						Expression aggregate = new AndExpression(unusableJoinConditions.get(attributeNames), arg0);
+						unusableJoinConditions.put(attributeNames, aggregate);
+					} else {
+						unusableJoinConditions.put(attributeNames, arg0);
+					}
+				}
 			} else {
 				Long value = ((LongValue)arg0.getRightExpression()).toLong();
 				leftElement.setUpperBound(value);
