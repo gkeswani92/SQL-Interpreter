@@ -59,23 +59,15 @@ public class SMJSortConditionsBuilder implements ExpressionVisitor{
 	public void visit(EqualsTo arg0) {
 		
 		if (((Column)arg0.getLeftExpression()).getTable().toString().equals(rightTableName)) {
-			if (!rightSortConditions.contains(arg0.getLeftExpression().toString())) {
 				rightSortConditions.add(arg0.getLeftExpression().toString());
-			}
 		} else {
-			if (!leftSortConditions.contains(arg0.getLeftExpression().toString())) {
 				leftSortConditions.add(arg0.getLeftExpression().toString());
-			}
 		}
 		
 		if (((Column)arg0.getRightExpression()).getTable().toString().equals(rightTableName)) {
-			if (!rightSortConditions.contains(arg0.getRightExpression().toString())) {
 				rightSortConditions.add(arg0.getRightExpression().toString());
-			}
 		} else {
-			if (!leftSortConditions.contains(arg0.getRightExpression().toString())) {
 				leftSortConditions.add(arg0.getRightExpression().toString());
-			}
 		}
 	}
 	
