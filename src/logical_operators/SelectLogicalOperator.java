@@ -33,7 +33,7 @@ public class SelectLogicalOperator extends LogicalOperator {
 		whereClause = exp;
 		dbCatalog = DatabaseCatalog.getInstance();
 		alias = getTableName();
-		currentAttributeStatistics = getAttributeSelectionStatistics(getTableName());
+		currentAttributeStatistics = getAttributeSelectionStatistics(dbCatalog.getTableForAlias(alias));
 	}
 	
 	public Map<String, AttributeSelectionStatistics> getCurrentAttributeStatistics() {
