@@ -71,7 +71,6 @@ public class Interpreter {
             queriesFile 	= inputSrcDir+"/queries.sql";
             
 			DatabaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
-			PlanBuilderConfigFileReader.getInstance().readConfigFile(inputSrcDir);
 			PlanBuilderConfigFileReader.getInstance().setTempDir(tempMergeOutput);
 			IndexConfigFileReader.getInstance().readConfigFile(inputSrcDir);
 			writeToFile = new DumpRelations(outputScrDir);
