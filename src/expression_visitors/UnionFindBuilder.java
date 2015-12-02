@@ -83,6 +83,11 @@ public class UnionFindBuilder implements ExpressionVisitor {
 				} else {
 					unionFind.merge(leftElement, rightElement);
 				}
+				
+				if (left.getTable().toString().equals(right.getTable().toString())) {
+					unusableSelectConditions.add(arg0);
+				}
+				
 			} else {
 				Long value = ((LongValue)arg0.getRightExpression()).toLong();
 				leftElement.setEqualityConstraint(value);
