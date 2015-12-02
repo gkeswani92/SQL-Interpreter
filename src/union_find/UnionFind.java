@@ -139,25 +139,23 @@ public class UnionFind {
 		Expression finalExp = null;
 
 		// If all bounds are null, the create equalsTo expressions for all pairs of attributes from the same table
-		if (ufe.getEqualityConstraint() == null && ufe.getLowerBound() == null && ufe.getUpperBound() == null) {
-			if (attributes.size() > 1) {
-				Column left = attributes.get(0);
-				finalExp = new EqualsTo(left, attributes.get(1));
-				if (attributes.size() == 2) {
-					return finalExp;
-				}
-				
-				for (int i = 2; i < attributes.size(); i++) {
-					finalExp = new AndExpression(finalExp, new EqualsTo(left, attributes.get(i)));
-				}
-			}
+		if (attributes.size() > 1) {
+			Column left = attributes.get(0);
+			finalExp = new EqualsTo(left, attributes.get(1));
 			
-			return finalExp;
+			for (int i = 2; i < attributes.size(); i++) {
+				finalExp = new AndExpression(finalExp, new EqualsTo(left, attributes.get(i)));
+			}
 		}
 		
 		// Comes here only if atleast 1 bound is non-null
 		if (ufe.getEqualityConstraint() != null) {
-			finalExp = new EqualsTo(attributes.get(0), new LongValue(ufe.getEqualityConstraint()));
+			if (finalExp == null) {
+				finalExp = new EqualsTo(attributes.get(0), new LongValue(ufe.getEqualityConstraint()));
+			} else {
+				finalExp = new AndExpression(finalExp, new EqualsTo(attributes.get(0), new LongValue(ufe.getEqualityConstraint())));
+			}
+			
 			if (attributes.size() == 1) {
 				return finalExp;
 			} else {
@@ -170,7 +168,12 @@ public class UnionFind {
 		} else {
 			// If union find has a lower bound
 			if (ufe.getLowerBound() != null) {
-				finalExp = new GreaterThanEquals(attributes.get(0), new LongValue(ufe.getLowerBound()));
+				if (finalExp == null) {
+					finalExp = new GreaterThanEquals(attributes.get(0), new LongValue(ufe.getLowerBound()));
+
+				} else {
+					finalExp = new AndExpression(finalExp, new GreaterThanEquals(attributes.get(0), new LongValue(ufe.getLowerBound())));
+				}
 				
 				if (attributes.size() > 1) {
 					for(int i = 1; i < attributes.size(); i++) {

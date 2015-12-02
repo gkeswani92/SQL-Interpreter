@@ -480,13 +480,15 @@ public class JoinLogicalOperator extends LogicalOperator {
 		
 		// Join with Residual join expressions
 		plan = plan + "Join" + "[";
+		if (joinConditions.isEmpty()) {
+			plan = plan + "null ";
+		}
+		
 		for (List<String> key: joinConditions.keySet()) {
 			plan = plan + joinConditions.get(key).toString() + ",";
 		}
 		plan = plan.substring(0, plan.length()-1);
-		if (!joinConditions.isEmpty()) {
-			plan = plan + "]";
-		}
+		plan = plan + "]";
 		
 		plan = plan + "\n";
 		
