@@ -18,7 +18,6 @@ import statistics.TableStatistics;
 import utils.DatabaseCatalog;
 import utils.IndexBinaryFileReader;
 import utils.IndexConfigFileReader;
-import utils.PlanBuilderConfigFileReader;
 
 public class SelectLogicalOperator extends LogicalOperator {
 
@@ -33,7 +32,7 @@ public class SelectLogicalOperator extends LogicalOperator {
 		whereClause = exp;
 		dbCatalog = DatabaseCatalog.getInstance();
 		alias = getTableName();
-		currentAttributeStatistics = getAttributeSelectionStatistics(dbCatalog.getTableForAlias(alias));
+		currentAttributeStatistics = getAttributeSelectionStatistics(alias);
 	}
 	
 	public Map<String, AttributeSelectionStatistics> getCurrentAttributeStatistics() {

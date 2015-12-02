@@ -209,10 +209,90 @@ public class SelectionBoundCalculator implements ExpressionVisitor {
 	
 	@Override
 	public void visit(GreaterThan arg0) {
+		// If left exp is a column
+		if (arg0.getLeftExpression() instanceof Column) {
+			String leftColName = ((Column)arg0.getLeftExpression()).getColumnName();
+			// If right exp is a column, add columns to map if they don't exist, else remains unchanged
+			if (arg0.getRightExpression() instanceof Column) {
+				if (ass.isEmpty() || !ass.containsKey(leftColName)) {
+					ass.put(leftColName, new AttributeSelectionStatistics());
+				}
+				
+				String rightColName = ((Column)arg0.getRightExpression()).getColumnName();
+				if (ass.isEmpty() || !ass.containsKey(rightColName)) {
+					ass.put(rightColName, new AttributeSelectionStatistics());
+				}
+			} else {
+				Long lowerBound = ((LongValue)arg0.getRightExpression()).getValue();
+				// No entry exists for the attribute
+				if (ass.isEmpty() || !ass.containsKey(leftColName)) {
+					ass.put(leftColName, new AttributeSelectionStatistics(lowerBound+1, null));
+				} else {
+					Long currLowerBound = ass.get(leftColName).getLowerBound();
+					if (currLowerBound == null || lowerBound.compareTo(currLowerBound) > 0) {
+						ass.get(leftColName).setUpperBound(lowerBound+1);
+					}
+				}
+			}
+		} 
+		// If left exp is a long value, right exp is column
+		else {
+			String rightColName = ((Column)arg0.getLeftExpression()).getColumnName();
+			Long upperBound = ((LongValue)arg0.getLeftExpression()).getValue();
+			// No entry exists for the attribute
+			if (ass.isEmpty() || !ass.containsKey(rightColName)) {
+				ass.put(rightColName, new AttributeSelectionStatistics(null, upperBound-1));
+			} else {
+				Long currUpperBound = ass.get(rightColName).getUpperBound();
+				if (currUpperBound == null || upperBound.compareTo(currUpperBound) < 0) {
+					ass.get(rightColName).setUpperBound(upperBound-1);
+				}
+			}
+		}
 	}
 	
 	@Override
 	public void visit(MinorThan arg0) {
+		// If left exp is a column
+		if (arg0.getLeftExpression() instanceof Column) {
+			String leftColName = ((Column)arg0.getLeftExpression()).getColumnName();
+			// If right exp is a column, add columns to map if they don't exist, else remains unchanged
+			if (arg0.getRightExpression() instanceof Column) {
+				if (ass.isEmpty() || !ass.containsKey(leftColName)) {
+					ass.put(leftColName, new AttributeSelectionStatistics());
+				}
+				
+				String rightColName = ((Column)arg0.getRightExpression()).getColumnName();
+				if (ass.isEmpty() || !ass.containsKey(rightColName)) {
+					ass.put(rightColName, new AttributeSelectionStatistics());
+				}
+			} else {
+				Long lowerBound = ((LongValue)arg0.getRightExpression()).getValue();
+				// No entry exists for the attribute
+				if (ass.isEmpty() || !ass.containsKey(leftColName)) {
+					ass.put(leftColName, new AttributeSelectionStatistics(lowerBound-1, null));
+				} else {
+					Long currLowerBound = ass.get(leftColName).getLowerBound();
+					if (currLowerBound == null || lowerBound.compareTo(currLowerBound) > 0) {
+						ass.get(leftColName).setUpperBound(lowerBound-1);
+					}
+				}
+			}
+		} 
+		// If left exp is a long value, right exp is column
+		else {
+			String rightColName = ((Column)arg0.getLeftExpression()).getColumnName();
+			Long upperBound = ((LongValue)arg0.getLeftExpression()).getValue();
+			// No entry exists for the attribute
+			if (ass.isEmpty() || !ass.containsKey(rightColName)) {
+				ass.put(rightColName, new AttributeSelectionStatistics(null, upperBound+1));
+			} else {
+				Long currUpperBound = ass.get(rightColName).getUpperBound();
+				if (currUpperBound == null || upperBound.compareTo(currUpperBound) < 0) {
+					ass.get(rightColName).setUpperBound(upperBound+1);
+				}
+			}
+		}
 	}
 	
 	@Override
