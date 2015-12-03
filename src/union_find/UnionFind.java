@@ -121,10 +121,13 @@ public class UnionFind {
 		}
 		
 		//Setting the equality constraint of the merged element
-		if(element1.getEqualityConstraint() == null){
-			mergedElement.setEqualityConstraint(element2.getEqualityConstraint());
-		} else {
-			mergedElement.setEqualityConstraint(element1.getEqualityConstraint());
+		if(element1.getEqualityConstraint() != null || element2.getEqualityConstraint() != null ){
+			if(element1.getEqualityConstraint() == null){	
+				mergedElement.setEqualityConstraint(element2.getEqualityConstraint());
+			}
+			else {
+				mergedElement.setEqualityConstraint(element1.getEqualityConstraint());
+			}
 		}
 	}
 	
