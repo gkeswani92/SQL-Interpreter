@@ -161,11 +161,9 @@ public class SelectLogicalOperator extends LogicalOperator {
 		
 		//Setting the reduction factors for all the attributes
 		for(String attribute: currentAttributeStatistics.keySet()) {
-			if(IndexConfigFileReader.getInstance().attributeHasIndex(attribute, alias)){
-				AttributeSelectionStatistics attrSelectionStats = currentAttributeStatistics.get(attribute);
-				AttributeStatistics attrRelationStats = tableStats.getAttributeStatistics(attribute);
-				attrSelectionStats.setReductionFactor(attrRelationStats.minimum, attrRelationStats.maximum);
-			}
+			AttributeSelectionStatistics attrSelectionStats = currentAttributeStatistics.get(attribute);
+			AttributeStatistics attrRelationStats = tableStats.getAttributeStatistics(attribute);
+			attrSelectionStats.setReductionFactor(attrRelationStats.minimum, attrRelationStats.maximum);
 		}
 		return currentAttributeStatistics;
 	}
