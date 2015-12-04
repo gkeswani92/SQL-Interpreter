@@ -2,7 +2,9 @@ package operators;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import utils.BinaryFileReader;
 import utils.BinaryFileWriter;
@@ -403,8 +405,13 @@ public class ExternalSortOperator extends SortOperator {
 			}
 		}
 		
-		plan = plan + "ExternalSort" + "[";
+		Set<String> uniqueConditions = new LinkedHashSet<String>();
 		for (String cond: sortConditions) {
+			uniqueConditions.add(cond);
+		}
+		
+		plan = plan + "ExternalSort" + "[";
+		for (String cond: uniqueConditions) {
 			plan = plan + cond + ",";
 		}
 		
