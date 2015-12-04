@@ -164,12 +164,16 @@ public class JoinLogicalOperator extends LogicalOperator {
 	private void computeSizeOfSingleRelationSubset(String tableName, RelationSubset currentSubset) {
 		
 		LogicalOperator currentChild = children.get(tableName);
-		Map<String, AttributeSelectionStatistics> attrSelectionStats = ((SelectLogicalOperator) currentChild).getCurrentAttributeStatistics();
-		Integer tupleCount = dbCatalog.getStatistics(tableName).count;	
 		Double cumulativeReductionFactor = 1.0;
-		for(String attr: attrSelectionStats.keySet()){
-			AttributeSelectionStatistics attrStats = attrSelectionStats.get(attr);
-			cumulativeReductionFactor *= attrStats.getReductionFactor();
+		Integer tupleCount = dbCatalog.getStatistics(tableName).count;
+		
+		//Find the reduction factor if we have a selection. Else, reduction factor is 1 by default for scan
+		if(currentChild instanceof SelectLogicalOperator){
+			Map<String, AttributeSelectionStatistics> attrSelectionStats = ((SelectLogicalOperator) currentChild).getCurrentAttributeStatistics();
+			for(String attr: attrSelectionStats.keySet()){
+				AttributeSelectionStatistics attrStats = attrSelectionStats.get(attr);
+				cumulativeReductionFactor *= attrStats.getReductionFactor();
+			}
 		}
 		Double size = tupleCount * cumulativeReductionFactor;
 		currentSubset.setSize(size);
