@@ -237,7 +237,7 @@ public class SelectionBoundCalculator implements ExpressionVisitor {
 		} 
 		// If left exp is a long value, right exp is column
 		else {
-			String rightColName = ((Column)arg0.getLeftExpression()).getColumnName();
+			String rightColName = ((Column)arg0.getRightExpression()).getColumnName();
 			Long upperBound = ((LongValue)arg0.getLeftExpression()).getValue();
 			// No entry exists for the attribute
 			if (ass.isEmpty() || !ass.containsKey(rightColName)) {
@@ -267,21 +267,21 @@ public class SelectionBoundCalculator implements ExpressionVisitor {
 					ass.put(rightColName, new AttributeSelectionStatistics());
 				}
 			} else {
-				Long lowerBound = ((LongValue)arg0.getRightExpression()).getValue();
+				Long upperBound = ((LongValue)arg0.getRightExpression()).getValue();
 				// No entry exists for the attribute
 				if (ass.isEmpty() || !ass.containsKey(leftColName)) {
-					ass.put(leftColName, new AttributeSelectionStatistics(lowerBound-1, null));
+					ass.put(leftColName, new AttributeSelectionStatistics(null, upperBound-1));
 				} else {
-					Long currLowerBound = ass.get(leftColName).getLowerBound();
-					if (currLowerBound == null || lowerBound.compareTo(currLowerBound) > 0) {
-						ass.get(leftColName).setUpperBound(lowerBound-1);
+					Long currUpperBound = ass.get(leftColName).getUpperBound();
+					if (currUpperBound == null || upperBound.compareTo(currUpperBound) > 0) {
+						ass.get(leftColName).setUpperBound(upperBound-1);
 					}
 				}
 			}
 		} 
 		// If left exp is a long value, right exp is column
 		else {
-			String rightColName = ((Column)arg0.getLeftExpression()).getColumnName();
+			String rightColName = ((Column)arg0.getRightExpression()).getColumnName();
 			Long upperBound = ((LongValue)arg0.getLeftExpression()).getValue();
 			// No entry exists for the attribute
 			if (ass.isEmpty() || !ass.containsKey(rightColName)) {
