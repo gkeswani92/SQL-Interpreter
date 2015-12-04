@@ -13,6 +13,13 @@ public class RelationSubsetComparator implements Comparator<RelationSubset> {
 
 	@Override
 	public int compare(RelationSubset o1, RelationSubset o2) {
-		return o1.getPlanCost().compareTo(o2.getPlanCost());
+		int comp = o1.getPlanCost().compareTo(o2.getPlanCost());
+		if (comp != 0) {
+			return comp;
+		} else {
+			Double parentSize1 = o1.getParentSize();
+			Double parentSize2 = o2.getParentSize();
+			return parentSize1.compareTo(parentSize2);
+		}
 	}
 }
