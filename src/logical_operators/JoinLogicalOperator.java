@@ -34,6 +34,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 	private Map<String, Double> v_values;
 	private DatabaseCatalog dbCatalog;
 	private Map<String, Operator> physicalChildren;
+	private Map<String, Double> singleRelationSize;
 	
 	public JoinLogicalOperator(Map<List<String>, Expression> joinConditions, Map<String, LogicalOperator> children,
 					UnionFind unionFind) {
@@ -48,6 +49,8 @@ public class JoinLogicalOperator extends LogicalOperator {
 		relationsToBeJoined.addAll(children.keySet());
 		v_values = new HashMap<String, Double>(); 
 		computeVValuesForChildren();
+		
+		singleRelationSize = new HashMap<String, Double>();
 	}
 	
 	/**
@@ -143,6 +146,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 		//Initialising the map to contain one relation plans
 		for(String tableName: physicalChildren.keySet()) {
 			RelationSubset currentSubset = new RelationSubset(tableName);
+			computeSizeOfSingleRelationSubset(tableName, currentSubset);
 			relationSubsets.add(currentSubset);
 			initialRelations.add(tableName);
 		}
@@ -150,6 +154,26 @@ public class JoinLogicalOperator extends LogicalOperator {
 		//Find the best join plan for the given relations
 		RelationSubset bestJoinPlanSubset = findBestJoinPlan(relationSubsets, initialRelations);
 		return getLeftDeepTree(bestJoinPlanSubset);
+	}
+
+	/**
+	 * Computes the size of the single relation subsets depending on the selection statistics
+	 * @param tableName
+	 * @param currentSubset
+	 */
+	private void computeSizeOfSingleRelationSubset(String tableName, RelationSubset currentSubset) {
+		
+		LogicalOperator currentChild = children.get(tableName);
+		Map<String, AttributeSelectionStatistics> attrSelectionStats = ((SelectLogicalOperator) currentChild).getCurrentAttributeStatistics();
+		Integer tupleCount = dbCatalog.getStatistics(tableName).count;	
+		Double cumulativeReductionFactor = 1.0;
+		for(String attr: attrSelectionStats.keySet()){
+			AttributeSelectionStatistics attrStats = attrSelectionStats.get(attr);
+			cumulativeReductionFactor *= attrStats.getReductionFactor();
+		}
+		Double size = tupleCount * cumulativeReductionFactor;
+		currentSubset.setSize(size);
+		singleRelationSize.put(tableName, size);
 	}
 	
 	/**
@@ -309,7 +333,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 			
 			//Find all possible relation subsets that can be created using the current relation subset
 			for(String relation: relationAdditions) {
-				RelationSubset currentPossibleSubset = new RelationSubset(currentSubset.getRelations(), relation);
+				RelationSubset currentPossibleSubset = new RelationSubset(currentSubset.getRelations(), relation, currentSubset.getSize());
 				relationAdditionSubsets.add(currentPossibleSubset);
 				
 				//Computing the cost of the current plan
@@ -360,12 +384,12 @@ public class JoinLogicalOperator extends LogicalOperator {
 		
 		//If this is a base table, size of join of is 0
 		if(currentSubset.getRelations().size() == 1) {
-			return size;
+			return currentSubset.getSize();
 		}
 	
 		List<String> leftRelations = parentSubset.getRelations();
 		String rightRelation = newRelation;
-		Integer numTuplesRight = dbCatalog.getStatistics(rightRelation).count;
+		Double rightRelationSize = singleRelationSize.get(rightRelation);
 		
 		List<List<Column>> joinConditions = unionFind.getJoinAttributes(leftRelations, rightRelation);
 		currentSubset.addJoinConditions(joinConditions);
@@ -373,7 +397,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 		//If the current subset has two tables, the V values of the children needs
 		//to be used directly
 		if(currentSubset.getRelations().size() == 2) {
-			Integer numTuplesLeft = dbCatalog.getStatistics(leftRelations.get(0)).count;
+			Double leftRelationSize = parentSubset.getSize();
 			Double denominator = 1.0;
 			
 			//If there are no join condition, the size is the cross product
@@ -387,7 +411,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 					denominator *= Math.max(vValueLeft,vValueRight);
 				}
 			} 
-			size = (numTuplesLeft * numTuplesRight) / denominator;
+			size = (leftRelationSize * rightRelationSize) / denominator;
 		}
 		
 		//For joins which contains more than 2 tables on the left, we need to
@@ -399,7 +423,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 			for(List<Column> joinCondition: joinConditions){
 				denominator *= computeMaxVValueForJoinCondition(joinCondition, parentSubset, newRelation);
 			}
-			size = (numTuplesLeft * numTuplesRight * 1.0) / denominator;
+			size = (numTuplesLeft * rightRelationSize * 1.0) / denominator;
 		}	
 		return size;
 	}

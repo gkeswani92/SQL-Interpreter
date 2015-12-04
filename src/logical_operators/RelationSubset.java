@@ -5,11 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.jsqlparser.schema.Column;
+import statistics.AttributeSelectionStatistics;
 
 public class RelationSubset implements Iterable<String> {
 	
 	private List<String> relations;
-	private Double planCost, size;
+	private Double planCost, size, parentSize;
 	private List<List<Column>> joinConditions;
 	
 	public RelationSubset(String tableName){
@@ -17,15 +18,17 @@ public class RelationSubset implements Iterable<String> {
 		relations.add(tableName);
 		planCost = 0.0;
 		size = 0.0;
+		parentSize = 0.0;
 		joinConditions = new ArrayList<List<Column>>();
 	}
 	
-	public RelationSubset(List<String> tableNames, String newTableName){
+	public RelationSubset(List<String> tableNames, String newTableName, Double parentSize){
 		relations = new ArrayList<String>();
 		relations.addAll(tableNames);
 		relations.add(newTableName);
 		planCost = 0.0;
 		size = 0.0;
+		this.parentSize = parentSize;
 		joinConditions = new ArrayList<List<Column>>();
 	}
 
@@ -116,4 +119,11 @@ public class RelationSubset implements Iterable<String> {
 		return relations.iterator();
 	}
 	
+	public Double getParentSize() {
+		return parentSize;
+	}
+
+	public void setParentSize(Double parentSize) {
+		this.parentSize = parentSize;
+	}
 }
