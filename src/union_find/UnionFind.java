@@ -74,8 +74,12 @@ public class UnionFind {
 		UnionFindElement mergedElement = new UnionFindElement();
 		
 		mergedElement.addAllAttributesFromList(element1.getAttributes());
-		mergedElement.addAllAttributesFromList(element2.getAttributes());
 		
+		for(Column c: element2.getAttributes()){
+			if(!mergedElement.getAttributes().contains(c)){
+				mergedElement.addAttributeToElement(c);
+			}
+		}
 		setBoundsForElement(element1, element2, mergedElement);
 		
 		elements.remove(element1);
