@@ -89,7 +89,9 @@ public class SelectLogicalOperator extends LogicalOperator {
 	public String getBestIndexForSelection(Map<String, Double> ioCost, String tableName){
 		
 		//Initialising minimum cost to full scan
-		Double minCost = dbCatalog.getStatistics(tableName).count * 1.0;
+		Integer numAttributes = dbCatalog.getTableAttributes(alias).length;
+		Integer numTuples = dbCatalog.getStatistics(alias).count;
+		Double minCost = Math.floorDiv(numTuples, 4088 / (4 * numAttributes)) * 1.0;
 		String attrIndexToUse = null;
 		
 		//Checking if there is a better way than a full scan
