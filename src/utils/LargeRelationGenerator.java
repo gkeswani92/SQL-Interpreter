@@ -9,11 +9,11 @@ public class LargeRelationGenerator {
 	private Integer rows, cols;
 	private String tableName;
 	private String tablePath;
-	private String inputSrc = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input";
-	private static String statsFile = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input/db/stats.txt";
+//	private String inputSrc = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input";
+//	private static String statsFile = "/Users/tanvimehta/Desktop/CORNELL..YAY!!/Courses/CS5321/project2/samples/input/db/stats.txt";
 	
-//	private String inputSrc = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/input";
-//	private static String statsFile = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/input/db/stats.txt";
+	private String inputSrc = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/input";
+	private static String statsFile = "/Users/gaurav/Documents/Eclipse/SQL-Interpreter/samples/input/db/stats.txt";
 	
 	private int[] highs, lows;
 	
@@ -95,6 +95,8 @@ public class LargeRelationGenerator {
 			relation.generateLargeRelation();
 			line = file.readLine();
 		}
+		
+		file.close();
 	}
 	
 }

@@ -3,9 +3,7 @@ package logical_operators;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import net.sf.jsqlparser.schema.Column;
-import statistics.AttributeSelectionStatistics;
 
 public class RelationSubset implements Iterable<String> {
 	

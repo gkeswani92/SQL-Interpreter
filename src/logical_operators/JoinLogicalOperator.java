@@ -324,8 +324,6 @@ public class JoinLogicalOperator extends LogicalOperator {
 		// Base case: When all plans have the size of the initial number of relations
 		// Select the plan with the minimum cost
 		if(tableNames.size() == relationSubsets.get(0).getRelations().size()){
-			Collections.sort(relationSubsets, new RelationSubsetComparator());
-			System.out.println("\nFinal plans: " + relationSubsets);
 			System.out.println("Best plan: " + relationSubsets.get(0));
 			return relationSubsets.get(0);
 		}
