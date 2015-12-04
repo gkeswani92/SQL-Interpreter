@@ -36,11 +36,16 @@ public class BNLJOperator extends JoinOperator {
 		//We get the first tuple inside this to check the size of each tuple
 		//This is to decide how many tuples we are going to fill in the outer buffer
 		t = leftChild.getNextTuple(); 
-		outerBufferMaxTupleCount = (this.numBufferPages * 4096) / (4 *  t.getArributeList().size());
-		
-		//Adding the first tuple to the outer buffer and reducing the count of tuples needed
-		outerBuffer.add(t);
-		outerBufferMaxTupleCount--;
+		if (t != null) {
+			outerBufferMaxTupleCount = (this.numBufferPages * 4096) / (4 *  t.getArributeList().size());
+			
+			//Adding the first tuple to the outer buffer and reducing the count of tuples needed
+			outerBuffer.add(t);
+			outerBufferMaxTupleCount--;
+		} else {
+			outerBlockStatus = -1;
+			return;
+		}
 		
 		while(outerBufferMaxTupleCount != 0){
 			t = leftChild.getNextTuple();
@@ -68,10 +73,15 @@ public class BNLJOperator extends JoinOperator {
 		innerIndex = 0;
 		
 		t = rightChild.getNextTuple();
-		innerBufferMaxTupleCount = 4096 / (4 * t.getArributeList().size());
-		
-		innerBuffer.add(t);
-		innerBufferMaxTupleCount--;
+		if (t != null) {
+			innerBufferMaxTupleCount = 4096 / (4 * t.getArributeList().size());
+			
+			innerBuffer.add(t);
+			innerBufferMaxTupleCount--;
+		} else {
+			innerBlockStatus = -1;
+			return;
+		}
 		
 		while(innerBufferMaxTupleCount != 0){
 			t = rightChild.getNextTuple();

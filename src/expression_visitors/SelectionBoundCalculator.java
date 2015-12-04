@@ -90,7 +90,7 @@ public class SelectionBoundCalculator implements ExpressionVisitor {
 		} 
 		// If left exp is a long value, right exp is column
 		else {
-			String rightColName = ((Column)arg0.getLeftExpression()).getColumnName();
+			String rightColName = ((Column)arg0.getRightExpression()).getColumnName();
 			Long bound = ((LongValue)arg0.getLeftExpression()).getValue();
 			// No entry exists for the attribute
 			if (ass.isEmpty() || !ass.containsKey(rightColName)) {
@@ -132,7 +132,7 @@ public class SelectionBoundCalculator implements ExpressionVisitor {
 		} 
 		// If left exp is a long value, right exp is column
 		else {
-			String rightColName = ((Column)arg0.getLeftExpression()).getColumnName();
+			String rightColName = ((Column)arg0.getRightExpression()).getColumnName();
 			Long upperBound = ((LongValue)arg0.getLeftExpression()).getValue();
 			// No entry exists for the attribute
 			if (ass.isEmpty() || !ass.containsKey(rightColName)) {
@@ -176,7 +176,7 @@ public class SelectionBoundCalculator implements ExpressionVisitor {
 		} 
 		// If left exp is a long value, right exp is column
 		else {
-			String rightColName = ((Column)arg0.getLeftExpression()).getColumnName();
+			String rightColName = ((Column)arg0.getRightExpression()).getColumnName();
 			Long lowerBound = ((LongValue)arg0.getLeftExpression()).getValue();
 			// No entry exists for the attribute
 			if (ass.isEmpty() || !ass.containsKey(rightColName)) {

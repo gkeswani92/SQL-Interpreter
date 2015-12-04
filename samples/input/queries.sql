@@ -1,0 +1,1 @@
+SELECT * FROM Sailors,Boats WHERE Sailors.A < 50 AND Boats.D < 1;
