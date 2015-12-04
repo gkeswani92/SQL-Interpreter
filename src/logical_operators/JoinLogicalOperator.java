@@ -324,14 +324,12 @@ public class JoinLogicalOperator extends LogicalOperator {
 		// Base case: When all plans have the size of the initial number of relations
 		// Select the plan with the minimum cost
 		if(tableNames.size() == relationSubsets.get(0).getRelations().size()){
-			System.out.println("Best plan: " + relationSubsets.get(0));
 			return relationSubsets.get(0);
 		}
 		
 		List<RelationSubset> newSubsets = new ArrayList<RelationSubset>();
 		
 		for(RelationSubset currentSubset: relationSubsets){
-			System.out.println("\nFinding the best next plan for "+currentSubset);
 			List<String> relationAdditions = currentSubset.findAddableRelations(tableNames);
 			List<RelationSubset> relationAdditionSubsets = new ArrayList<RelationSubset>();
 			
@@ -347,7 +345,6 @@ public class JoinLogicalOperator extends LogicalOperator {
 				//Computing the size of the current plan
 				Double size = computeSizeOfPlan(currentPossibleSubset, currentSubset, relation);
 				currentPossibleSubset.setSize(size);
-				System.out.println(currentPossibleSubset);
 			}	
 			
 			//Finding the best plans for the current subset and keeping them for the next iteration
@@ -355,10 +352,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 			newSubsets.addAll(bestAddableRelationSubsets);
 		}
 		
-		System.out.println("New subset at the end of this round: "+newSubsets);
 		List<RelationSubset> bestSubsets = findBestPlanForEachSubset(newSubsets);
-		System.out.println("Best subsets for next round: "+bestSubsets);
-		
 		return findBestJoinPlan(bestSubsets, tableNames);
 	}
 	

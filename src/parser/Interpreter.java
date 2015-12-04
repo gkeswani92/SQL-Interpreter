@@ -51,8 +51,6 @@ public class Interpreter {
 	private static String tempMergeOutput;
 	private static String interpreterConfigPath;
 	private static DumpRelations writeToFile;
-	private static Integer buildIndex;
-	private static Integer executeQueries;
 	
 	public static void main(String[] args) {
 		
@@ -66,8 +64,6 @@ public class Interpreter {
 			inputSrcDir  	= params.get(0);
             outputScrDir 	= params.get(1);
             tempMergeOutput = params.get(2);
-            buildIndex 		= Integer.parseInt(params.get(3));
-            executeQueries  = Integer.parseInt(params.get(4));
             queriesFile 	= inputSrcDir+"/queries.sql";
             
 			DatabaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
@@ -80,11 +76,8 @@ public class Interpreter {
 			GatherStatistics.gatherStatistics(tableNames);
 		}
 		
-		if(buildIndex == 1)
-			BuildIndex.buildIndexes();
-		
-		if(executeQueries == 1)
-			executeQueries();
+		BuildIndex.buildIndexes();
+		executeQueries();
 	}
 
 	/**
@@ -151,8 +144,8 @@ public class Interpreter {
 	                }
 	    			
 	                Operator physicalRoot = constructPhysicalPlan(root, queryCount, outputScrDir);
-	                //writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
-	                physicalRoot.dump();
+	                writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
+	                //physicalRoot.dump();
 	    			//writeToFile.writeTestFile(physicalRoot, queryCount, outputFileFormat);
 	    			
 	    			long endTime = System.nanoTime();
