@@ -44,7 +44,7 @@ public abstract class Operator {
 			//System.out.println(count++ + " " + currentTuple.toStringValues());
 			currentTuple = getNextTuple();
 		}
-		System.out.println(tableDump);
+//		System.out.println(tableDump);
 		PrintWriter out = null;
 		try {
 			out = new PrintWriter("hello.txt");

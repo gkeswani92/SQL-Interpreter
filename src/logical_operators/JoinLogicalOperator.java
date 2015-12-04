@@ -362,6 +362,13 @@ public class JoinLogicalOperator extends LogicalOperator {
 		return findBestJoinPlan(bestSubsets, tableNames);
 	}
 	
+	/**
+	 * For each subset, select the best plan for every combination of tables
+	 * Example: Given a subet consisting of {Boats, Sailors} and {Sailors, Boats}, only
+	 * 1 of these 2 would be selected to go into the next level of selection.
+	 * @param subsets
+	 * @return
+	 */
 	public List<RelationSubset> findBestPlanForEachSubset(List<RelationSubset> subsets){
 		
 		List<RelationSubset> bestSubsets = new ArrayList<RelationSubset>();
@@ -379,6 +386,7 @@ public class JoinLogicalOperator extends LogicalOperator {
 				}
 			}
 			
+			// Sort these equivalent subsets and only retain the best one.
 			Collections.sort(currentOuterEquivalents, new RelationSubsetComparator());
 			RelationSubset bestSubset = currentOuterEquivalents.get(0);
 			if(!bestSubsets.contains(bestSubset)){

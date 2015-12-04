@@ -99,6 +99,8 @@ public class ExternalSortOperator extends SortOperator {
 				buffer.add(t);
 				numTuples--;
 			}
+		} else {
+			return;
 		}
 		
 		//Indicator that there are more tuples that need to be read in
@@ -125,6 +127,11 @@ public class ExternalSortOperator extends SortOperator {
 	public void passZero(){
 		
 		fillBufferForPass0();
+		
+		if (buffer.size() == 0) {
+			return;
+		}
+		
 		sortCondition();
 		childCount++;
 		BinaryFileWriter bfw;
@@ -339,6 +346,9 @@ public class ExternalSortOperator extends SortOperator {
 		//it was broken down into
 		if (!pass0Done) {
 			passZero();
+			if (buffer.size() == 0) {
+				return;
+			}
 			pass0Done = true;
 		}
 		sortAndMerge();
@@ -350,6 +360,9 @@ public class ExternalSortOperator extends SortOperator {
 		
 		if (sortedFile == null) {
 			doExternalSort();
+			if (buffer.size() == 0) {
+				return null;
+			}
 			sortedFileReader = getSortedFileReader(sortedFile);
 		}
 		
