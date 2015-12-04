@@ -172,7 +172,9 @@ public class JoinLogicalOperator extends LogicalOperator {
 			Map<String, AttributeSelectionStatistics> attrSelectionStats = ((SelectLogicalOperator) currentChild).getCurrentAttributeStatistics();
 			for(String attr: attrSelectionStats.keySet()){
 				AttributeSelectionStatistics attrStats = attrSelectionStats.get(attr);
-				cumulativeReductionFactor *= attrStats.getReductionFactor();
+				if(attrStats.getReductionFactor().compareTo(0.0) >= 0) {
+					cumulativeReductionFactor *= attrStats.getReductionFactor();
+				}
 			}
 		}
 		Double size = tupleCount * cumulativeReductionFactor;
@@ -322,8 +324,8 @@ public class JoinLogicalOperator extends LogicalOperator {
 		// Base case: When all plans have the size of the initial number of relations
 		// Select the plan with the minimum cost
 		if(tableNames.size() == relationSubsets.get(0).getRelations().size()){
-			System.out.println("\nFinal plans: " + relationSubsets);
 			Collections.sort(relationSubsets, new RelationSubsetComparator());
+			System.out.println("\nFinal plans: " + relationSubsets);
 			System.out.println("Best plan: " + relationSubsets.get(0));
 			return relationSubsets.get(0);
 		}
@@ -353,9 +355,39 @@ public class JoinLogicalOperator extends LogicalOperator {
 			//Finding the best plans for the current subset and keeping them for the next iteration
 			List<RelationSubset> bestAddableRelationSubsets = findBestAddableRelationSubset(relationAdditionSubsets);
 			newSubsets.addAll(bestAddableRelationSubsets);
-			System.out.println("Best plans for current subset are "+bestAddableRelationSubsets);
 		}
-		return findBestJoinPlan(newSubsets, tableNames);
+		
+		System.out.println("New subset at the end of this round: "+newSubsets);
+		List<RelationSubset> bestSubsets = findBestPlanForEachSubset(newSubsets);
+		System.out.println("Best subsets for next round: "+bestSubsets);
+		
+		return findBestJoinPlan(bestSubsets, tableNames);
+	}
+	
+	public List<RelationSubset> findBestPlanForEachSubset(List<RelationSubset> subsets){
+		
+		List<RelationSubset> bestSubsets = new ArrayList<RelationSubset>();
+		
+		for(int i=0; i<subsets.size(); i++){
+			RelationSubset outer = subsets.get(i);
+			List<RelationSubset> currentOuterEquivalents = new ArrayList<RelationSubset>();
+			currentOuterEquivalents.add(outer);
+			
+			//Finding all subsets that contains the exact same tables as the outer
+			for(int j=0; j<subsets.size(); j++){
+				RelationSubset inner = subsets.get(j);
+				if(outer.exactSubset(inner)){
+					currentOuterEquivalents.add(inner);
+				}
+			}
+			
+			Collections.sort(currentOuterEquivalents, new RelationSubsetComparator());
+			RelationSubset bestSubset = currentOuterEquivalents.get(0);
+			if(!bestSubsets.contains(bestSubset)){
+				bestSubsets.add(bestSubset);
+			}
+		}
+		return bestSubsets;
 	}
 	
 	/**

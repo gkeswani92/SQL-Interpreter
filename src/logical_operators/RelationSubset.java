@@ -111,7 +111,7 @@ public class RelationSubset implements Iterable<String> {
 	}
 	
 	public String toString() {
-		return "Subset: " + relations + " Cost: " + planCost + " Size: " + size;
+		return "Subset: " + relations + " Cost: " + planCost + " Size: " + size + " Parent Size: "+parentSize;
 	}
 
 	@Override
@@ -126,4 +126,18 @@ public class RelationSubset implements Iterable<String> {
 	public void setParentSize(Double parentSize) {
 		this.parentSize = parentSize;
 	}
+	
+	public boolean exactSubset(RelationSubset other){
+		
+		if(relations.size() != other.getRelations().size())	{
+			return false;
+		} 
+		for(String relation: other.getRelations()){
+			if(!relations.contains(relation)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
 }
