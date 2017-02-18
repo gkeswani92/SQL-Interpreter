@@ -1,12 +1,16 @@
 package parser;
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
+import java.util.Set;
+import expression_visitors.UnionFindBuilder;
+import indexing.BuildIndex;
 import logical_operators.DuplicateEliminationLogicalOperator;
 import logical_operators.JoinLogicalOperator;
 import logical_operators.LogicalOperator;
@@ -14,16 +18,25 @@ import logical_operators.ProjectLogicalOperator;
 import logical_operators.ScanLogicalOperator;
 import logical_operators.SelectLogicalOperator;
 import logical_operators.SortLogicalOperator;
-import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.BinaryExpression;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParser;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.*;
+import net.sf.jsqlparser.statement.select.Join;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import operators.Operator;
-import utils.ConfigFileReader;
+import statistics.GatherStatistics;
+import union_find.UnionFind;
+import union_find.UnionFindElement;
 import utils.DatabaseCatalog;
 import utils.DirectoryCleanUp;
 import utils.DumpRelations;
+import utils.IndexConfigFileReader;
+import utils.PlanBuilderConfigFileReader;
 
 /**
  * Class for getting started with JSQLParser. Reads SQL statements from
@@ -32,28 +45,48 @@ import utils.DumpRelations;
  */
 public class Interpreter {
 
-	private static String queriesFile = null;
+	private static String queriesFile;
+	private static String inputSrcDir;
+	private static String outputScrDir;
+	private static String tempMergeOutput;
+	private static String interpreterConfigPath;
+	private static DumpRelations writeToFile;
 	
 	public static void main(String[] args) {
 		
-		String inputSrcDir = "";
-		String outputScrDir = "";
-		String tempMergeOutput = "";
-		DumpRelations writeToFile = null;
-		String outputFileFormat = "Binary";
-		long startTime = System.nanoTime();
-		
 		//Building the single instance of the database catalog and config file reader
-		if(args.length == 3){
-			inputSrcDir = args[0];
-            outputScrDir = args[1];
-            tempMergeOutput = args[2];
-            queriesFile = inputSrcDir+"/queries.sql";
+		if(args.length == 1){
+			
+			//Reading in the new config file for input, out, temp dirs and flags
+			interpreterConfigPath = args[0];
+			ArrayList<String> params = DatabaseCatalog.getInstance().getConfigPaths(interpreterConfigPath);
+			
+			inputSrcDir  	= params.get(0);
+            outputScrDir 	= params.get(1);
+            tempMergeOutput = params.get(2);
+            queriesFile 	= inputSrcDir+"/queries.sql";
+            
 			DatabaseCatalog.getInstance().buildDbCatalog(inputSrcDir);
-			ConfigFileReader.getInstance().readConfigFile(inputSrcDir);
-			ConfigFileReader.getInstance().setTempDir(tempMergeOutput);
+			PlanBuilderConfigFileReader.getInstance().setTempDir(tempMergeOutput);
+			IndexConfigFileReader.getInstance().readConfigFile(inputSrcDir);
 			writeToFile = new DumpRelations(outputScrDir);
+			
+			//Gathering statistics about the given relations
+			Set<String> tableNames = DatabaseCatalog.getInstance().getTableNames();
+			GatherStatistics.gatherStatistics(tableNames);
 		}
+		
+		BuildIndex.buildIndexes();
+		executeQueries();
+	}
+
+	/**
+	 * Method to read the queries file and execute them if the execute queries 
+	 * flag is set to True
+	 */
+	private static void executeQueries() {
+		
+		long startTime = System.nanoTime();
 		
 		try {
 			CCJSqlParser parser = new CCJSqlParser(new FileReader(queriesFile));
@@ -95,7 +128,6 @@ public class Interpreter {
 	                	
 	                	//Making join the child of project operation
 		                if (selectAttr.size() != 1 || selectAttr.get(0).toString() != "*") {
-		                	System.out.println("Projection has been called on the join operator");
 		                	root = new ProjectLogicalOperator(body, root);
 		                }
 	                }
@@ -111,15 +143,14 @@ public class Interpreter {
 	                		root = new DuplicateEliminationLogicalOperator(root);
 	                }
 	    			
-	                Operator physicalRoot = constructPhysicalPlan(root);
-
+	                Operator physicalRoot = constructPhysicalPlan(root, queryCount, outputScrDir);
 	                writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
 	                //physicalRoot.dump();
 	    			//writeToFile.writeRelationToBinaryFile(physicalRoot, queryCount);
 	    			//writeToFile.writeTestFile(physicalRoot, queryCount,outputFileFormat);
 
 	    			long endTime = System.nanoTime();
-	    			System.out.println("Took "+(endTime - startTime)/10e8 + " ns"); 
+	    			System.out.println("Took "+(endTime - startTime)/10e8 + " sec"); 
 	    			System.out.println("<------------End of query----------->");
 	    			DirectoryCleanUp.cleanupTempDir();
 	    			
@@ -140,11 +171,43 @@ public class Interpreter {
 			System.err.println("Exception occurred during parsing");
 			e.printStackTrace();
 		}
-	}	
-
-	private static Operator constructPhysicalPlan (LogicalOperator root) {
+	}
+	
+	/**
+	 * Constructs and writes the logical and physical plan to disk
+	 * @param root
+	 * @param queryCount
+	 * @param outputScrDir
+	 * @return
+	 */
+	private static Operator constructPhysicalPlan (LogicalOperator root, Integer queryCount, String outputScrDir) {
+		String plan = root.getLogicalPlanToString(0);
+		writePlanToDisk(plan, "logicalplan", queryCount, outputScrDir);
+		
 		Operator opRoot = root.getNextPhysicalOperator();
+		plan = opRoot.getPhysicalPlanToString(0);
+		writePlanToDisk(plan, "physicalplan", queryCount, outputScrDir);
 		return opRoot;
+	}
+	
+	/**
+	 * Writes the passed in plan to disk
+	 * @param plan
+	 * @param typeOfPlan
+	 * @param queryCount
+	 * @param outputScrDir
+	 */
+	private static void writePlanToDisk(String plan, String typeOfPlan, Integer queryCount, String outputScrDir) {
+		
+		String filePath = outputScrDir + "/query"+ queryCount.toString() + "_" + typeOfPlan;
+		PrintWriter out = null;
+		try {
+			out = new PrintWriter(filePath);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		out.write(plan);
+		out.close();
 	}
 	
 	private static LogicalOperator handleWithoutJoin(PlainSelect body, List<SelectItem> selectAttr) {
@@ -196,70 +259,99 @@ public class Interpreter {
 	 * @param body select body
 	 */
 	public static LogicalOperator handleJoin(PlainSelect body) {
-		Map<String, List<LogicalOperator>> tableOperators = new HashMap<String, List<LogicalOperator>>();
-		List<Entry<List<String>,Expression>> joins = new ArrayList<>();
+		
+		List<String> allChildren = new ArrayList<String>();
+		getChildrenFromQuery(body, allChildren);
+		
+		UnionFind unionFind = new UnionFind();
+		Map<List<String>, Expression> unusableJoinConditions = new LinkedHashMap<List<String>, Expression>();
+		List<Expression> unusableSelectConditions = new ArrayList<Expression>();
 		
 		// If where clause exists, call visitor class to get map of basic operators and list of join conditions
 		if (body.getWhere() != null) {
-			WhereBuilder where = new WhereBuilder(tableOperators, joins);
-			body.getWhere().accept(where);
+			UnionFindBuilder ufb = new UnionFindBuilder(unionFind, unusableJoinConditions, unusableSelectConditions);
+			body.getWhere().accept(ufb);
 		}
 		
-		List<String> currentLeftJoinTables = new ArrayList<>();		
+		Map<String, LogicalOperator> children = new LinkedHashMap<String, LogicalOperator>();
 		
-		// First left table comes from the FromItem
-		if(body.getFromItem().getAlias()!=null){
-			currentLeftJoinTables.add(body.getFromItem().getAlias());			
-		} else {
-			currentLeftJoinTables.add(body.getFromItem().toString());
-		}
-		
-		String currentRightJoinTable;
-		
-		LogicalOperator temp, root = null;
-		
-		for (Object exp: body.getJoins()) {
+		for(String tableName: allChildren){
+			List<UnionFindElement> unionFindElements = unionFind.findElementsForRelation(tableName);
+			Expression unsuableSelectionConditions = getUnusableConditionsForRelation(tableName, unusableSelectConditions);
+			Expression unionFindConditions= unionFind.getExpressionForUnionFindElements(unionFindElements, tableName);
+			Expression finalExpressionRelation = null;
 			
-			if(((Join)exp).getRightItem().getAlias()!=null){
-				currentRightJoinTable = ((Join)exp).getRightItem().getAlias();			
-			} else{
-				currentRightJoinTable = ((Join)exp).getRightItem().toString();
-			}
-			Expression finalJoinCondition = null;
-			
-			// If the root is null and there is just 1 table in the left list of tables, create
-			// join operator tree with left and right table basic operators as left and right children
-			if (root == null && currentLeftJoinTables.size() == 1) {
-				finalJoinCondition = getJoinCondition(joins, currentLeftJoinTables.get(0), currentRightJoinTable);
-				temp = new JoinLogicalOperator(finalJoinCondition, 
-						getBasicOperator(tableOperators, currentLeftJoinTables.get(0)), 
-						getBasicOperator(tableOperators, currentRightJoinTable),
-						currentRightJoinTable);
-				root = temp;
-			} 
-			// Add 1 table from join(joins from select body) into the left current join list
-			// Check if any of the tables in the left list have a join condition with the right table
-			// If they do, conjunct all the join conditions and create a join operator with the conjunct join condition
-			// Use old root as the left child and right table as right child
-			else {
-				for (String leftTable : currentLeftJoinTables) {
-					Expression currentTableJoin = getJoinCondition(joins, leftTable, currentRightJoinTable);
-					if (finalJoinCondition == null) {
-						finalJoinCondition = currentTableJoin;
-					} else {
-						//Check for null condition before appending an AND
-						if(currentTableJoin != null)
-							finalJoinCondition = new AndExpression(finalJoinCondition, currentTableJoin);
-					}
+			if(unionFindConditions != null) {
+				if(unsuableSelectionConditions != null) {
+					finalExpressionRelation = new AndExpression(unionFindConditions, unsuableSelectionConditions);
+				} else {
+					finalExpressionRelation = unionFindConditions;
 				}
-				temp = new JoinLogicalOperator(finalJoinCondition, root, getBasicOperator(tableOperators, currentRightJoinTable), currentRightJoinTable);
-				root = temp;
+			} else {
+				if(unsuableSelectionConditions != null) {
+					finalExpressionRelation = unsuableSelectionConditions;
+				}
 			}
 			
-			// Add the current right table into the list of left tables for next iteration
-			currentLeftJoinTables.add(currentRightJoinTable);
+			if(finalExpressionRelation == null){
+				children.put(tableName, new ScanLogicalOperator(tableName));
+			} else {
+				children.put(tableName, new SelectLogicalOperator(finalExpressionRelation, new ScanLogicalOperator(tableName)));
+			}
+			
 		}
-		return root;
+		return new JoinLogicalOperator(unusableJoinConditions, children, unionFind);
+	}
+	
+	private static Expression getUnusableConditionsForRelation(String tableName, List<Expression> unusableSelectConditions) {
+		
+		List<Expression> conditions = new ArrayList<Expression>();
+		
+		for(Expression currentExp: unusableSelectConditions){
+			BinaryExpression currentExpression = ((BinaryExpression)currentExp);
+			
+			//Left is a column
+			if(currentExpression.getLeftExpression() instanceof Column){
+				if(((Column)currentExpression.getLeftExpression()).getTable().toString().equals(tableName)){
+					conditions.add(currentExp);
+				}
+			} else {
+				if(((Column)currentExpression.getRightExpression()).getTable().toString().equals(tableName)){
+					conditions.add(currentExp);
+				}
+			}
+		}
+		
+		//Creating a conjunction of all the unusable conditions
+		if (conditions.size() == 0){
+			return null;
+		} else if (conditions.size() == 1) {
+			return conditions.get(0);
+		}
+		
+		Expression finalExpression = conditions.get(0);
+		for(int i=1; i<conditions.size(); i++){
+			finalExpression = new AndExpression(finalExpression, conditions.get(i));
+		}
+		return finalExpression;
+	}
+	
+	private static void getChildrenFromQuery(PlainSelect body, List<String> allChildren) {
+		if (body.getFromItem().getAlias() == null) {
+			allChildren.add(body.getFromItem().toString());
+		} else {
+			allChildren.add(body.getFromItem().getAlias());
+		}
+		
+		if (body.getJoins()!=null) {
+            for (Object exp: body.getJoins()) {
+            	if (exp.toString().contains("AS")) {
+    				allChildren.add(((Join)exp).getRightItem().getAlias());
+            	} else {
+            		allChildren.add(((Join)exp).getRightItem().toString());
+            	}
+            }
+        }
 	}
 	
 	/**

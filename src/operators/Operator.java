@@ -1,7 +1,6 @@
 package operators;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-
 import utils.Tuple;
 
 /**
@@ -11,6 +10,7 @@ import utils.Tuple;
  */
 public abstract class Operator {
 
+	int count = 0;
 	/**
 	 * Gets the next tuple from the table
 	 * @return next tuple that satifies operator's conditions
@@ -21,6 +21,8 @@ public abstract class Operator {
 	 * Resets the getNextTuple to start from the beginning of the table
 	 */
 	public abstract void reset();
+	
+	public abstract String getPhysicalPlanToString(Integer level);
 	
 	public void reset(int index) {
 		
@@ -33,12 +35,16 @@ public abstract class Operator {
     public void dump() {
 		Tuple currentTuple = getNextTuple();
 		String tableDump = null;
-		if (currentTuple != null)
-			tableDump = new String(currentTuple.toStringAttributes()+"\n");
+		if (currentTuple != null){
+			tableDump = new String(count++ + " " + currentTuple.toStringAttributes()+"\n");
+		}
+			
 		while(currentTuple != null) {
-			tableDump = tableDump + currentTuple.toStringValues() +  "\n";
+			tableDump = tableDump + count++ + " " + currentTuple.toStringValues() +  "\n";
+			//System.out.println(count++ + " " + currentTuple.toStringValues());
 			currentTuple = getNextTuple();
 		}
+//		System.out.println(tableDump);
 		PrintWriter out = null;
 		try {
 			out = new PrintWriter("hello.txt");

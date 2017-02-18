@@ -1,7 +1,7 @@
 package operators;
 
+import expression_visitors.ExpressionEvaluator;
 import net.sf.jsqlparser.expression.Expression;
-import parser.ExpressionEvaluator;
 import utils.Tuple;
 
 /**
@@ -28,7 +28,14 @@ public class SelectOperator extends Operator {
     @Override
     public Tuple getNextTuple() {
         Tuple currentTuple = child.getNextTuple();
+        
     	while (currentTuple != null) {
+            // Update tuple with tableName if child is an indexScanOperator
+            if (child instanceof IndexScanOperator) {
+            	IndexScanOperator isc = (IndexScanOperator)child;
+            	currentTuple.updateTuple(isc.getTableName());
+            }
+            
 	        ExpressionEvaluator ob = new ExpressionEvaluator(currentTuple);
 	        whereClause.accept(ob);
 	        // Check if tuple satisfies the select condition
@@ -48,4 +55,20 @@ public class SelectOperator extends Operator {
     public Expression getExpression(){
     	return whereClause;
     }
+
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		plan = plan + "Select[";
+		plan = plan + whereClause.toString();
+		plan = plan + "]\n";
+		plan = plan + child.getPhysicalPlanToString(level+=1);
+		return plan;
+	}
 }

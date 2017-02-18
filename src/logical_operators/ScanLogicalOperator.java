@@ -15,10 +15,10 @@ public class ScanLogicalOperator extends LogicalOperator {
 	}
 	
 	public ScanLogicalOperator(PlainSelect body) {
-		this.tableName = body.getFromItem().toString();
+		tableName = body.getFromItem().toString();
 		if(body.getFromItem().getAlias()!=null) {
-			this.tableName = updateCatalogForAlias(this.tableName,body.getFromItem().getAlias());
-			this.alias = body.getFromItem().getAlias();
+			updateCatalogForAlias(tableName,body.getFromItem().getAlias());
+			tableName = body.getFromItem().getAlias();
 		}
 	}
 	
@@ -36,5 +36,29 @@ public class ScanLogicalOperator extends LogicalOperator {
 	@Override
 	public Operator getNextPhysicalOperator() {
 		return new ScanOperator(this.tableName, this.alias);
+	}
+	
+	public String getTableName() {
+		return tableName;
+	}
+
+	@Override
+	public String getLogicalPlanToString(Integer level) {
+		String plan = "";
+		
+		// Level
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		String table = tableName;
+		if (DatabaseCatalog.getInstance().getTableForAlias(table) != null) {
+			table = DatabaseCatalog.getInstance().getTableForAlias(table);
+		}
+		
+		plan = plan + "Leaf[" + table + "]\n";
+		return plan;
 	}
 }

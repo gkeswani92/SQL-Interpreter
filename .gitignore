@@ -1,3 +1,6 @@
+i
+hello.txt
 /bin/
 /samples/output/
 src/parser/Interpreter.java
+samples/interpreter_config_file.txt

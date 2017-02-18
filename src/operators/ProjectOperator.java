@@ -20,17 +20,6 @@ public class ProjectOperator extends Operator {
 		this.requiredColumns = requiredColumns;
 	}
 	
-//	public ProjectOperator(PlainSelect body, Operator child) {
-//		this.child = child;
-//		this.requiredColumns = new ArrayList<String>();
-//		@SuppressWarnings("unchecked")
-//		List<SelectExpressionItem> selectColumns = body.getSelectItems();
-//		
-//		//Converting each select item to string
-//		for(Object c: selectColumns) 
-//			requiredColumns.add(c.toString());
-//	}
-	
 	/**
 	 * Gets the next tuple using the scan operator and keeps only the columns
 	 * that were present in the query
@@ -65,4 +54,27 @@ public class ProjectOperator extends Operator {
     public void setRequiredColumns(List<String> requiredColumns) {
     	this.requiredColumns = requiredColumns;
     }
+
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		
+		// Level
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		plan = plan + "Project" + "[";
+		for (String col: requiredColumns) {
+			plan = plan + col + ",";
+		}
+		plan = plan.substring(0, plan.length()-1);
+		plan = plan + "]\n";
+		
+		plan = plan + child.getPhysicalPlanToString(level+=1);
+		
+		return plan;
+	}
 }

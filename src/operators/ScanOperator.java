@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 
 import utils.Tuple;
 import utils.BinaryFileReader;
+import utils.DatabaseCatalog;
 
 /**
  * Extends operator to implement the scan
@@ -49,6 +50,7 @@ public class ScanOperator extends Operator{
 		tuple = bfr.getNextTuple();
 		
 		if(tuple == null){
+			bfr.closeStuff();
 			return tuple;
 		}
 		
@@ -71,5 +73,25 @@ public class ScanOperator extends Operator{
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		
+		// Level
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		String table = tableName;
+		if (DatabaseCatalog.getInstance().getTableForAlias(table) != null) {
+			table = DatabaseCatalog.getInstance().getTableForAlias(table);
+		}
+		
+		plan = plan + "TableScan[" + table + "]\n";
+		return plan;
 	}
 }

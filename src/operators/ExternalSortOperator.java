@@ -2,11 +2,13 @@ package operators;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import utils.BinaryFileReader;
 import utils.BinaryFileWriter;
-import utils.ConfigFileReader;
+import utils.PlanBuilderConfigFileReader;
 import utils.Tuple;
 import utils.TupleComparator;
 
@@ -18,18 +20,39 @@ public class ExternalSortOperator extends SortOperator {
 	private List<String> sortConditions, inputFilePaths, outputFilePaths;
 	private List<BinaryFileReader> fanInBuffers;
 
-	private String tempDir = ConfigFileReader.getInstance().getTempDir()+"/";
+	private String tempDir = PlanBuilderConfigFileReader.getInstance().getTempDir()+"/";
 	private boolean pass0Done;
 	private String tableName, sortedFile;
 	private String[] attributes;
 	private BinaryFileReader sortedFileReader;
+	private List<String> projectedColumns;
 
+	public ExternalSortOperator(List<String> sortConditions, Operator child, Integer numBufferPages,
+			List<String> projectedColumns) {
+		super(sortConditions, child);
+		this.numBufferPages = numBufferPages;
+		this.sortConditions = new ArrayList<String>();
+		this.sortConditions.addAll(sortConditions);
+		this.projectedColumns	= new ArrayList<String>();
+		this.projectedColumns.addAll(projectedColumns);
+		
+		buffer 				= new ArrayList<Tuple>();
+		inputFilePaths 		= new ArrayList<String>(); //Keeps track of the files created in pass 0
+		outputFilePaths 	= new ArrayList<String>();
+		fanInBuffers 		= new ArrayList<BinaryFileReader>();
+		pass0RunCount 		= 0;
+		passCount			= 1;
+		pass0Done 			= false;
+		sortedFile 			= null;
+		sortedFileReader    = null;
+	}
+	
 	public ExternalSortOperator(List<String> sortConditions, Operator child, Integer numBufferPages) {
 		super(sortConditions, child);
 		this.numBufferPages = numBufferPages;
-		buffer 				= new ArrayList<Tuple>();
 		this.sortConditions = new ArrayList<String>();
 		this.sortConditions.addAll(sortConditions);
+		buffer 				= new ArrayList<Tuple>();
 		inputFilePaths 		= new ArrayList<String>(); //Keeps track of the files created in pass 0
 		outputFilePaths 	= new ArrayList<String>();
 		fanInBuffers 		= new ArrayList<BinaryFileReader>();
@@ -76,6 +99,8 @@ public class ExternalSortOperator extends SortOperator {
 				buffer.add(t);
 				numTuples--;
 			}
+		} else {
+			return;
 		}
 		
 		//Indicator that there are more tuples that need to be read in
@@ -102,6 +127,11 @@ public class ExternalSortOperator extends SortOperator {
 	public void passZero(){
 		
 		fillBufferForPass0();
+		
+		if (buffer.size() == 0) {
+			return;
+		}
+		
 		sortCondition();
 		childCount++;
 		BinaryFileWriter bfw;
@@ -158,7 +188,8 @@ public class ExternalSortOperator extends SortOperator {
 			//Gets one tuple each from all of the file readers and maintain a list of
 			//indexes to be dropped if file reader hits null (no more tuples)
 			for(int i=0; i<fanInBuffers.size(); i++){
-				Tuple currentTuple = fanInBuffers.get(i).getNextTuple();
+				
+				Tuple currentTuple = getTupleForExternalSort(fanInBuffers.get(i));
 				
 				if(currentTuple == null) {
 					indexToBeDropped.add(i);
@@ -202,7 +233,7 @@ public class ExternalSortOperator extends SortOperator {
 				
 				//Gets the next tuple for the appropriate BFR. If next tuple is null,
 				//removes that entry from BFR and Merge Tuple List
-				Tuple newTuple = fanInBuffers.get(minTupleIndex).getNextTuple();
+				Tuple newTuple = getTupleForExternalSort(fanInBuffers.get(minTupleIndex));
 				
 				if(newTuple == null){
 					fanInBuffers.remove(minTupleIndex.intValue());
@@ -233,6 +264,31 @@ public class ExternalSortOperator extends SortOperator {
 		passCount++;
 		sortAndMerge();
 	}
+
+	/**
+	 * If the child is a projection, we just get the values from the file and create the 
+	 * tuple ourselves because the attribute list in the catalog wont match the current
+	 * attribute values
+	 * @param bfr
+	 * @return
+	 */
+	private Tuple getTupleForExternalSort(BinaryFileReader bfr) {
+		
+		Tuple currentTuple = null;
+		
+		if(projectedColumns == null) {
+			currentTuple = bfr.getNextTuple();
+		} else {
+			int[] tupleValues = bfr.getNextTupleValues();
+			
+			if(tupleValues != null) {
+				String[] columns = projectedColumns.toArray(new String[projectedColumns.size()]);
+				currentTuple = new Tuple(tupleValues, columns, tableName);
+			}
+		}
+		return currentTuple;
+	}
+	
 	
 	public void addToOutputBuffer(List<Tuple> outputBuffer, Tuple t, Integer fanInCount, 
 			BinaryFileWriter bfw){
@@ -290,6 +346,9 @@ public class ExternalSortOperator extends SortOperator {
 		//it was broken down into
 		if (!pass0Done) {
 			passZero();
+			if (buffer.size() == 0) {
+				return;
+			}
 			pass0Done = true;
 		}
 		sortAndMerge();
@@ -301,10 +360,16 @@ public class ExternalSortOperator extends SortOperator {
 		
 		if (sortedFile == null) {
 			doExternalSort();
+			if (buffer.size() == 0) {
+				return null;
+			}
 			sortedFileReader = getSortedFileReader(sortedFile);
 		}
 		
-		Tuple tableLessTuple = sortedFileReader.getNextTuple();
+		//If the child is a projection, we just get the values from the file and create the 
+		//tuple ourselves because the attribute list in the catalog wont match the current
+		//attribute values
+		Tuple tableLessTuple = getTupleForExternalSort(sortedFileReader);
 		
 		if (tableLessTuple != null) {
 			tableLessTuple.setTableName(tableName);
@@ -323,10 +388,49 @@ public class ExternalSortOperator extends SortOperator {
 		}
 		
 		sortedFileReader.closeStuff();
-		sortedFileReader = getSortedFileReader(sortedFile);
+		sortedFileReader = getSortedFileReader(sortedFile);		
 		
-		for (int i = 0; i < index; i++) {
+		Integer sizeOfTuple = attributes.length * 4;
+		Integer availablePageSize = 4096 - 8;
+		Integer tuplesPerPage = Math.floorDiv(availablePageSize, sizeOfTuple);
+		
+		Integer pageIndex = Math.floorDiv(index+1, tuplesPerPage);
+		
+		Integer temp = (index+1) % tuplesPerPage;
+		if (temp == 0) {
+			pageIndex--;
+		}
+		
+		sortedFileReader.setChannelToPage(pageIndex);
+		Integer tuplesBefore = index - (pageIndex * tuplesPerPage);
+
+		for (int i = 0; i < tuplesBefore; i++) {
 			sortedFileReader.getNextTuple();
 		}
+	}
+
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		Set<String> uniqueConditions = new LinkedHashSet<String>();
+		for (String cond: sortConditions) {
+			uniqueConditions.add(cond);
+		}
+		
+		plan = plan + "ExternalSort" + "[";
+		for (String cond: uniqueConditions) {
+			plan = plan + cond + ",";
+		}
+		
+		plan = plan.substring(0, plan.length()-1);
+		plan = plan + "]\n";
+		plan = plan + child.getPhysicalPlanToString(level+=1);
+		return plan;
 	}
 }

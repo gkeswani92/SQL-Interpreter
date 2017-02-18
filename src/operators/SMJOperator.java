@@ -74,12 +74,36 @@ public class SMJOperator extends JoinOperator {
 					currOuterIndex++;
 					currInnerIndex = innerPartitionStartIndex;
 					}
-				
+					
 					return returnTuple;
 				}	
 			}			
 		}
 		
 		return returnTuple;
+	}
+	
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		
+		// Level
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		// Join with join expressions
+		if (joinCondition != null) {
+			plan = plan + "SMJ[" + joinCondition.toString()+ "]\n";
+		} else {
+			plan = plan + "SMJ\n";
+		}
+		
+		level += 1;
+		plan = plan + leftChild.getPhysicalPlanToString(level);
+		plan = plan + rightChild.getPhysicalPlanToString(level);
+		return plan;
 	}
 }

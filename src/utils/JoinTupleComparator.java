@@ -22,21 +22,18 @@ public class JoinTupleComparator {
 	 */
 	public int joinCompare(Tuple o1, Tuple o2) {
 		int n = 10;
+		
+		if (o2 == null || o1 == null) 
+			return -1;
+		
 		for (int i = 0; i < leftColumns.size(); i++) {
-			if (o2 == null) {
-				return -1;
-			} else if (o1 == null) {
-				return -2;
-			}
 			
-			Integer left = o1.getValueForAttr(leftColumns.get(i).toString());
+			Integer left = o1.getValueForAttr(leftColumns.get(i).toString());				
 			Integer right = o2.getValueForAttr(rightColumns.get(i).toString());
-			
 			n = left.compareTo(right);
 
-			if (n != 0) {
+			if (n != 0) 
 				return n;
-			}
 		}
 		return n;
 	}

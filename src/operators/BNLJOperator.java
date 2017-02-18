@@ -1,8 +1,9 @@
 package operators;
 
 import java.util.ArrayList;
+
+import expression_visitors.ExpressionEvaluator;
 import net.sf.jsqlparser.expression.Expression;
-import parser.ExpressionEvaluator;
 import utils.Tuple;
 
 public class BNLJOperator extends JoinOperator {
@@ -35,11 +36,16 @@ public class BNLJOperator extends JoinOperator {
 		//We get the first tuple inside this to check the size of each tuple
 		//This is to decide how many tuples we are going to fill in the outer buffer
 		t = leftChild.getNextTuple(); 
-		outerBufferMaxTupleCount = (this.numBufferPages * 4096) / (4 *  t.getArributeList().size());
-		
-		//Adding the first tuple to the outer buffer and reducing the count of tuples needed
-		outerBuffer.add(t);
-		outerBufferMaxTupleCount--;
+		if (t != null) {
+			outerBufferMaxTupleCount = (this.numBufferPages * 4096) / (4 *  t.getArributeList().size());
+			
+			//Adding the first tuple to the outer buffer and reducing the count of tuples needed
+			outerBuffer.add(t);
+			outerBufferMaxTupleCount--;
+		} else {
+			outerBlockStatus = -1;
+			return;
+		}
 		
 		while(outerBufferMaxTupleCount != 0){
 			t = leftChild.getNextTuple();
@@ -67,10 +73,15 @@ public class BNLJOperator extends JoinOperator {
 		innerIndex = 0;
 		
 		t = rightChild.getNextTuple();
-		innerBufferMaxTupleCount = 4096 / (4 * t.getArributeList().size());
-		
-		innerBuffer.add(t);
-		innerBufferMaxTupleCount--;
+		if (t != null) {
+			innerBufferMaxTupleCount = 4096 / (4 * t.getArributeList().size());
+			
+			innerBuffer.add(t);
+			innerBufferMaxTupleCount--;
+		} else {
+			innerBlockStatus = -1;
+			return;
+		}
 		
 		while(innerBufferMaxTupleCount != 0){
 			t = rightChild.getNextTuple();
@@ -139,8 +150,10 @@ public class BNLJOperator extends JoinOperator {
 				break;
 			
 			//If it is a cartesian product, just return the tuple
-			if(joinCondition == null)
+			if(joinCondition == null){
+				outerIndex++;
 				return joinTuple;
+			}
 			
 			//If the joined tuple, satisfies the join condition, return it
 			ExpressionEvaluator ob = new ExpressionEvaluator(joinTuple);
@@ -152,5 +165,29 @@ public class BNLJOperator extends JoinOperator {
 		    outerIndex++;
 		}	
 		return null;
+	}
+
+	@Override
+	public String getPhysicalPlanToString(Integer level) {
+		String plan = "";
+		
+		// Level
+		if (level > 0) {
+			for (int i = 0; i < level; i++) {
+				plan = plan + "-";
+			}
+		}
+		
+		// Join with join expressions
+		if (joinCondition != null) {
+			plan = plan + "BNLJ[" + joinCondition.toString()+ "]\n";
+		} else {
+			plan = plan + "BNLJ\n";
+		}
+		
+		level += 1;
+		plan = plan + leftChild.getPhysicalPlanToString(level);
+		plan = plan + rightChild.getPhysicalPlanToString(level);
+		return plan;
 	}
 }
